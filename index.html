@@ -1,139 +1,594 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Amaya Bordados</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
       color: #333;
+      background-color: #fafafa;
     }
+
     header {
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo img {
-      height: 50px;
-    }
-    .search input {
-      padding: 8px 12px;
-      width: 300px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    nav {
-      padding: 10px;
-      background: #eee;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    nav button {
-      padding: 8px 14px;
-      border-radius: 20px;
-      border: none;
-      background: #fff;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    main {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    .item {
-      background: #fff;
-      padding: 15px;
-      border-radius: 12px;
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 20px 0 10px;
+      position: relative;
     }
-    .item .photo {
-      background: #ddd;
-      height: 140px;
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    header p {
+      letter-spacing: 2px;
+      font-size: 12px;
+      margin: 4px 0;
+    }
+
+    .cart-icon {
+      position: absolute;
+      right: 20px;
+      top: 25px;
+      cursor: pointer;
+      font-size: 24px;
+    }
+
+    .cart-icon span {
+      background-color: #333;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 50%;
+      font-size: 12px;
+      position: absolute;
+      top: -10px;
+      right: -10px;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    .product {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      background-color: white;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 100px;
+      background-color: #f0f0f0;
       border-radius: 8px;
       margin-bottom: 10px;
     }
-    .item h3 {
-      margin: 10px 0 5px;
+
+    .product h3 {
+      margin: 0 0 5px;
+      font-size: 16px;
     }
-    .rating {
-      color: #10b981;
-      margin-bottom: 5px;
-    }
+
     .price {
       font-weight: bold;
+      font-size: 15px;
+      margin-bottom: 10px;
     }
+
+    .btn {
+      padding: 8px 12px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #555;
+    }
+
+    /* Carrito lateral fijo y encima */
+    #cart-panel {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background: white;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+      padding: 20px;
+      overflow-y: auto;
+      transition: right 0.3s ease-in-out;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #cart-panel.open {
+      right: 0;
+    }
+
+    #close-cart {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #333;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.3s;
+      z-index: 10000;
+    }
+
+    #close-cart:hover {
+      color: #a00;
+    }
+
+    .cart-item {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #a00;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .checkout-btn {
+      margin-top: auto;
+      background-color: #333;
+      color: white;
+      padding: 10px 14px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .checkout-btn:hover {
+      background-color: #555;
+    }
+
+    #checkout, #pedido-pendiente {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    #checkout h2, #pedido-pendiente h2 {
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    form label {
+      display: block;
+      margin: 12px 0 4px;
+    }
+
+    form input, form textarea, form select {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .carrito-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+
+    #copy-msg {
+      margin-top: 10px;
+      color: green;
+      font-weight: bold;
+      display: none;
+      text-align: center;
+    }
+
+    /* Pestañas del carrito */
+    #cart-tabs {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    #cart-tabs button {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #333;
+      background: white;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    #cart-tabs button.active,
+    #cart-tabs button:hover {
+      background-color: #333;
+      color: white;
+    }
+
+    #pedidos-items {
+      max-height: 60vh;
+      overflow-y: auto;
+      display: none;
+    }
+
+    /* Estilo buscador */
+    #buscador {
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      display: block;
+      width: calc(100% - 40px);
+      max-width: 900px;
+    }
+
     footer {
       text-align: center;
-      padding: 30px 0;
-      font-size: 0.9rem;
-      color: #666;
+      font-size: 12px;
+      color: #777;
+      margin: 40px 0 20px;
+    }
+
+    /* ==== MEDIA QUERIES ==== */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 28px;
+      }
+
+      header p {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+      }
+
+      .cart-icon {
+        font-size: 28px;
+        right: 15px;
+        top: 20px;
+      }
+
+      .products {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        margin: 15px 10px;
+        padding: 0 10px;
+      }
+
+      .product {
+        padding: 12px;
+      }
+
+      .image-placeholder {
+        height: 150px;
+      }
+
+      .product h3 {
+        font-size: 18px;
+      }
+
+      .price {
+        font-size: 16px;
+      }
+
+      .btn, .checkout-btn {
+        font-size: 16px;
+        padding: 12px;
+      }
+
+      #cart-panel {
+        width: 80vw !important;
+        height: 100vh;
+      }
+
+      #checkout, #pedido-pendiente {
+        margin: 20px 10px;
+        padding: 20px;
+        max-width: 90vw;
+      }
+
+      #buscador {
+        width: calc(100% - 20px);
+        margin: 15px 10px 0;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="logo-amaya.png" alt="Amaya Bordados">
-    </div>
-    <div class="search">
-      <input type="text" placeholder="Buscar productos...">
-    </div>
-    <div>🔍 🛒</div>
-  </header>
-  <nav>
-    <button>Todos</button>
-    <button>Mujer</button>
-    <button>Hombre</button>
-    <button>Infantil</button>
-    <button>Bordados</button>
-    <button>Accesorios</button>
-  </nav>
-  <main>
-    <div class="grid">
-      <div class="item">
-        <div class="photo"></div>
-        <h3>Bordado Floral</h3>
-        <div class="rating">⭐ 4.8 (12)</div>
-        <div class="price">24,99 €</div>
-      </div>
-      <div class="item">
-        <div class="photo"></div>
-        <h3>Camiseta Clásica</h3>
-        <div class="rating">⭐ 4.5 (8)</div>
-        <div class="price">19,99 €</div>
-      </div>
-      <div class="item">
-        <div class="photo"></div>
-        <h3>Bordado Personalizado</h3>
-        <div class="rating">⭐ 5.0 (21)</div>
-        <div class="price">29,99 €</div>
-      </div>
-      <div class="item">
-        <div class="photo"></div>
-        <h3>Toalla Bordada</h3>
-        <div class="rating">⭐ 4.7 (14)</div>
-        <div class="price">15,99 €</div>
-      </div>
-    </div>
-  </main>
-  <footer>
-    &copy; 2025 Amaya Bordados. Todos los derechos reservados.
-  </footer>
+
+<header>
+  <h1 onclick="volverInicio()">Amaya</h1>
+  <p>BORDADOS</p>
+  <div class="cart-icon" onclick="toggleCart()">🛒 <span id="cart-count">0</span></div>
+</header>
+
+<!-- Buscador de productos -->
+<input
+  type="search"
+  id="buscador"
+  placeholder="Buscar productos..."
+  oninput="filtrarProductos()"
+>
+
+<div class="products" id="tienda">
+  <div class="product">
+    <div class="image-placeholder"></div>
+    <h3>Bordado Floral</h3>
+    <div class="price">24.99 €</div>
+    <button class="btn" onclick="addToCart('Bordado Floral', 24.99)">Añadir al carrito</button>
+  </div>
+  <div class="product">
+    <div class="image-placeholder"></div>
+    <h3>Camiseta Clásica</h3>
+    <div class="price">19.99 €</div>
+    <button class="btn" onclick="addToCart('Camiseta Clásica', 19.99)">Añadir al carrito</button>
+  </div>
+</div>
+
+<div id="cart-panel">
+  <h3>Carrito</h3>
+  <button id="close-cart" aria-label="Cerrar carrito">✕</button>
+
+  <div id="cart-tabs">
+    <button id="btn-tab-carrito" class="active" onclick="switchTab('carrito')">Carrito</button>
+    <button id="btn-tab-pedidos" onclick="switchTab('pedidos')">Pedidos</button>
+  </div>
+
+  <div id="cart-items"></div>
+  <div id="pedidos-items"></div>
+
+  <button class="checkout-btn" onclick="mostrarCheckout()">Finalizar pedido</button>
+</div>
+
+<div id="checkout">
+  <h2>Finalizar pedido</h2>
+  <form onsubmit="confirmarPedido(event)">
+    <label for="nombre">Nombre completo</label>
+    <input type="text" id="nombre" required>
+    <label for="direccion">Dirección</label>
+    <textarea id="direccion" required></textarea>
+    <label for="correo">Correo electrónico</label>
+    <input type="email" id="correo" required>
+    <label for="metodo">Método de pago</label>
+    <select id="metodo" required>
+      <option value="">Selecciona</option>
+      <option value="bizum">Bizum</option>
+    </select>
+    <button class="btn" type="submit">Confirmar pedido</button>
+  </form>
+</div>
+
+<div id="pedido-pendiente">
+  <h2>Pedido pendiente de pago</h2>
+  <p>Gracias por tu pedido. Aquí tienes el resumen:</p>
+  <div id="resumen-pendiente"></div>
+  <button class="btn" onclick="copiarNumeroBizum()">Copiar número de Bizum 📱</button>
+  <div id="copy-msg">Número copiado al portapapeles ✅</div>
+</div>
+
+<footer>
+  © 2025 Amaya Bordados. Todos los derechos reservados.
+</footer>
+
+<script>
+  let cart = [];
+  let pedidos = [];
+
+  function addToCart(nombre, precio) {
+    cart.push({ nombre, precio });
+    updateCart();
+  }
+
+  function updateCart() {
+    document.getElementById("cart-count").innerText = cart.length;
+    const container = document.getElementById("cart-items");
+    container.innerHTML = "";
+    cart.forEach((item, i) => {
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <span>${item.nombre} - ${item.precio.toFixed(2)} €</span>
+        <button class="remove-btn" onclick="removeFromCart(${i})">✕</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCart();
+  }
+
+  function toggleCart() {
+    document.getElementById("cart-panel").classList.toggle("open");
+  }
+
+  document.getElementById("close-cart").addEventListener("click", () => {
+    document.getElementById("cart-panel").classList.remove("open");
+  });
+
+  function mostrarCheckout() {
+    if (cart.length === 0) {
+      alert("El carrito está vacío.");
+      return;
+    }
+    document.getElementById("cart-panel").classList.remove("open");
+    document.getElementById("tienda").style.display = "none";
+    document.getElementById("checkout").style.display = "block";
+  }
+
+  function confirmarPedido(e) {
+    e.preventDefault();
+    const metodo = document.getElementById("metodo").value;
+    if (metodo !== "bizum") {
+      alert("Selecciona Bizum para continuar.");
+      return;
+    }
+
+    let total = 0;
+    cart.forEach(item => total += item.precio);
+
+    pedidos.push({
+      items: [...cart],
+      total: total,
+      fecha: new Date()
+    });
+
+    cart = [];
+    updateCart();
+
+    document.getElementById("checkout").style.display = "none";
+    const resumen = document.getElementById("resumen-pendiente");
+    resumen.innerHTML = "";
+    pedidos[pedidos.length-1].items.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "carrito-item";
+      div.innerHTML = `<span>${item.nombre}</span><span>${item.precio.toFixed(2)} €</span>`;
+      resumen.appendChild(div);
+    });
+    const totalDiv = document.createElement("div");
+    totalDiv.className = "carrito-item";
+    totalDiv.innerHTML = `<strong>Total</strong><strong>${total.toFixed(2)} €</strong>`;
+    resumen.appendChild(totalDiv);
+
+    document.getElementById("pedido-pendiente").style.display = "block";
+
+    switchTab("pedidos");
+  }
+
+  function mostrarPedidos() {
+    const pedidosContainer = document.getElementById("pedidos-items");
+    pedidosContainer.innerHTML = "";
+
+    if (pedidos.length === 0) {
+      pedidosContainer.innerHTML = "<p>No tienes pedidos pendientes.</p>";
+      return;
+    }
+
+    pedidos.forEach((pedido, idx) => {
+      const pedidoDiv = document.createElement("div");
+      pedidoDiv.style.borderBottom = "1px solid #ccc";
+      pedidoDiv.style.marginBottom = "15px";
+      pedidoDiv.style.paddingBottom = "10px";
+
+      const titulo = document.createElement("h4");
+      titulo.textContent = `Pedido ${idx + 1} (En revisión de pago)`;
+      pedidoDiv.appendChild(titulo);
+
+      pedido.items.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.style.display = "flex";
+        itemDiv.style.justifyContent = "space-between";
+        itemDiv.innerHTML = `<span>${item.nombre}</span><span>${item.precio.toFixed(2)} €</span>`;
+        pedidoDiv.appendChild(itemDiv);
+      });
+
+      const totalDiv = document.createElement("div");
+      totalDiv.style.display = "flex";
+      totalDiv.style.justifyContent = "space-between";
+      totalDiv.style.fontWeight = "bold";
+      totalDiv.style.marginTop = "10px";
+      totalDiv.innerHTML = `<span>Total</span><span>${pedido.total.toFixed(2)} €</span>`;
+      pedidoDiv.appendChild(totalDiv);
+
+      pedidosContainer.appendChild(pedidoDiv);
+    });
+  }
+
+  function switchTab(tab) {
+    const checkoutBtn = document.querySelector(".checkout-btn");
+
+    if (tab === "carrito") {
+      document.getElementById("cart-items").style.display = "block";
+      document.getElementById("pedidos-items").style.display = "none";
+      document.getElementById("btn-tab-carrito").classList.add("active");
+      document.getElementById("btn-tab-pedidos").classList.remove("active");
+      checkoutBtn.style.display = "block"; // Mostrar botón en pestaña carrito
+    } else {
+      document.getElementById("cart-items").style.display = "none";
+      document.getElementById("pedidos-items").style.display = "block";
+      mostrarPedidos();
+      document.getElementById("btn-tab-carrito").classList.remove("active");
+      document.getElementById("btn-tab-pedidos").classList.add("active");
+      checkoutBtn.style.display = "none"; // Ocultar botón en pestaña pedidos
+    }
+  }
+
+  function filtrarProductos() {
+    const texto = document.getElementById("buscador").value.toLowerCase();
+    const productos = document.querySelectorAll(".product");
+
+    productos.forEach(prod => {
+      const nombre = prod.querySelector("h3").textContent.toLowerCase();
+      if (nombre.includes(texto)) {
+        prod.style.display = "";
+      } else {
+        prod.style.display = "none";
+      }
+    });
+  }
+
+  function copiarNumeroBizum() {
+    navigator.clipboard.writeText("603603321").then(() => {
+      const msg = document.getElementById("copy-msg");
+      msg.style.display = "block";
+
+      // Mostrar la sección de pedido pendiente
+      document.getElementById("pedido-pendiente").style.display = "block";
+
+      // Abrir el carrito y mostrar pestaña pedidos
+      document.getElementById("cart-panel").classList.add("open");
+      switchTab("pedidos");
+
+      setTimeout(() => { msg.style.display = "none"; }, 3000);
+    });
+  }
+
+  function volverInicio() {
+    window.location.reload();
+  }
+</script>
+
 </body>
 </html>
