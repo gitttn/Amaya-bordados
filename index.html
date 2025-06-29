@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amaya Bordados</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f7f7f7;
+      color: #333;
+    }
+    header {
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo img {
+      height: 50px;
+    }
+    .search input {
+      padding: 8px 12px;
+      width: 300px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    nav {
+      padding: 10px;
+      background: #eee;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    nav button {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: none;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    main {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .item {
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .item .photo {
+      background: #ddd;
+      height: 140px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .item h3 {
+      margin: 10px 0 5px;
+    }
+    .rating {
+      color: #10b981;
+      margin-bottom: 5px;
+    }
+    .price {
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo-amaya.png" alt="Amaya Bordados">
+    </div>
+    <div class="search">
+      <input type="text" placeholder="Buscar productos...">
+    </div>
+    <div>🔍 🛒</div>
+  </header>
+  <nav>
+    <button>Todos</button>
+    <button>Mujer</button>
+    <button>Hombre</button>
+    <button>Infantil</button>
+    <button>Bordados</button>
+    <button>Accesorios</button>
+  </nav>
+  <main>
+    <div class="grid">
+      <div class="item">
+        <div class="photo"></div>
+        <h3>Bordado Floral</h3>
+        <div class="rating">⭐ 4.8 (12)</div>
+        <div class="price">24,99 €</div>
+      </div>
+      <div class="item">
+        <div class="photo"></div>
+        <h3>Camiseta Clásica</h3>
+        <div class="rating">⭐ 4.5 (8)</div>
+        <div class="price">19,99 €</div>
+      </div>
+      <div class="item">
+        <div class="photo"></div>
+        <h3>Bordado Personalizado</h3>
+        <div class="rating">⭐ 5.0 (21)</div>
+        <div class="price">29,99 €</div>
+      </div>
+      <div class="item">
+        <div class="photo"></div>
+        <h3>Toalla Bordada</h3>
+        <div class="rating">⭐ 4.7 (14)</div>
+        <div class="price">15,99 €</div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    &copy; 2025 Amaya Bordados. Todos los derechos reservados.
+  </footer>
+</body>
+</html>
