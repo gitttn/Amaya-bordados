@@ -206,7 +206,78 @@
       cursor: pointer;
       margin-top: auto;
     }
-  </style>
+  
+/* Modal de imagen */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+.modal-overlay {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+}
+
+}
+
+.modal-content {
+  background: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  max-width: 90%;
+  max-height: 90%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-image {
+  width: 100%;
+  height: 400px;
+  max-width: 100%;
+  background: linear-gradient(135deg, #ddd, #ccc);
+  border-radius: 10px;
+}
+
+.modal-close, .modal-prev, .modal-next {
+  position: absolute;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.modal-close {
+  top: 10px;
+  right: 15px;
+}
+
+.modal-prev {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.modal-next {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+</style>
 </head>
 <body>
 
@@ -279,10 +350,10 @@
     function renderizarProductos(lista) {
       const contenedor = document.getElementById("lista-productos");
       contenedor.innerHTML = "";
-      lista.forEach(p => {
+      lista.forEach((p, index) => {
         contenedor.innerHTML += `
         <div class="product-card">
-          <div class="product-image"></div>
+          <div class="product-image" onclick="openModal({index})"></div>
           <div class="product-title">${p.nombre}</div>
           <div class="product-price">${p.precio.toFixed(2)} €</div>
           <button onclick="addToCart('${p.nombre}', ${p.precio})">Añadir al carrito</button>
@@ -402,6 +473,65 @@
       actualizarContadorCarrito();
       window.open(`https://wa.me/34603603321?text=${mensaje}`, "_blank");
     }
-  </script>
+  
+// Galería simulada por producto
+const fakeImages = [
+  ['linear-gradient(135deg, #ddd, #ccc)', 'linear-gradient(135deg, #ccc, #bbb)', 'linear-gradient(135deg, #eee, #ddd)'],
+  ['linear-gradient(135deg, #bbb, #aaa)', 'linear-gradient(135deg, #aaa, #999)', 'linear-gradient(135deg, #ccc, #aaa)'],
+  ['linear-gradient(135deg, #f0f0f0, #ddd)', 'linear-gradient(135deg, #ddd, #bbb)', 'linear-gradient(135deg, #bbb, #999)'],
+  ['linear-gradient(135deg, #eee, #ccc)', 'linear-gradient(135deg, #ccc, #aaa)', 'linear-gradient(135deg, #aaa, #888)'],
+  ['linear-gradient(135deg, #ddd, #bbb)', 'linear-gradient(135deg, #bbb, #999)', 'linear-gradient(135deg, #999, #777)']
+];
+
+let currentImageIndex = 0;
+let currentProductIndex = 0;
+
+function openModal(productIndex) {
+  currentProductIndex = productIndex;
+  currentImageIndex = 0;
+  updateModalImage();
+  const modal = document.getElementById('imageModal');
+  modal.style.display = 'flex';
+  setTimeout(() => modal.classList.add('show'), 10);
+  modal.onclick = function(e) {
+    if (e.target === modal) closeModal();
+  };
+}
+
+function closeModal() {
+  const modal = document.getElementById('imageModal');
+  modal.classList.remove('show');
+  setTimeout(() => modal.style.display = 'none', 300);
+}
+
+function updateModalImage() {
+  const imageDiv = document.getElementById('modalImage');
+  imageDiv.style.background = fakeImages[currentProductIndex][currentImageIndex];
+}
+
+function nextImage() {
+  const images = fakeImages[currentProductIndex];
+  currentImageIndex = (currentImageIndex + 1) % images.length;
+  updateModalImage();
+}
+
+function prevImage() {
+  const images = fakeImages[currentProductIndex];
+  currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+  updateModalImage();
+}
+
+</script>
+
+<!-- Modal -->
+<div class="modal-overlay" id="imageModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">✖</button>
+    <button class="modal-prev" onclick="prevImage()">‹</button>
+    <div class="modal-image" id="modalImage"></div>
+    <button class="modal-next" onclick="nextImage()">›</button>
+  </div>
+</div>
+
 </body>
 </html>
