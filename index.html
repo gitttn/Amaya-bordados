@@ -3,592 +3,356 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Amaya Bordados</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+  <title>Amaya Design</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background-color: #fff;
       margin: 0;
       padding: 0;
-      color: #333;
-      background-color: #fafafa;
+      color: #222;
     }
 
     header {
       text-align: center;
-      padding: 20px 0 10px;
+      padding: 30px 20px 10px;
       position: relative;
     }
 
-    header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      margin: 0;
+    header img {
+      height: 70px;
       cursor: pointer;
-    }
-
-    header p {
-      letter-spacing: 2px;
-      font-size: 12px;
-      margin: 4px 0;
+      display: block;
+      margin: 0 auto;
     }
 
     .cart-icon {
       position: absolute;
+      top: 20px;
       right: 20px;
-      top: 25px;
-      cursor: pointer;
       font-size: 24px;
-    }
-
-    .cart-icon span {
-      background-color: #333;
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 50%;
-      font-size: 12px;
-      position: absolute;
-      top: -10px;
-      right: -10px;
-    }
-
-    .products {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 0 20px;
-    }
-
-    .product {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 15px;
-      background-color: white;
-    }
-
-    .image-placeholder {
-      width: 100%;
-      height: 100px;
-      background-color: #f0f0f0;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-
-    .product h3 {
-      margin: 0 0 5px;
-      font-size: 16px;
-    }
-
-    .price {
-      font-weight: bold;
-      font-size: 15px;
-      margin-bottom: 10px;
-    }
-
-    .btn {
-      padding: 8px 12px;
-      background-color: #333;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
       cursor: pointer;
-      transition: background-color 0.3s;
     }
 
-    .btn:hover {
-      background-color: #555;
-    }
-
-    /* Carrito lateral fijo y encima */
-    #cart-panel {
+    .overlay, .checkout-overlay {
       position: fixed;
       top: 0;
-      right: -100%;
-      width: 300px;
+      left: 0;
       height: 100vh;
-      background: white;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+      width: 100vw;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      display: none;
+    }
+
+    .cart-window, .checkout-window {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 360px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
       padding: 20px;
-      overflow-y: auto;
-      transition: right 0.3s ease-in-out;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
+      z-index: 999;
+      display: none;
     }
 
-    #cart-panel.open {
-      right: 0;
-    }
-
-    #close-cart {
+    .close-cart, .close-checkout {
       position: absolute;
       top: 10px;
-      right: 10px;
+      right: 15px;
+      font-size: 20px;
       background: none;
       border: none;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
       color: #333;
-      padding: 0;
-      line-height: 1;
-      transition: color 0.3s;
-      z-index: 10000;
+      cursor: pointer;
     }
 
-    #close-cart:hover {
-      color: #a00;
+    .cart-window h3,
+    .checkout-window h3 {
+      margin: 0 0 10px 0;
     }
 
-    .cart-item {
-      border-bottom: 1px solid #ccc;
-      padding: 10px 0;
+    .cart-item,
+    .checkout-item {
       display: flex;
       justify-content: space-between;
-      flex-shrink: 0;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
-    .remove-btn {
+    .cart-item button {
       background: none;
       border: none;
       color: #a00;
+      font-size: 18px;
       cursor: pointer;
-      font-size: 14px;
+      padding: 0 5px;
     }
 
-    .checkout-btn {
-      margin-top: auto;
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button.finalizar, button.enviar {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .search-container input {
+      width: 90%;
+      max-width: 500px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      font-size: 16px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px 10px;
+    }
+
+    .filters button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 20px;
+      background-color: #eee;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .filters button.active {
       background-color: #333;
-      color: white;
-      padding: 10px 14px;
+      color: #fff;
+    }
+
+    .product-list {
+      padding: 0 10px 50px;
+    }
+
+    .product-card {
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 180px;
+      background: #ddd;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .product-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .product-price {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .product-card button {
+      background-color: #222;
+      color: #fff;
+      padding: 10px;
       width: 100%;
       border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .checkout-btn:hover {
-      background-color: #555;
-    }
-
-    #checkout, #pedido-pendiente {
-      max-width: 500px;
-      margin: 40px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      display: none;
-    }
-
-    #checkout h2, #pedido-pendiente h2 {
-      font-family: 'Playfair Display', serif;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    form label {
-      display: block;
-      margin: 12px 0 4px;
-    }
-
-    form input, form textarea, form select {
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
-    }
-
-    .carrito-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 5px;
-    }
-
-    #copy-msg {
-      margin-top: 10px;
-      color: green;
-      font-weight: bold;
-      display: none;
-      text-align: center;
-    }
-
-    /* Pestañas del carrito */
-    #cart-tabs {
-      margin-bottom: 10px;
-      display: flex;
-      gap: 10px;
-    }
-
-    #cart-tabs button {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #333;
-      background: white;
-      cursor: pointer;
-      border-radius: 6px;
-      font-weight: bold;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    #cart-tabs button.active,
-    #cart-tabs button:hover {
-      background-color: #333;
-      color: white;
-    }
-
-    #pedidos-items {
-      max-height: 60vh;
-      overflow-y: auto;
-      display: none;
-    }
-
-    /* Estilo buscador */
-    #buscador {
-      max-width: 900px;
-      margin: 20px auto 0;
-      padding: 10px;
+      border-radius: 8px;
       font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      display: block;
-      width: calc(100% - 40px);
-      max-width: 900px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: #777;
-      margin: 40px 0 20px;
-    }
-
-    /* ==== MEDIA QUERIES ==== */
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 28px;
-      }
-
-      header p {
-        font-size: 10px;
-        letter-spacing: 1.5px;
-      }
-
-      .cart-icon {
-        font-size: 28px;
-        right: 15px;
-        top: 20px;
-      }
-
-      .products {
-        grid-template-columns: 1fr;
-        max-width: 100%;
-        margin: 15px 10px;
-        padding: 0 10px;
-      }
-
-      .product {
-        padding: 12px;
-      }
-
-      .image-placeholder {
-        height: 150px;
-      }
-
-      .product h3 {
-        font-size: 18px;
-      }
-
-      .price {
-        font-size: 16px;
-      }
-
-      .btn, .checkout-btn {
-        font-size: 16px;
-        padding: 12px;
-      }
-
-      #cart-panel {
-        width: 80vw !important;
-        height: 100vh;
-      }
-
-      #checkout, #pedido-pendiente {
-        margin: 20px 10px;
-        padding: 20px;
-        max-width: 90vw;
-      }
-
-      #buscador {
-        width: calc(100% - 20px);
-        margin: 15px 10px 0;
-      }
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1 onclick="volverInicio()">Amaya</h1>
-  <p>BORDADOS</p>
-  <div class="cart-icon" onclick="toggleCart()">🛒 <span id="cart-count">0</span></div>
-</header>
+  <!-- Header -->
+  <header>
+    <img src="logo-amaya.png" alt="Amaya Design" onclick="location.reload()" />
+    <div class="cart-icon" onclick="toggleCart()" title="Ver carrito">🛒</div>
+  </header>
 
-<!-- Buscador de productos -->
-<input
-  type="search"
-  id="buscador"
-  placeholder="Buscar productos..."
-  oninput="filtrarProductos()"
->
+  <!-- Overlays -->
+  <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+  <div class="checkout-overlay" id="checkoutOverlay" onclick="cerrarCheckout()"></div>
 
-<div class="products" id="tienda">
-  <div class="product">
-    <div class="image-placeholder"></div>
-    <h3>Bordado Floral</h3>
-    <div class="price">24.99 €</div>
-    <button class="btn" onclick="addToCart('Bordado Floral', 24.99)">Añadir al carrito</button>
-  </div>
-  <div class="product">
-    <div class="image-placeholder"></div>
-    <h3>Camiseta Clásica</h3>
-    <div class="price">19.99 €</div>
-    <button class="btn" onclick="addToCart('Camiseta Clásica', 19.99)">Añadir al carrito</button>
-  </div>
-</div>
-
-<div id="cart-panel">
-  <h3>Carrito</h3>
-  <button id="close-cart" aria-label="Cerrar carrito">✕</button>
-
-  <div id="cart-tabs">
-    <button id="btn-tab-carrito" class="active" onclick="switchTab('carrito')">Carrito</button>
-    <button id="btn-tab-pedidos" onclick="switchTab('pedidos')">Pedidos</button>
+  <!-- Carrito -->
+  <div class="cart-window" id="cartWindow">
+    <button class="close-cart" onclick="toggleCart()">✖</button>
+    <h3>Carrito</h3>
+    <div id="cart"></div>
+    <button class="finalizar" onclick="abrirCheckout()">Finalizar pedido</button>
   </div>
 
-  <div id="cart-items"></div>
-  <div id="pedidos-items"></div>
+  <!-- Checkout -->
+  <div class="checkout-window" id="checkoutWindow">
+    <button class="close-checkout" onclick="cerrarCheckout()">✖</button>
+    <h3>Revisar y Enviar Pedido</h3>
+    <div id="checkoutResumen"></div>
+    <input type="text" id="nombre" placeholder="Tu nombre completo">
+    <input type="text" id="telefono" placeholder="Tu número de teléfono">
+    <textarea id="direccion" placeholder="Dirección de entrega"></textarea>
+    <button class="enviar" onclick="enviarPedido()">Enviar por WhatsApp</button>
+  </div>
 
-  <button class="checkout-btn" onclick="mostrarCheckout()">Finalizar pedido</button>
-</div>
+  <!-- Buscador -->
+  <div class="search-container">
+    <input type="text" placeholder="Buscar productos...">
+  </div>
 
-<div id="checkout">
-  <h2>Finalizar pedido</h2>
-  <form onsubmit="confirmarPedido(event)">
-    <label for="nombre">Nombre completo</label>
-    <input type="text" id="nombre" required>
-    <label for="direccion">Dirección</label>
-    <textarea id="direccion" required></textarea>
-    <label for="correo">Correo electrónico</label>
-    <input type="email" id="correo" required>
-    <label for="metodo">Método de pago</label>
-    <select id="metodo" required>
-      <option value="">Selecciona</option>
-      <option value="bizum">Bizum</option>
-    </select>
-    <button class="btn" type="submit">Confirmar pedido</button>
-  </form>
-</div>
+  <!-- Filtros -->
+  <div class="filters">
+    <button class="active">Todos</button>
+    <button>Mujer</button>
+    <button>Hombre</button>
+    <button>Infantil</button>
+    <button>Hogar</button>
+  </div>
 
-<div id="pedido-pendiente">
-  <h2>Pedido pendiente de pago</h2>
-  <p>Gracias por tu pedido. Aquí tienes el resumen:</p>
-  <div id="resumen-pendiente"></div>
-  <button class="btn" onclick="copiarNumeroBizum()">Copiar número de Bizum 📱</button>
-  <div id="copy-msg">Número copiado al portapapeles ✅</div>
-</div>
+  <!-- Productos -->
+  <div class="product-list">
+    <div class="product-card">
+      <div class="product-image"></div>
+      <div class="product-title">Bordado Floral</div>
+      <div class="product-price">24,99 €</div>
+      <button onclick="addToCart('Bordado Floral', 24.99)">Añadir al carrito</button>
+    </div>
+  </div>
 
-<footer>
-  © 2025 Amaya Bordados. Todos los derechos reservados.
-</footer>
+  <!-- Scripts -->
+  <script>
+    let carrito = [];
 
-<script>
-  let cart = [];
-  let pedidos = [];
+    const cartWindow = document.getElementById("cartWindow");
+    const overlay = document.getElementById("overlay");
+    const checkoutWindow = document.getElementById("checkoutWindow");
+    const checkoutOverlay = document.getElementById("checkoutOverlay");
+    const cartContainer = document.getElementById("cart");
+    const checkoutResumen = document.getElementById("checkoutResumen");
 
-  function addToCart(nombre, precio) {
-    cart.push({ nombre, precio });
-    updateCart();
-  }
-
-  function updateCart() {
-    document.getElementById("cart-count").innerText = cart.length;
-    const container = document.getElementById("cart-items");
-    container.innerHTML = "";
-    cart.forEach((item, i) => {
-      const div = document.createElement("div");
-      div.className = "cart-item";
-      div.innerHTML = `
-        <span>${item.nombre} - ${item.precio.toFixed(2)} €</span>
-        <button class="remove-btn" onclick="removeFromCart(${i})">✕</button>
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCart();
-  }
-
-  function toggleCart() {
-    document.getElementById("cart-panel").classList.toggle("open");
-  }
-
-  document.getElementById("close-cart").addEventListener("click", () => {
-    document.getElementById("cart-panel").classList.remove("open");
-  });
-
-  function mostrarCheckout() {
-    if (cart.length === 0) {
-      alert("El carrito está vacío.");
-      return;
-    }
-    document.getElementById("cart-panel").classList.remove("open");
-    document.getElementById("tienda").style.display = "none";
-    document.getElementById("checkout").style.display = "block";
-  }
-
-  function confirmarPedido(e) {
-    e.preventDefault();
-    const metodo = document.getElementById("metodo").value;
-    if (metodo !== "bizum") {
-      alert("Selecciona Bizum para continuar.");
-      return;
+    function toggleCart() {
+      const visible = cartWindow.style.display === "block";
+      cartWindow.style.display = visible ? "none" : "block";
+      overlay.style.display = visible ? "none" : "block";
     }
 
-    let total = 0;
-    cart.forEach(item => total += item.precio);
+    function abrirCheckout() {
+      if (carrito.length === 0) {
+        alert("El carrito está vacío.");
+        return;
+      }
 
-    pedidos.push({
-      items: [...cart],
-      total: total,
-      fecha: new Date()
-    });
+      checkoutResumen.innerHTML = "";
+      let total = 0;
 
-    cart = [];
-    updateCart();
-
-    document.getElementById("checkout").style.display = "none";
-    const resumen = document.getElementById("resumen-pendiente");
-    resumen.innerHTML = "";
-    pedidos[pedidos.length-1].items.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "carrito-item";
-      div.innerHTML = `<span>${item.nombre}</span><span>${item.precio.toFixed(2)} €</span>`;
-      resumen.appendChild(div);
-    });
-    const totalDiv = document.createElement("div");
-    totalDiv.className = "carrito-item";
-    totalDiv.innerHTML = `<strong>Total</strong><strong>${total.toFixed(2)} €</strong>`;
-    resumen.appendChild(totalDiv);
-
-    document.getElementById("pedido-pendiente").style.display = "block";
-
-    switchTab("pedidos");
-  }
-
-  function mostrarPedidos() {
-    const pedidosContainer = document.getElementById("pedidos-items");
-    pedidosContainer.innerHTML = "";
-
-    if (pedidos.length === 0) {
-      pedidosContainer.innerHTML = "<p>No tienes pedidos pendientes.</p>";
-      return;
-    }
-
-    pedidos.forEach((pedido, idx) => {
-      const pedidoDiv = document.createElement("div");
-      pedidoDiv.style.borderBottom = "1px solid #ccc";
-      pedidoDiv.style.marginBottom = "15px";
-      pedidoDiv.style.paddingBottom = "10px";
-
-      const titulo = document.createElement("h4");
-      titulo.textContent = `Pedido ${idx + 1} (En revisión de pago)`;
-      pedidoDiv.appendChild(titulo);
-
-      pedido.items.forEach(item => {
-        const itemDiv = document.createElement("div");
-        itemDiv.style.display = "flex";
-        itemDiv.style.justifyContent = "space-between";
-        itemDiv.innerHTML = `<span>${item.nombre}</span><span>${item.precio.toFixed(2)} €</span>`;
-        pedidoDiv.appendChild(itemDiv);
+      carrito.forEach(({ nombre, precio, cantidad }) => {
+        checkoutResumen.innerHTML += `<div class="checkout-item">${nombre} x${cantidad} - ${(precio * cantidad).toFixed(2)} €</div>`;
+        total += precio * cantidad;
       });
 
-      const totalDiv = document.createElement("div");
-      totalDiv.style.display = "flex";
-      totalDiv.style.justifyContent = "space-between";
-      totalDiv.style.fontWeight = "bold";
-      totalDiv.style.marginTop = "10px";
-      totalDiv.innerHTML = `<span>Total</span><span>${pedido.total.toFixed(2)} €</span>`;
-      pedidoDiv.appendChild(totalDiv);
+      checkoutResumen.innerHTML += `<strong>Total: ${total.toFixed(2)} €</strong>`;
 
-      pedidosContainer.appendChild(pedidoDiv);
-    });
-  }
-
-  function switchTab(tab) {
-    const checkoutBtn = document.querySelector(".checkout-btn");
-
-    if (tab === "carrito") {
-      document.getElementById("cart-items").style.display = "block";
-      document.getElementById("pedidos-items").style.display = "none";
-      document.getElementById("btn-tab-carrito").classList.add("active");
-      document.getElementById("btn-tab-pedidos").classList.remove("active");
-      checkoutBtn.style.display = "block"; // Mostrar botón en pestaña carrito
-    } else {
-      document.getElementById("cart-items").style.display = "none";
-      document.getElementById("pedidos-items").style.display = "block";
-      mostrarPedidos();
-      document.getElementById("btn-tab-carrito").classList.remove("active");
-      document.getElementById("btn-tab-pedidos").classList.add("active");
-      checkoutBtn.style.display = "none"; // Ocultar botón en pestaña pedidos
+      cartWindow.style.display = "none";
+      overlay.style.display = "none";
+      checkoutWindow.style.display = "block";
+      checkoutOverlay.style.display = "block";
     }
-  }
 
-  function filtrarProductos() {
-    const texto = document.getElementById("buscador").value.toLowerCase();
-    const productos = document.querySelectorAll(".product");
+    function cerrarCheckout() {
+      checkoutWindow.style.display = "none";
+      checkoutOverlay.style.display = "none";
+    }
 
-    productos.forEach(prod => {
-      const nombre = prod.querySelector("h3").textContent.toLowerCase();
-      if (nombre.includes(texto)) {
-        prod.style.display = "";
+    function addToCart(nombre, precio) {
+      const index = carrito.findIndex(item => item.nombre === nombre);
+      if (index !== -1) {
+        carrito[index].cantidad++;
       } else {
-        prod.style.display = "none";
+        carrito.push({ nombre, precio, cantidad: 1 });
       }
-    });
-  }
+      mostrarCarrito();
+    }
 
-  function copiarNumeroBizum() {
-    navigator.clipboard.writeText("603603321").then(() => {
-      const msg = document.getElementById("copy-msg");
-      msg.style.display = "block";
+    function eliminarDelCarrito(index) {
+      if (carrito[index].cantidad > 1) {
+        carrito[index].cantidad--;
+      } else {
+        carrito.splice(index, 1);
+      }
+      mostrarCarrito();
+    }
 
-      // Mostrar la sección de pedido pendiente
-      document.getElementById("pedido-pendiente").style.display = "block";
+    function mostrarCarrito() {
+      cartContainer.innerHTML = "";
+      carrito.forEach(({ nombre, precio, cantidad }, index) => {
+        cartContainer.innerHTML += `
+          <div class="cart-item">
+            <span>${nombre} (${cantidad}) - ${(precio * cantidad).toFixed(2)} €</span>
+            <button onclick="eliminarDelCarrito(${index})">🗑️</button>
+          </div>`;
+      });
+    }
 
-      // Abrir el carrito y mostrar pestaña pedidos
-      document.getElementById("cart-panel").classList.add("open");
-      switchTab("pedidos");
+    function enviarPedido() {
+      const nombre = document.getElementById("nombre").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const direccion = document.getElementById("direccion").value.trim();
 
-      setTimeout(() => { msg.style.display = "none"; }, 3000);
-    });
-  }
+      if (!nombre || !telefono || !direccion) {
+        alert("Por favor, completa todos los datos.");
+        return;
+      }
 
-  function volverInicio() {
-    window.location.reload();
-  }
-</script>
+      let mensaje = `*Nuevo pedido desde Amaya Design*%0A`;
+      mensaje += `*Nombre:* ${encodeURIComponent(nombre)}%0A`;
+      mensaje += `*Teléfono:* ${encodeURIComponent(telefono)}%0A`;
+      mensaje += `*Dirección:* ${encodeURIComponent(direccion)}%0A%0A*Productos:*%0A`;
 
+      let total = 0;
+      carrito.forEach(({ nombre, precio, cantidad }) => {
+        mensaje += `- ${nombre} x${cantidad}: ${(precio * cantidad).toFixed(2)} €%0A`;
+        total += precio * cantidad;
+      });
+
+      mensaje += `%0A*Total:* ${total.toFixed(2)} €`;
+
+      carrito = [];
+      mostrarCarrito();
+
+      const telefonoDestino = "34603603321";
+      const url = `https://wa.me/${telefonoDestino}?text=${mensaje}`;
+      window.open(url, "_blank");
+    }
+  </script>
 </body>
 </html>
