@@ -13,20 +13,17 @@
       padding: 0;
       color: #222;
     }
-
     header {
       text-align: center;
       padding: 30px 20px 10px;
       position: relative;
     }
-
     header img {
       height: 70px;
       cursor: pointer;
       display: block;
       margin: 0 auto;
     }
-
     .cart-icon {
       position: absolute;
       top: 20px;
@@ -34,7 +31,17 @@
       font-size: 24px;
       cursor: pointer;
     }
-
+    #cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #e00;
+      color: #fff;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+      display: none;
+    }
     .overlay, .checkout-overlay {
       position: fixed;
       top: 0;
@@ -45,7 +52,6 @@
       z-index: 998;
       display: none;
     }
-
     .cart-window, .checkout-window {
       position: fixed;
       top: 50%;
@@ -60,8 +66,8 @@
       padding: 20px;
       z-index: 999;
       display: none;
+      box-sizing: border-box;
     }
-
     .close-cart, .close-checkout {
       position: absolute;
       top: 10px;
@@ -72,20 +78,11 @@
       color: #333;
       cursor: pointer;
     }
-
-    .cart-window h3,
-    .checkout-window h3 {
-      margin: 0 0 10px 0;
-    }
-
-    .cart-item,
-    .checkout-item {
+    .cart-item, .checkout-item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       margin-bottom: 10px;
     }
-
     .cart-item button {
       background: none;
       border: none;
@@ -94,15 +91,14 @@
       cursor: pointer;
       padding: 0 5px;
     }
-
     input, textarea {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      box-sizing: border-box;
     }
-
     button.finalizar, button.enviar {
       background: #000;
       color: #fff;
@@ -113,13 +109,11 @@
       font-size: 16px;
       cursor: pointer;
     }
-
     .search-container {
       display: flex;
       justify-content: center;
       padding: 10px;
     }
-
     .search-container input {
       width: 90%;
       max-width: 500px;
@@ -128,7 +122,6 @@
       border-radius: 30px;
       font-size: 16px;
     }
-
     .filters {
       display: flex;
       flex-wrap: wrap;
@@ -136,7 +129,6 @@
       gap: 10px;
       padding: 20px 10px;
     }
-
     .filters button {
       padding: 10px 16px;
       border: none;
@@ -146,42 +138,39 @@
       font-size: 14px;
       cursor: pointer;
     }
-
     .filters button.active {
       background-color: #333;
       color: #fff;
     }
-
     .product-list {
       padding: 0 10px 50px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
     }
-
     .product-card {
       background: #f9f9f9;
       border-radius: 12px;
       padding: 16px;
-      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
     }
-
     .product-image {
       width: 100%;
       height: 180px;
-      background: #ddd;
+      background: linear-gradient(135deg, #ddd, #ccc);
       border-radius: 10px;
       margin-bottom: 15px;
     }
-
     .product-title {
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 5px;
     }
-
     .product-price {
       font-size: 16px;
       margin-bottom: 10px;
     }
-
     .product-card button {
       background-color: #222;
       color: #fff;
@@ -191,30 +180,30 @@
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
+      margin-top: auto;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <header>
-    <img src="logo-amaya.png" alt="Amaya Design" onclick="location.reload()" />
-    <div class="cart-icon" onclick="toggleCart()" title="Ver carrito">🛒</div>
+    <img src="logo-amaya.png" alt="Amaya Design" onclick="location.reload()"/>
+    <div class="cart-icon" onclick="toggleCart()" title="Ver carrito">
+      🛒<span id="cart-count"></span>
+    </div>
   </header>
 
-  <!-- Overlays -->
   <div class="overlay" id="overlay" onclick="toggleCart()"></div>
   <div class="checkout-overlay" id="checkoutOverlay" onclick="cerrarCheckout()"></div>
 
-  <!-- Carrito -->
   <div class="cart-window" id="cartWindow">
     <button class="close-cart" onclick="toggleCart()">✖</button>
     <h3>Carrito</h3>
+    <div id="envioGratisBarra" style="font-size:13px; color:#555; margin-bottom:10px;"></div>
     <div id="cart"></div>
     <button class="finalizar" onclick="abrirCheckout()">Finalizar pedido</button>
   </div>
 
-  <!-- Checkout -->
   <div class="checkout-window" id="checkoutWindow">
     <button class="close-checkout" onclick="cerrarCheckout()">✖</button>
     <h3>Revisar y Enviar Pedido</h3>
@@ -225,133 +214,165 @@
     <button class="enviar" onclick="enviarPedido()">Enviar por WhatsApp</button>
   </div>
 
-  <!-- Buscador -->
   <div class="search-container">
-    <input type="text" placeholder="Buscar productos...">
+    <input type="text" id="busqueda" placeholder="Buscar productos..." oninput="filtrarProductos()">
   </div>
 
-  <!-- Filtros -->
   <div class="filters">
-    <button class="active">Todos</button>
-    <button>Mujer</button>
-    <button>Hombre</button>
-    <button>Infantil</button>
-    <button>Hogar</button>
+    <button class="active" onclick="filtrarCategoria('todos', this)">Todos</button>
+    <button onclick="filtrarCategoria('mujer', this)">Mujer</button>
+    <button onclick="filtrarCategoria('hombre', this)">Hombre</button>
+    <button onclick="filtrarCategoria('infantil', this)">Infantil</button>
+    <button onclick="filtrarCategoria('hogar', this)">Hogar</button>
   </div>
 
-  <!-- Productos -->
-  <div class="product-list">
-    <div class="product-card">
-      <div class="product-image"></div>
-      <div class="product-title">Bordado Floral</div>
-      <div class="product-price">24,99 €</div>
-      <button onclick="addToCart('Bordado Floral', 24.99)">Añadir al carrito</button>
-    </div>
-  </div>
+  <div class="product-list" id="lista-productos"></div>
 
-  <!-- Scripts -->
   <script>
+    const productos = [
+      { nombre: "Bordado Floral", precio: 24.99, categoria: "mujer" },
+      { nombre: "Cojín Decorativo", precio: 19.99, categoria: "hogar" },
+      { nombre: "Babero Infantil", precio: 9.99, categoria: "infantil" },
+      { nombre: "Toalla Hombre", precio: 14.99, categoria: "hombre" },
+      { nombre: "Set Hogar Deluxe", precio: 29.99, categoria: "hogar" }
+    ];
+
     let carrito = [];
 
-    const cartWindow = document.getElementById("cartWindow");
-    const overlay = document.getElementById("overlay");
-    const checkoutWindow = document.getElementById("checkoutWindow");
-    const checkoutOverlay = document.getElementById("checkoutOverlay");
-    const cartContainer = document.getElementById("cart");
-    const checkoutResumen = document.getElementById("checkoutResumen");
+    window.onload = () => {
+      const guardado = localStorage.getItem("carrito");
+      if (guardado) carrito = JSON.parse(guardado);
+      mostrarCarrito();
+      actualizarBarraEnvio();
+      actualizarContadorCarrito();
+      renderizarProductos(productos);
+    };
+
+    function renderizarProductos(lista) {
+      const contenedor = document.getElementById("lista-productos");
+      contenedor.innerHTML = "";
+      lista.forEach(p => {
+        contenedor.innerHTML += `
+        <div class="product-card">
+          <div class="product-image"></div>
+          <div class="product-title">${p.nombre}</div>
+          <div class="product-price">${p.precio.toFixed(2)} €</div>
+          <button onclick="addToCart('${p.nombre}', ${p.precio})">Añadir al carrito</button>
+        </div>`;
+      });
+    }
+
+    function filtrarCategoria(cat, boton) {
+      document.querySelectorAll(".filters button").forEach(b => b.classList.remove("active"));
+      boton.classList.add("active");
+      filtrarProductos();
+    }
+
+    function filtrarProductos() {
+      const texto = document.getElementById("busqueda").value.toLowerCase();
+      const categoria = document.querySelector(".filters button.active").textContent.toLowerCase();
+      const resultado = productos.filter(p =>
+        (!categoria || categoria === "todos" || p.categoria === categoria) &&
+        p.nombre.toLowerCase().includes(texto)
+      );
+      renderizarProductos(resultado);
+    }
 
     function toggleCart() {
-      const visible = cartWindow.style.display === "block";
-      cartWindow.style.display = visible ? "none" : "block";
+      const ventana = document.getElementById("cartWindow");
+      const overlay = document.getElementById("overlay");
+      const visible = ventana.style.display === "block";
+      ventana.style.display = visible ? "none" : "block";
       overlay.style.display = visible ? "none" : "block";
     }
 
     function abrirCheckout() {
-      if (carrito.length === 0) {
-        alert("El carrito está vacío.");
-        return;
-      }
-
-      checkoutResumen.innerHTML = "";
+      if (carrito.length === 0) return alert("El carrito está vacío.");
+      const resumen = document.getElementById("checkoutResumen");
+      resumen.innerHTML = "";
       let total = 0;
-
-      carrito.forEach(({ nombre, precio, cantidad }) => {
-        checkoutResumen.innerHTML += `<div class="checkout-item">${nombre} x${cantidad} - ${(precio * cantidad).toFixed(2)} €</div>`;
-        total += precio * cantidad;
+      carrito.forEach(p => {
+        resumen.innerHTML += `<div class="checkout-item">${p.nombre} x${p.cantidad} - ${(p.precio * p.cantidad).toFixed(2)} €</div>`;
+        total += p.precio * p.cantidad;
       });
-
-      checkoutResumen.innerHTML += `<strong>Total: ${total.toFixed(2)} €</strong>`;
-
-      cartWindow.style.display = "none";
-      overlay.style.display = "none";
-      checkoutWindow.style.display = "block";
-      checkoutOverlay.style.display = "block";
+      resumen.innerHTML += `<strong>Total: ${total.toFixed(2)} €</strong>`;
+      resumen.innerHTML += `<p style="font-size:13px; color:#666; margin-top:10px;">Envíos: 1 día laborable<br>Pedidos de más de 40€ → <strong>envío gratuito</strong></p>`;
+      document.getElementById("cartWindow").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("checkoutWindow").style.display = "block";
+      document.getElementById("checkoutOverlay").style.display = "block";
     }
 
     function cerrarCheckout() {
-      checkoutWindow.style.display = "none";
-      checkoutOverlay.style.display = "none";
+      document.getElementById("checkoutWindow").style.display = "none";
+      document.getElementById("checkoutOverlay").style.display = "none";
     }
 
     function addToCart(nombre, precio) {
-      const index = carrito.findIndex(item => item.nombre === nombre);
-      if (index !== -1) {
-        carrito[index].cantidad++;
-      } else {
-        carrito.push({ nombre, precio, cantidad: 1 });
-      }
+      const index = carrito.findIndex(p => p.nombre === nombre);
+      if (index !== -1) carrito[index].cantidad++;
+      else carrito.push({ nombre, precio, cantidad: 1 });
+      localStorage.setItem("carrito", JSON.stringify(carrito));
       mostrarCarrito();
+      actualizarBarraEnvio();
+      actualizarContadorCarrito();
     }
 
     function eliminarDelCarrito(index) {
-      if (carrito[index].cantidad > 1) {
-        carrito[index].cantidad--;
-      } else {
-        carrito.splice(index, 1);
-      }
+      if (carrito[index].cantidad > 1) carrito[index].cantidad--;
+      else carrito.splice(index, 1);
+      localStorage.setItem("carrito", JSON.stringify(carrito));
       mostrarCarrito();
+      actualizarBarraEnvio();
+      actualizarContadorCarrito();
     }
 
     function mostrarCarrito() {
-      cartContainer.innerHTML = "";
-      carrito.forEach(({ nombre, precio, cantidad }, index) => {
-        cartContainer.innerHTML += `
+      const contenedor = document.getElementById("cart");
+      contenedor.innerHTML = "";
+      carrito.forEach((item, index) => {
+        contenedor.innerHTML += `
           <div class="cart-item">
-            <span>${nombre} (${cantidad}) - ${(precio * cantidad).toFixed(2)} €</span>
+            <span>${item.nombre} (${item.cantidad}) - ${(item.precio * item.cantidad).toFixed(2)} €</span>
             <button onclick="eliminarDelCarrito(${index})">🗑️</button>
           </div>`;
       });
+    }
+
+    function actualizarBarraEnvio() {
+      const barra = document.getElementById("envioGratisBarra");
+      if (!barra) return;
+      let total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+      barra.innerHTML = total >= 40
+        ? '<strong>¡Envío gratuito activado!</strong>'
+        : `Añade ${(40 - total).toFixed(2)} € más para envío gratuito.`;
+    }
+
+    function actualizarContadorCarrito() {
+      const contador = document.getElementById("cart-count");
+      const total = carrito.reduce((sum, p) => sum + p.cantidad, 0);
+      contador.style.display = total > 0 ? "inline-block" : "none";
+      contador.textContent = total;
     }
 
     function enviarPedido() {
       const nombre = document.getElementById("nombre").value.trim();
       const telefono = document.getElementById("telefono").value.trim();
       const direccion = document.getElementById("direccion").value.trim();
-
-      if (!nombre || !telefono || !direccion) {
-        alert("Por favor, completa todos los datos.");
-        return;
-      }
-
-      let mensaje = `*Nuevo pedido desde Amaya Design*%0A`;
-      mensaje += `*Nombre:* ${encodeURIComponent(nombre)}%0A`;
-      mensaje += `*Teléfono:* ${encodeURIComponent(telefono)}%0A`;
-      mensaje += `*Dirección:* ${encodeURIComponent(direccion)}%0A%0A*Productos:*%0A`;
-
+      if (!nombre || !telefono || !direccion) return alert("Completa todos los datos.");
+      let mensaje = `*Nuevo pedido desde Amaya Design*%0A*Nombre:* ${encodeURIComponent(nombre)}%0A*Teléfono:* ${encodeURIComponent(telefono)}%0A*Dirección:* ${encodeURIComponent(direccion)}%0A%0A*Productos:*%0A`;
       let total = 0;
-      carrito.forEach(({ nombre, precio, cantidad }) => {
-        mensaje += `- ${nombre} x${cantidad}: ${(precio * cantidad).toFixed(2)} €%0A`;
-        total += precio * cantidad;
+      carrito.forEach(p => {
+        mensaje += `- ${p.nombre} x${p.cantidad}: ${(p.precio * p.cantidad).toFixed(2)} €%0A`;
+        total += p.precio * p.cantidad;
       });
-
       mensaje += `%0A*Total:* ${total.toFixed(2)} €`;
-
       carrito = [];
+      localStorage.removeItem("carrito");
       mostrarCarrito();
-
-      const telefonoDestino = "34603603321";
-      const url = `https://wa.me/${telefonoDestino}?text=${mensaje}`;
-      window.open(url, "_blank");
+      actualizarBarraEnvio();
+      actualizarContadorCarrito();
+      window.open(`https://wa.me/34603603321?text=${mensaje}`, "_blank");
     }
   </script>
 </body>
