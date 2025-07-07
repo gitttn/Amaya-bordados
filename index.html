@@ -232,6 +232,11 @@
 
 .modal-content {
   background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  transition: transform 0.3s ease;
+  background: #fff;
   padding: 10px;
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0,0,0,0.4);
@@ -247,6 +252,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 300px;
 }
 
 .modal-close, .modal-prev, .modal-next {
@@ -327,38 +333,40 @@
 
   <script>
     
+
 const productos = [
   {
     nombre: "Bordado Floral",
     precio: 24.99,
     categoria: "mujer",
-    imagenes: ["fotos/bordado1.jpg"]
+    imagenes: ["fotos/bordado1.jpg", "fotos/bordado1b.jpg"]
   },
   {
     nombre: "Cojín Decorativo",
     precio: 19.99,
     categoria: "hogar",
-    imagenes: ["fotos/cojin1.jpg"]
+    imagenes: ["fotos/cojin1.jpg", "fotos/cojin1b.jpg"]
   },
   {
     nombre: "Babero Infantil",
     precio: 9.99,
     categoria: "infantil",
-    imagenes: ["fotos/babero1.jpg"]
+    imagenes: ["fotos/babero1.jpg", "fotos/babero1b.jpg"]
   },
   {
     nombre: "Toalla Hombre",
     precio: 14.99,
     categoria: "hombre",
-    imagenes: ["fotos/toalla1.jpg"]
+    imagenes: ["fotos/toalla1.jpg", "fotos/toalla1b.jpg"]
   },
   {
     nombre: "Set Hogar Deluxe",
     precio: 29.99,
     categoria: "hogar",
-    imagenes: ["fotos/sethogar1.jpg"]
+    imagenes: ["fotos/sethogar1.jpg", "fotos/sethogar1b.jpg"]
   }
 ];
+
 
 
     let carrito = [];
