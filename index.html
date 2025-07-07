@@ -13,13 +13,17 @@
       padding: 0;
       color: #222;
     }
-
     header {
       text-align: center;
-      padding: 40px 20px 20px;
+      padding: 30px 20px 10px;
       position: relative;
     }
-
+    header img {
+      height: 70px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+    }
     .cart-icon {
       position: absolute;
       top: 20px;
@@ -27,7 +31,6 @@
       font-size: 24px;
       cursor: pointer;
     }
-
     #cart-count {
       position: absolute;
       top: -8px;
@@ -39,7 +42,6 @@
       font-size: 12px;
       display: none;
     }
-
     .overlay, .checkout-overlay {
       position: fixed;
       top: 0;
@@ -50,7 +52,6 @@
       z-index: 998;
       display: none;
     }
-
     .cart-window, .checkout-window {
       position: fixed;
       top: 50%;
@@ -67,7 +68,6 @@
       display: none;
       box-sizing: border-box;
     }
-
     .close-cart, .close-checkout {
       position: absolute;
       top: 10px;
@@ -78,13 +78,11 @@
       color: #333;
       cursor: pointer;
     }
-
     .cart-item, .checkout-item {
       display: flex;
       justify-content: space-between;
       margin-bottom: 10px;
     }
-
     .cart-item button {
       background: none;
       border: none;
@@ -93,7 +91,6 @@
       cursor: pointer;
       padding: 0 5px;
     }
-
     input, textarea {
       width: 100%;
       padding: 10px;
@@ -102,7 +99,6 @@
       border-radius: 5px;
       box-sizing: border-box;
     }
-
     button.finalizar, button.enviar {
       background: #000;
       color: #fff;
@@ -113,13 +109,11 @@
       font-size: 16px;
       cursor: pointer;
     }
-
     .search-container {
       display: flex;
       justify-content: center;
       padding: 10px;
     }
-
     .search-container input {
       width: 90%;
       max-width: 500px;
@@ -128,7 +122,6 @@
       border-radius: 30px;
       font-size: 16px;
     }
-
     .filters {
       display: flex;
       flex-wrap: wrap;
@@ -136,7 +129,6 @@
       gap: 10px;
       padding: 20px 10px;
     }
-
     .filters button {
       padding: 10px 16px;
       border: none;
@@ -146,19 +138,16 @@
       font-size: 14px;
       cursor: pointer;
     }
-
     .filters button.active {
       background-color: #333;
       color: #fff;
     }
-
     .product-list {
       padding: 0 10px 50px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 20px;
     }
-
     .product-card {
       background: #f9f9f9;
       border-radius: 12px;
@@ -166,7 +155,6 @@
       display: flex;
       flex-direction: column;
     }
-
     .product-image {
       width: 100%;
       height: 180px;
@@ -174,18 +162,15 @@
       border-radius: 10px;
       margin-bottom: 15px;
     }
-
     .product-title {
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 5px;
     }
-
     .product-price {
       font-size: 16px;
       margin-bottom: 10px;
     }
-
     .product-card button {
       background-color: #222;
       color: #fff;
@@ -202,9 +187,7 @@
 <body>
 
   <header>
-    <svg onclick="location.reload()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 100" style="height:100px; cursor:pointer; display:block; margin:0 auto;">
-      <text x="0" y="70" font-family="'Playfair Display', serif" font-size="64" fill="#000">Amaya Design</text>
-    </svg>
+    <img src="logo-amaya.png" alt="Amaya Design" onclick="location.reload()"/>
     <div class="cart-icon" onclick="toggleCart()" title="Ver carrito">
       🛒<span id="cart-count"></span>
     </div>
