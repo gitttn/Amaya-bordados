@@ -48,6 +48,44 @@
       display: none;
     }
 
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      display: none;
+    }
+
+    .cart-window {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 360px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+      padding: 20px;
+      z-index: 999;
+      display: none;
+    }
+
+    .close-cart {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      background: none;
+      border: none;
+      color: #333;
+      cursor: pointer;
+    }
+
     .search-container {
       display: flex;
       justify-content: center;
@@ -137,6 +175,16 @@
   </div>
 </header>
 
+<!-- Fondo oscuro -->
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
+<!-- Carrito -->
+<div class="cart-window" id="cartWindow">
+  <button class="close-cart" onclick="toggleCart()">✖</button>
+  <h3>Carrito</h3>
+  <div id="cart"></div>
+</div>
+
 <div class="search-container">
   <input type="text" id="buscador" placeholder="Buscar productos..." onkeyup="filtrarProductos()">
 </div>
@@ -162,7 +210,12 @@
   let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
   function toggleCart() {
-    alert('Aquí aparecerá tu carrito (interfaz no implementada en esta vista).');
+    const cartWindow = document.getElementById("cartWindow");
+    const overlay = document.getElementById("overlay");
+    const visible = cartWindow.style.display === "block";
+    cartWindow.style.display = visible ? "none" : "block";
+    overlay.style.display = visible ? "none" : "block";
+    mostrarCarrito();
   }
 
   function addToCart(nombre, precio) {
@@ -174,6 +227,17 @@
     }
     localStorage.setItem("carrito", JSON.stringify(carrito));
     actualizarContadorCarrito();
+  }
+
+  function mostrarCarrito() {
+    const contenedor = document.getElementById("cart");
+    contenedor.innerHTML = "";
+    carrito.forEach((item) => {
+      contenedor.innerHTML += `
+        <div class='cart-item'>
+          ${item.nombre} - ${item.precio.toFixed(2)} € x${item.cantidad}
+        </div>`;
+    });
   }
 
   function actualizarContadorCarrito() {
