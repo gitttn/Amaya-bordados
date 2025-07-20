@@ -169,7 +169,7 @@
     .product-list {
       padding: 0 10px 50px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 20px;
     }
 
@@ -285,6 +285,96 @@
   top: 50%;
   transform: translateY(-50%);
 }
+
+
+    /* White frame and centered images */
+    .product-image {
+      background-color: #fff !important;
+      border-radius: 12px !important;
+      padding: 10px !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+      margin: 0 auto 15px auto !important;
+      background-size: cover !important;
+      background-position: center !important;
+    }
+
+
+    /* Correct overlay and modal sizing */
+    .overlay, .checkout-overlay {
+      background: rgba(0,0,0,0.5) !important;
+    }
+    .cart-window, .checkout-window {
+      width: 90% !important;
+      max-width: 400px !important;
+      padding: 30px !important;
+      border-radius: 12px !important;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+    }
+
+
+    /* Centrar marcos de imágenes y mantener texto ancho completo */
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .product-image {
+      width: calc(100% - 32px) !important;
+      max-width: 100%;
+      margin: 0 auto 15px auto !important;
+    }
+    .product-card .product-title,
+    .product-card .product-price,
+    .product-card button {
+      width: 100%;
+      text-align: center;
+    }
+
+
+    /* Reducir margen blanco alrededor de las imágenes */
+    .product-image {
+      padding: 4px !important;
+      margin: 0 auto 12px auto !important;
+      border-radius: 10px !important;
+    }
+
+
+    /* Hacer imágenes más grandes y cuadradas */
+    .product-image {
+      width: 100% !important;
+      aspect-ratio: 1 / 1 !important;
+      height: auto !important;
+      padding: 0 !important;
+      margin: 0 0 12px 0 !important;
+      border-radius: 12px !important;
+    }
+
+
+    /* Reducir espacio entre productos */
+    .product-list {
+      gap: 8px !important;
+    }
+
+
+    /* Reducir espacio entre header y barra de búsqueda */
+    header {
+      margin-bottom: 5px !important;
+    }
+    .search-container {
+      margin-top: 5px !important;
+      padding-top: 0 !important;
+    }
+
+
+    /* Reducir padding de header y espacio de búsqueda */
+    header {
+      padding: 5px 0 !important;
+      margin-bottom: 0 !important;
+    }
+    .search-container {
+      margin-top: 5px !important;
+      padding: 0 !important;
+    }
 
 </style>
 </head>
