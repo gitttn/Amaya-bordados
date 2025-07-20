@@ -416,14 +416,18 @@
     <input type="text" id="busqueda" placeholder="Buscar productos..." oninput="filtrarProductos()">
   </div>
 
+  
+  
   <div class="filters">
-    <button class="active" onclick="filtrarCategoria('todos', this)">Todos</button>
+    <button onclick="filtrarCategoria('todos', this)" class="active">Todos</button>
     <button onclick="filtrarCategoria('mujer', this)">Mujer</button>
     <button onclick="filtrarCategoria('hombre', this)">Hombre</button>
     <button onclick="filtrarCategoria('infantil', this)">Infantil</button>
     <button onclick="filtrarCategoria('hogar', this)">Hogar</button>
-    <button onclick=\"filtrarCategoria('regalos', this)\">Regalos</button>
+    <button onclick="filtrarCategoria('regalos', this)">Regalos</button>
   </div>
+
+
 
   <div class="product-list" id="lista-productos"></div>
 
@@ -460,7 +464,20 @@ const productos = [
     precio: 29.99,
     categoria: "hogar",
     imagenes: ["fotos/sethogar1.jpg", "fotos/sethogar1b.jpg"]
-  }
+  },
+      {
+        nombre: "Caja de Regalo",
+        precio: 39.99,
+        categoria: "regalos",
+        imagenes: ["fotos/caja_regalo1.jpg", "fotos/caja_regalo1b.jpg"]
+      },
+      {
+        nombre: "Set de Regalo",
+        precio: 49.99,
+        categoria: "regalos",
+        imagenes: ["fotos/set_regalo1.jpg", "fotos/set_regalo1b.jpg"]
+      },
+
 ];
 
 
