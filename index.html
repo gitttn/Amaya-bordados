@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Amaya Design</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Amaya Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&amp;display=swap" rel="stylesheet"/>
+<style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #fff;
@@ -224,12 +225,12 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-.modal-overlay {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .modal-overlay.show {
+  display: flex;
   opacity: 1;
 }
 
@@ -376,62 +377,133 @@
       padding: 0 !important;
     }
 
+
+
+.product-image {
+  background: #fff;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.product-image img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  image-rendering: auto;
+}
+
+/* Modal estilo Zara */
+.zara-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+.zara-modal {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+  text-align: center;
+  position: relative;
+}
+.zara-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.zara-modal img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+.zara-modal-info h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  margin: 0;
+}
+.zara-modal-info p {
+  font-size: 18px;
+  color: #444;
+  margin: 10px 0 20px;
+}
+.zara-add-button {
+  background: #fff;
+  border: 1px solid #000;
+  color: #000;
+  padding: 10px 24px;
+  font-size: 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.zara-add-button:hover {
+  background: #000;
+  color: #fff;
+}
+
 </style>
 </head>
 <body>
-
-  <header>
-    <img src="logo-amaya.png" alt="Amaya Design" onclick="location.reload()"/>
-    <div class="cart-icon" onclick="toggleCart()" title="Ver carrito">
-      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="9" cy="21" r="1"></circle>
-  <circle cx="20" cy="21" r="1"></circle>
-  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+<header>
+<img alt="Amaya Design" onclick="location.reload()" src="logo-amaya.png"/>
+<div class="cart-icon" onclick="toggleCart()" title="Ver carrito">
+<svg fill="none" height="26" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26" xmlns="http://www.w3.org/2000/svg">
+<circle cx="9" cy="21" r="1"></circle>
+<circle cx="20" cy="21" r="1"></circle>
+<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
 </svg><span id="cart-count"></span>
-    </div>
-  </header>
-
-  <div class="overlay" id="overlay" onclick="toggleCart()"></div>
-  <div class="checkout-overlay" id="checkoutOverlay" onclick="cerrarCheckout()"></div>
-
-  <div class="cart-window" id="cartWindow">
-    <button class="close-cart" onclick="toggleCart()">✖</button>
-    <h3>Carrito</h3>
-    <div id="envioGratisBarra" style="font-size:13px; color:#555; margin-bottom:10px;"></div>
-    <div id="cart"></div>
-    <button class="finalizar" onclick="abrirCheckout()">Finalizar pedido</button>
-  </div>
-
-  <div class="checkout-window" id="checkoutWindow">
-    <button class="close-checkout" onclick="cerrarCheckout()">✖</button>
-    <h3>Revisar y Enviar Pedido</h3>
-    <div id="checkoutResumen"></div>
-    <input type="text" id="nombre" placeholder="Tu nombre completo">
-    <input type="text" id="telefono" placeholder="Tu número de teléfono">
-    <textarea id="direccion" placeholder="Dirección de entrega"></textarea>
-    <button class="enviar" onclick="enviarPedido()">Enviar por WhatsApp</button>
-  </div>
-
-  <div class="search-container">
-    <input type="text" id="busqueda" placeholder="Buscar productos..." oninput="filtrarProductos()">
-  </div>
-
-  
-  
-  <div class="filters">
-    <button onclick="filtrarCategoria('todos', this)" class="active">Todos</button>
-    <button onclick="filtrarCategoria('mujer', this)">Mujer</button>
-    <button onclick="filtrarCategoria('hombre', this)">Hombre</button>
-    <button onclick="filtrarCategoria('infantil', this)">Infantil</button>
-    <button onclick="filtrarCategoria('hogar', this)">Hogar</button>
-    <button onclick="filtrarCategoria('regalos', this)">Regalos</button>
-  </div>
-
-
-
-  <div class="product-list" id="lista-productos"></div>
-
-  <script>
+</div>
+</header>
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
+<div class="checkout-overlay" id="checkoutOverlay" onclick="cerrarCheckout()"></div>
+<div class="cart-window" id="cartWindow">
+<button class="close-cart" onclick="toggleCart()">✖</button>
+<h3>Carrito</h3>
+<div id="envioGratisBarra" style="font-size:13px; color:#555; margin-bottom:10px;"></div>
+<div id="cart"></div>
+<button class="finalizar" onclick="abrirInfo()">Finalizar pedido</button>
+</div>
+<div class="checkout-window" id="checkoutWindow">
+<button class="close-checkout" onclick="cerrarCheckout()">✖</button>
+<h3>Revisar y Enviar Pedido</h3>
+<div id="checkoutResumen"></div>
+<input id="nombre" placeholder="Tu nombre completo" type="text"/>
+<input id="telefono" placeholder="Tu número de teléfono" type="text"/>
+<textarea id="direccion" placeholder="Dirección de entrega"></textarea>
+<button class="enviar" onclick="enviarPedido()">Enviar por WhatsApp</button>
+</div>
+<div class="search-container">
+<input id="busqueda" oninput="filtrarProductos()" placeholder="Buscar productos..." type="text"/>
+</div>
+<div class="filters">
+<button class="active" onclick="filtrarCategoria('todos', this)">Todos</button>
+<button onclick="filtrarCategoria('mujer', this)">Mujer</button>
+<button onclick="filtrarCategoria('hombre', this)">Hombre</button>
+<button onclick="filtrarCategoria('infantil', this)">Infantil</button>
+<button onclick="filtrarCategoria('hogar', this)">Hogar</button>
+<button onclick="filtrarCategoria('regalos', this)">Regalos</button>
+</div>
+<div class="product-list" id="lista-productos"></div>
+<script>
     
 
 const productos = [
@@ -485,6 +557,7 @@ const productos = [
     let carrito = [];
 
     window.onload = () => {
+      setTimeout(agregarEventosModalZara, 100);
       const guardado = localStorage.getItem("carrito");
       if (guardado) carrito = JSON.parse(guardado);
       mostrarCarrito();
@@ -499,7 +572,7 @@ const productos = [
       lista.forEach((p, index) => {
         contenedor.innerHTML += `
         <div class="product-card">
-          <div class="product-image" onclick="openModal(${index})" style="background-image: url('${p.imagenes[0]}'); background-size: cover; background-position: center;"></div>
+          <div class=\"product-image\" onclick=\"openModal(${index})\"><img src=\"${p.imagenes[0]}\" alt=\"${p.nombre}\" loading=\"lazy\"/></div>
           <div class="product-title">${p.nombre}</div>
           <div class="product-price">${p.precio.toFixed(2)} €</div>
           <button onclick="addToCart('${p.nombre}', ${p.precio})">Añadir al carrito</button>
@@ -541,7 +614,7 @@ const productos = [
         total += p.precio * p.cantidad;
       });
       resumen.innerHTML += `<strong>Total: ${total.toFixed(2)} €</strong>`;
-      resumen.innerHTML += `<p style="font-size:13px; color:#666; margin-top:10px;">Envíos: 1 día laborable<br>Pedidos de más de 40€ → <strong>envío gratuito</strong></p>`;
+      resumen.innerHTML += `<p style="font-size:13px; color:#666; margin-top:10px;">Envíos: 1 o 2 días<br>Pedidos de más de 40€ → <strong>envío gratuito</strong></p>`;
       document.getElementById("cartWindow").style.display = "none";
       document.getElementById("overlay").style.display = "none";
       document.getElementById("checkoutWindow").style.display = "block";
@@ -622,15 +695,87 @@ const productos = [
   
 
 
-</script>
 
+function abrirInfo() {
+  if (carrito.length === 0) {
+    toggleCart(); // Cierra la ventana si está abierta
+    alert("El carrito está vacío.");
+    return;
+  }
+  abrirCheckout(); // Solo abrir checkout si no está vacío
+  document.getElementById("checkoutWindow").style.display = "none";
+  document.getElementById("checkoutOverlay").style.display = "none";
+  document.getElementById("infoWindow").style.display = "block";
+  document.getElementById("infoOverlay").style.display = "block";
+}
+
+function cerrarInfo() {
+  document.getElementById("infoWindow").style.display = "none";
+  document.getElementById("infoOverlay").style.display = "none";
+}
+
+function confirmarInfo() {
+  cerrarInfo();
+  document.getElementById("checkoutWindow").style.display = "block";
+  document.getElementById("checkoutOverlay").style.display = "block";
+}
+
+function openZaraModal(product) {
+  document.getElementById("zaraModalImage").src = product.image;
+  document.getElementById("zaraModalTitle").textContent = product.name;
+  document.getElementById("zaraModalPrice").textContent = product.price;
+  document.getElementById("zaraModal").style.display = "flex";
+}
+function closeZaraModal() {
+  document.getElementById("zaraModal").style.display = "none";
+}
+function agregarEventosModalZara() {
+  document.querySelectorAll(".product-image").forEach((img, index) => {
+    img.addEventListener("click", () => {
+      const producto = productos[index];
+      openZaraModal({
+        image: producto.imagenes[0],
+        name: producto.nombre,
+        price: producto.precio.toFixed(2) + " €"
+      });
+    });
+  });
+}
+
+</script>
 <!-- Modal -->
 <div class="modal-overlay" id="imageModal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal()">✖</button>
-    <button class="modal-prev" onclick="prevImage()">‹</button>
-    <div class="modal-image" id="modalImage"></div>
-    <button class="modal-next" onclick="nextImage()">›</button>
+<div class="modal-content">
+<button class="modal-close" onclick="closeModal()">✖</button>
+<button class="modal-prev" onclick="prevImage()">‹</button>
+<div class="modal-image" id="modalImage"></div>
+<button class="modal-next" onclick="nextImage()">›</button>
+</div>
+</div>
+<div class="checkout-overlay" id="infoOverlay" style="display:none;"></div>
+<div class="checkout-window" id="infoWindow" style="display:none;">
+<button class="close-checkout" onclick="cerrarInfo()">✖</button>
+<h3>Información sobre el pedido</h3>
+<p style="padding: 0 15px; font-size:14px; color:#333;">
+    Actualmente disponemos de <strong>contrarreembolso</strong> o <strong>Bizum</strong>.<br/><br/>
+    Se le redirigirá a WhatsApp para completar el pedido. Se puede cancelar en cualquier momento.<br/><br/>
+    Envíos de 1 a 2 días según la hora del pedido.<br/>
+    Aceptamos devoluciones en cuanto recibamos el producto. Toda la información se le dará en el chat.<br/><br/>
+    Para cualquier duda, escríbanos por WhatsApp.
+  </p>
+<button class="finalizar" onclick="confirmarInfo()">Aceptar</button>
+</div>
+
+<!-- Modal Zara -->
+<div class="zara-modal-overlay" id="zaraModal" style="display:none;">
+  <div class="zara-modal">
+    <button class="zara-modal-close" onclick="closeZaraModal()">✖</button>
+    <img id="zaraModalImage" src="" alt="Imagen del producto" />
+    <div class="zara-modal-info">
+      <h2 id="zaraModalTitle"></h2>
+      <p id="zaraModalPrice"></p>
+      <button class="zara-add-button">AÑADIR</button>
+    </div>
   </div>
 </div>
 
