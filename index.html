@@ -509,9 +509,9 @@
 const productos = [
   {
     nombre: "Sudadera M5 con capucha",
-    precio: 24.99,
-    categoria: "mujer",
-    imagenes: ["fotos/camiseta.jpg"]
+    precio: 21.99,
+    categoria: "hombre",
+    imagenes: ["fotos/sudadera_m5.jpg"]
   },
   {
     nombre: "Cojín Decorativo",
@@ -720,7 +720,8 @@ function confirmarInfo() {
   document.getElementById("checkoutOverlay").style.display = "block";
 }
 
-function openZaraModal(product) {
+function openZaraModal(product, index) {
+  window.currentZaraProduct = index;
   document.getElementById("zaraModalImage").src = product.image;
   document.getElementById("zaraModalTitle").textContent = product.name;
   document.getElementById("zaraModalPrice").textContent = product.price;
@@ -733,11 +734,7 @@ function agregarEventosModalZara() {
   document.querySelectorAll(".product-image").forEach((img, index) => {
     img.addEventListener("click", () => {
       const producto = productos[index];
-      openZaraModal({
-        image: producto.imagenes[0],
-        name: producto.nombre,
-        price: producto.precio.toFixed(2) + " €"
-      });
+      openZaraModal({ image: producto.imagenes[0], name: producto.nombre, price: producto.precio.toFixed(2) + " €" }, index);
     });
   });
 }
@@ -782,7 +779,7 @@ function addToCartFromModal() {
 <div class="zara-modal-info">
 <h2 id="zaraModalTitle"></h2>
 <p id="zaraModalPrice"></p>
-<button class="zara-add-button">AÑADIR</button>
+<button class="zara-add-button" onclick="addToCartFromModal()">AÑADIR</button>
 </div>
 </div>
 </div>
