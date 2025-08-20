@@ -508,7 +508,7 @@
 
 const productos = [
   {
-    nombre: "Camiseta",
+    nombre: "Sudadera M5 con capucha",
     precio: 24.99,
     categoria: "mujer",
     imagenes: ["fotos/camiseta.jpg"]
@@ -742,6 +742,15 @@ function agregarEventosModalZara() {
   });
 }
 
+
+
+function addToCartFromModal() {
+  if (window.currentZaraProduct !== undefined) {
+    const p = productos[window.currentZaraProduct];
+    addToCart(p.nombre, p.precio);
+    closeZaraModal();
+  }
+}
 </script>
 <!-- Modal -->
 <div class="modal-overlay" id="imageModal">
@@ -765,19 +774,17 @@ function agregarEventosModalZara() {
   </p>
 <button class="finalizar" onclick="confirmarInfo()">Aceptar</button>
 </div>
-
 <!-- Modal Zara -->
 <div class="zara-modal-overlay" id="zaraModal" style="display:none;">
-  <div class="zara-modal">
-    <button class="zara-modal-close" onclick="closeZaraModal()">✖</button>
-    <img id="zaraModalImage" src="" alt="Imagen del producto" />
-    <div class="zara-modal-info">
-      <h2 id="zaraModalTitle"></h2>
-      <p id="zaraModalPrice"></p>
-      <button class="zara-add-button">AÑADIR</button>
-    </div>
-  </div>
+<div class="zara-modal">
+<button class="zara-modal-close" onclick="closeZaraModal()">✖</button>
+<img alt="Imagen del producto" id="zaraModalImage" src=""/>
+<div class="zara-modal-info">
+<h2 id="zaraModalTitle"></h2>
+<p id="zaraModalPrice"></p>
+<button class="zara-add-button">AÑADIR</button>
 </div>
-
+</div>
+</div>
 </body>
 </html>
