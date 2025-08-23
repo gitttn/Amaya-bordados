@@ -474,55 +474,6 @@
 .size-picker .label{font-size:14px;margin-right:6px}
 .size-btn{padding:6px 12px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:13px}
 .size-btn[aria-pressed="true"]{border-color:#000;background:#f2f2f2}
-
-/* ==== Ajuste modal móvil: todo visible sin scroll de página ==== */
-@media (max-width: 480px){
-  .zara-modal-overlay{align-items:center;justify-content:center;}
-  .zara-modal{
-    width: 96vw;
-    max-height: 92vh;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    border-radius: 16px;
-    padding: 16px;
-  }
-  evh;
-    object-fit: contain;
-    background: #fff;
-    margin-bottom: 12px;
-  }
-  .zara-modal-info{
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    overflow: auto;
-    padding: 8px;
-  }
-  #zaraModalTitle{
-    font-size: 20px;
-    line-height: 1.2;
-    margin: 0;
-    text-align: center;
-  }
-  #zaraModalPrice{
-    margin: 4px 0 6px;
-    text-align: center;
-  }
-  .color-picker, .size-picker{
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .size-btn{padding: 6px 10px;}
-  .zara-add-button{
-    position: sticky;
-    bottom: 0;
-    margin-top: 8px;
-    padding: 12px 16px;
-    border-radius: 999px;
-  }
-}
-
 </style>
 
 </head>
@@ -854,7 +805,7 @@ const VARIANTES = {
   "Sudadera M5 con capucha": {
     default: "Negro",
     items: {
-      "Negro": { hex:"#111111", img:"fotos/sudadera_m5.jpg" },
+      "Negro": { hex:"#111111", img:"fotos/sudadera_m5_con_capucha_negro.jpg" },
       "Blanco": { hex:"#eaeaea", img:"fotos/sudadera_m5_con_capucha_blanco.jpg" },
       "Azul": { hex:"#1f6feb", img:"fotos/sudadera_m5_con_capucha_azul.jpg" },
       "Rojo": { hex:"#e10600", img:"fotos/sudadera_m5_con_capucha_rojo.jpg" }
@@ -1004,52 +955,6 @@ function renderSizePicker(nombreProd){
     });
   });
 }
-</script>
-
-
-<script>
-// ==== Carga robusta de imagen para variantes ====
-(function(){
-  function trySetImage(srcList){
-    const img = document.getElementById("zaraModalImage");
-    if(!img || !srcList || !srcList.length) return;
-    const prev = img.getAttribute("src") || "";
-    let i = 0;
-    function next(){
-      if(i >= srcList.length){ img.onerror = null; img.src = prev; return; }
-      const s = srcList[i++];
-      img.onerror = next;
-      img.src = s;
-    }
-    next();
-  }
-  // Helper: genera rutas alternativas razonables
-  function altPaths(original){
-    if(!original) return [];
-    const uniq = new Set();
-    const parts = [original];
-    // reemplazos: espacios -> _, minúsculas
-    parts.push(original.replace(/\s+/g,"_"));
-    parts.push(original.toLowerCase());
-    parts.push(original.toLowerCase().replace(/\s+/g,"_"));
-    // si no empieza por fotos/, lo probamos
-    if(!/^fotos\//i.test(original)){
-      const base = original.replace(/^\.\/?/, "");
-      parts.push("fotos/" + base);
-      parts.push("fotos/" + base.toLowerCase());
-      parts.push("fotos/" + base.toLowerCase().replace(/\s+/g,"_"));
-    }
-    parts.forEach(p=>uniq.add(p));
-    return Array.from(uniq);
-  }
-
-  // Exponer en global para usar desde renderColorPicker si existe
-  window.__trySetVariantImage = function(imgPath, fallback){
-    const list = altPaths(imgPath);
-    if(fallback){ list.push(fallback); }
-    trySetImage(list);
-  };
-})();
 </script>
 
 </body>
