@@ -523,41 +523,49 @@
   }
 }
 
+</style>
 
-/* === Ajuste modal móvil: todo visible sin desplazar (override) === */
-@media (max-width: 600px){
+<style>
+
+/* === Modal móvil sin scroll general: botón AÑADIR siempre visible === */
+@media (max-width: 700px){
   .zara-modal{
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    max-height: 90vh !important;
     width: 96vw !important;
-    max-width: 520px !important;
-    max-height: 92vh !important;
-    padding: 16px !important;
-    border-radius: 16px !important;
     overflow: hidden !important;
+    border-radius: 16px !important;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 8px)) 12px !important;
   }
   .zara-modal img{
-    max-height: 45vh !important;   /* imagen nunca ocupa toda la altura */
+    max-height: 38vh !important;  /* menos altura para liberar espacio */
     width: 100% !important;
     object-fit: contain !important;
-    margin-bottom: 12px !important;
+    margin: 0 auto 8px auto !important;
   }
   .zara-modal-info{
     flex: 1 1 auto !important;
-    overflow: auto !important;     /* si hay mucho contenido, solo esta parte hace scroll */
-    padding: 8px !important;
+    overflow: auto !important;           /* solo esta parte puede desplazarse */
+    padding-bottom: 84px !important;     /* hueco para el botón sticky */
   }
+  /* Botón 'AÑADIR' pegado al borde inferior del modal */
   .zara-add-button{
     position: sticky !important;
     bottom: 0 !important;
-    margin-top: 8px !important;
+    left: 0 !important;
+    right: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    margin: 8px 0 0 0 !important;
+    padding: 14px 16px !important;
+    font-size: 18px !important;
     border-radius: 999px !important;
+    z-index: 3 !important;
   }
 }
 
 </style>
-
 </head>
 <body>
 <header>
@@ -1132,54 +1140,32 @@ window.agregarEventosModalZara = function() {
 </script>
 
 
-<!-- Fix: producto actual fiable y añadir correcto incluso con lista filtrada -->
+<!-- Forzar botón AÑADIR visible y sticky en el modal (añade clase si falta) -->
 <script>
 (function(){
-  // Captura el producto visible al abrir el modal
-  const _agregar = window.agregarEventosModalZara;
-  window.agregarEventosModalZara = function(){
-    const cont = document.getElementById("lista-productos");
-    const cards = cont ? cont.querySelectorAll(".product-image") : [];
-    const lista = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : (window.productos || []);
-    cards.forEach((img, idx)=>{
-      img.onclick = null;
-      img.addEventListener("click", function(){
-        const producto = lista[idx];
-        if(!producto) return;
-        // Guarda el producto real seleccionado
-        window.__productoActual = producto;
-        // Abre el modal original con su index local (no nos fiamos del global)
-        if (typeof window.openZaraModal === "function") {
-          window.openZaraModal(
-            { image: (producto.imagenes && producto.imagenes[0]) || producto.imagen || "", name: producto.nombre, price: ((producto.precio && producto.precio.toFixed) ? producto.precio.toFixed(2) : producto.precio) + " €" },
-            idx
-          );
+  function etiquetarBotonAnadir(){
+    try{
+      var modal = document.querySelector('.zara-modal');
+      if(!modal) return;
+      // Busca un botón con texto "AÑADIR"
+      var btns = modal.querySelectorAll('button, .btn, .add-to-cart');
+      for (var i=0;i<btns.length;i++){
+        var t = (btns[i].textContent || '').trim().toUpperCase();
+        if (t.includes('AÑADIR')){
+          btns[i].classList.add('zara-add-button');
+          break;
         }
-        if (typeof window.renderColorPicker === "function") window.renderColorPicker(producto.nombre);
-        if (typeof window.renderSizePicker === "function") window.renderSizePicker(producto.nombre);
-      });
-    });
+      }
+    }catch(e){}
+  }
+  // Al abrir el modal, etiquetar el botón
+  var _open = window.openZaraModal;
+  window.openZaraModal = function(data, idx){
+    if (typeof _open === 'function') _open.apply(this, arguments);
+    setTimeout(etiquetarBotonAnadir, 50);
   };
-  // Llamar una vez por si la lista ya está pintada
-  try { window.agregarEventosModalZara(); } catch(e){}
-
-  // Reescribe añadir al carrito usando el producto actual guardado
-  const _add = window.addToCartFromModal;
-  window.addToCartFromModal = function(){
-    const p = window.__productoActual;
-    if(p){
-      try{
-        const conf = (typeof VARIANTES !== "undefined") ? VARIANTES[p.nombre] : null;
-        const color = (conf ? (window.selectedColor || conf.default) : null);
-        const talla = window.selectedSize || "M";
-        const nombreMostrar = conf && color ? (p.nombre + " (" + color + " - " + talla + ")") : (p.nombre + " (" + talla + ")");
-        addToCart(nombreMostrar, p.precio);
-        closeZaraModal();
-        return;
-      }catch(e){ /* fallback a la función original */ }
-    }
-    if (typeof _add === "function") return _add();
-  };
+  // Si el modal ya está abierto en este momento
+  setTimeout(etiquetarBotonAnadir, 100);
 })();
 </script>
 
