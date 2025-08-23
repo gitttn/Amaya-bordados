@@ -191,10 +191,13 @@
     }
 
     .product-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: #222;
+  margin-top: 6px;
+}
 
     .product-price {
       font-size: 16px;
@@ -523,6 +526,8 @@
   }
 }
 
+
+.product-card button{display:none !important;}
 </style>
 
 <style>
@@ -565,11 +570,15 @@
   }
 }
 
+
+.product-card button{display:none !important;}
 </style>
 
 <style>
 .product-card{ cursor:pointer; }
 .product-card button{ cursor:default; }
+
+.product-card button{display:none !important;}
 </style>
 
 
@@ -587,6 +596,8 @@
 .product-card button {
   cursor: default;
 }
+
+.product-card button{display:none !important;}
 </style>
 
 
@@ -613,6 +624,21 @@
 /* Mantener el cursor correcto */
 .product-card { cursor: pointer; }
 .product-card button { cursor: default; }
+
+.product-card button{display:none !important;}
+</style>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+<style>
+  .product-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: #222;
+  margin-top: 6px;
+}
 </style>
 
 </head>
@@ -662,13 +688,13 @@
 
 const productos = [
   {
-    nombre: "SUDADERA M5",
+    nombre: "Sudadera M5",
     precio: 21.99,
     categoria: "hombre",
     imagenes: ["fotos/sudadera_m5.jpg"]
   },
   {
-    nombre: "CHAQUETA NK",
+    nombre: "Chaqueta NK",
     precio: 18.99,
     categoria: "hombre",
     imagenes: ["fotos/Chaqueta NK Beige.png"]
@@ -729,8 +755,7 @@ const productos = [
           <div class=\"product-image\" onclick=\"openModal(${index})\"><img src=\"${p.imagenes[0]}\" alt=\"${p.nombre}\" loading=\"lazy\"/></div>
           <div class="product-title">${p.nombre}</div>
           <div class="product-price">${p.precio.toFixed(2)} €</div>
-          <button onclick="addToCart('${p.nombre}', ${p.precio})">Añadir al carrito</button>
-        </div>`;
+          </div>`;
       });
     }
 
