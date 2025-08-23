@@ -854,10 +854,7 @@ const VARIANTES = {
   "Sudadera M5 con capucha": {
     default: "Negro",
     items: {
-      "Negro": { hex:"#111111", img:"fotos/sudadera_m5.jpg" },
-      "Blanco": { hex:"#eaeaea", img:"fotos/sudadera_m5_con_capucha_blanco.jpg" },
-      "Azul": { hex:"#1f6feb", img:"fotos/sudadera_m5_con_capucha_azul.jpg" },
-      "Rojo": { hex:"#e10600", img:"fotos/sudadera_m5_con_capucha_rojo.jpg" }
+      "Negro": { hex:"#111111", img:"fotos/sudadera_m5.jpg" }
     }
   },
   "Chaqueta NK con capucha": {
@@ -1004,6 +1001,101 @@ function renderSizePicker(nombreProd){
     });
   });
 }
+</script>
+
+
+<script>
+// ==== Carga robusta de imagen para variantes ====
+(function(){
+  function trySetImage(srcList){
+    const img = document.getElementById("zaraModalImage");
+    if(!img || !srcList || !srcList.length) return;
+    const prev = img.getAttribute("src") || "";
+    let i = 0;
+    function next(){
+      if(i >= srcList.length){ img.onerror = null; img.src = prev; return; }
+      const s = srcList[i++];
+      img.onerror = next;
+      img.src = s;
+    }
+    next();
+  }
+  // Helper: genera rutas alternativas razonables
+  function altPaths(original){
+    if(!original) return [];
+    const uniq = new Set();
+    const parts = [original];
+    // reemplazos: espacios -> _, minúsculas
+    parts.push(original.replace(/\s+/g,"_"));
+    parts.push(original.toLowerCase());
+    parts.push(original.toLowerCase().replace(/\s+/g,"_"));
+    // si no empieza por fotos/, lo probamos
+    if(!/^fotos\//i.test(original)){
+      const base = original.replace(/^\.\/?/, "");
+      parts.push("fotos/" + base);
+      parts.push("fotos/" + base.toLowerCase());
+      parts.push("fotos/" + base.toLowerCase().replace(/\s+/g,"_"));
+    }
+    parts.forEach(p=>uniq.add(p));
+    return Array.from(uniq);
+  }
+
+  // Exponer en global para usar desde renderColorPicker si existe
+  window.__trySetVariantImage = function(imgPath, fallback){
+    const list = altPaths(imgPath);
+    if(fallback){ list.push(fallback); }
+    trySetImage(list);
+  };
+})();
+</script>
+
+
+<!-- Override mínimo y seguro: lista visible + reenganche modal -->
+<script>
+// Lista de productos visibles en pantalla
+window.__listaActual = window.productos || [];
+
+// Sobrescribe de forma no intrusiva (la última definición gana)
+window.renderizarProductos = function(lista) {
+  const contenedor = document.getElementById("lista-productos");
+  if (!contenedor) return;
+  contenedor.innerHTML = "";
+  window.__listaActual = (Array.isArray(lista) && lista.length) ? lista : (window.productos || []);
+
+  window.__listaActual.forEach((p, index) => {
+    const precio = (p && p.precio != null) ? (p.precio.toFixed ? p.precio.toFixed(2) : p.precio) : "";
+    contenedor.innerHTML += `
+      <div class="product-card">
+        <div class="product-image"><img src="${(p.imagenes && p.imagenes[0]) || p.imagen || ""}" alt="${p.nombre || ""}" loading="lazy"/></div>
+        <div class="product-title">${p.nombre || ""}</div>
+        <div class="product-price">${precio} €</div>
+        <button onclick="addToCart('${p ? (p.nombre || "") : ""}', ${p ? (p.precio || 0) : 0})">Añadir al carrito</button>
+      </div>`;
+  });
+
+  if (typeof window.agregarEventosModalZara === "function") window.agregarEventosModalZara();
+};
+
+window.agregarEventosModalZara = function() {
+  const cards = document.querySelectorAll(".product-image");
+  cards.forEach((img, index) => {
+    img.onclick = null;
+    img.addEventListener("click", () => {
+      const lista = window.__listaActual && window.__listaActual.length ? window.__listaActual : (window.productos || []);
+      const producto = lista[index];
+      if (!producto) return;
+
+      if (typeof window.openZaraModal === "function") {
+        window.openZaraModal(
+          { image: (producto.imagenes && producto.imagenes[0]) || producto.imagen || "", name: producto.nombre, price: ((producto.precio && producto.precio.toFixed) ? producto.precio.toFixed(2) : producto.precio) + " €" },
+          index
+        );
+      }
+      if (typeof window.renderColorPicker === "function") window.renderColorPicker(producto.nombre);
+      if (typeof window.renderSizePicker === "function") window.renderSizePicker(producto.nombre);
+    });
+  });
+};
 </script>
 
 </body>
