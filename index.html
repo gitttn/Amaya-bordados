@@ -439,8 +439,11 @@
   margin-bottom: 20px;
 }
 .zara-modal-info h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: #222;
   margin: 0;
 }
 .zara-modal-info p {
@@ -527,7 +530,76 @@
 }
 
 
-.product-card button{display:none !important;}
+.product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
+
+/* === Variantes en tarjetas: reutilizamos estilos del modal === */
+.card-variants { 
+  margin: 8px 0 4px; 
+  display: flex; 
+  gap: 8px; 
+  justify-content: center; 
+  align-items: center; 
+  flex-wrap: wrap;
+}
+
+
+/* === Variantes en tarjetas con el MISMO estilo que el hooking === */
+.card-variants.color-picker{margin:8px 0 6px}
+.card-variants .label{font-size:14px;margin-right:6px}
+.card-variants .color-swatch{width:28px;height:28px;border-radius:50%;border:1px solid #ccc;cursor:pointer;outline:none}
+.card-variants .color-swatch[aria-pressed="true"]{box-shadow:0 0 0 2px #000 inset;border-color:#000}
+.card-variants .color-name{width:100%;text-align:center;font-size:12px;color:#555;margin-top:6px}
+
+
+/* === Variantes en tarjetas: estilo minimal (solo círculos) === */
+.card-variants {
+  margin: 6px 0 4px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+.card-variants .color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  outline: none;
+}
+.card-variants .color-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px #000 inset;
+  border-color: #000;
+}
+
+
+/* Texto con cantidad de colores en tarjetas */
+.product-colors{
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+  margin-top: 4px;
+}
+
+
+/* Badge profesional "X colores" en esquina de la imagen */
+.product-card .product-image{ position: relative; }
+.product-colors-badge{
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(255,255,255,0.85);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  line-height: 1;
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+  border: 1px solid rgba(0,0,0,0.08);
+  backdrop-filter: blur(2px);
+}
+
 </style>
 
 <style>
@@ -571,14 +643,14 @@
 }
 
 
-.product-card button{display:none !important;}
+.product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
 
 <style>
 .product-card{ cursor:pointer; }
 .product-card button{ cursor:default; }
 
-.product-card button{display:none !important;}
+.product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
 
 
@@ -597,7 +669,7 @@
   cursor: default;
 }
 
-.product-card button{display:none !important;}
+.product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
 
 
@@ -625,7 +697,7 @@
 .product-card { cursor: pointer; }
 .product-card button { cursor: default; }
 
-.product-card button{display:none !important;}
+.product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
 
 
@@ -966,13 +1038,13 @@ function addToCartFromModal() {
 <script>
 // Variantes de color por producto
 const VARIANTES = {
-  "SUDADERA M5": {
+  "Sudadera M5": {
     default: "Negro",
     items: {
       "Negro": { hex:"#111111", img:"fotos/sudadera_m5.jpg" }
     }
   },
-  "CHAQUETA NK": {
+  "Chaqueta NK": {
     default: "Beige",
     items: {
       "Beige": { hex:"#d9c7a6", img:"fotos/Chaqueta NK Beige.png" },
@@ -1041,7 +1113,9 @@ function renderColorPicker(nombreProd){
     infoBox.insertBefore(exist, infoBox.querySelector(".zara-add-button"));
   }
   const entries = Object.entries(conf.items);
-  const def = conf.default && conf.items[conf.default] ? conf.default : entries[0][0];
+  // Usar color preseleccionado desde la tarjeta si existe y es válido
+  let def = (window.preselectedColor && conf.items[window.preselectedColor]) ? window.preselectedColor : (conf.default && conf.items[conf.default] ? conf.default : entries[0][0]);
+  window.selectedColor = def;
   window.selectedColor = def;
   exist.innerHTML = '<span class="label">Color:</span>' + entries.map(([nombre,data])=>{
     return `<button class="color-swatch" title="${nombre}" data-color="${nombre}" style="background:${data.hex}" aria-pressed="${nombre===def}"></button>`;
@@ -1175,6 +1249,12 @@ function renderSizePicker(nombreProd){
 window.__listaActual = window.productos || [];
 
 // Sobrescribe de forma no intrusiva (la última definición gana)
+
+
+
+
+
+
 window.renderizarProductos = function(lista) {
   const contenedor = document.getElementById("lista-productos");
   if (!contenedor) return;
@@ -1183,17 +1263,31 @@ window.renderizarProductos = function(lista) {
 
   window.__listaActual.forEach((p, index) => {
     const precio = (p && p.precio != null) ? (p.precio.toFixed ? p.precio.toFixed(2) : p.precio) : "";
+    const variantes = (typeof VARIANTES !== "undefined") ? VARIANTES[p?.nombre] : null;
+    const coloresCount = variantes && variantes.items ? Object.keys(variantes.items).length : 0;
+    const coloresLabel = coloresCount > 0 ? (coloresCount + (coloresCount === 1 ? " color" : " colores")) : "";
+
     contenedor.innerHTML += `
-      <div class="product-card">
-        <div class="product-image"><img src="${(p.imagenes && p.imagenes[0]) || p.imagen || ""}" alt="${p.nombre || ""}" loading="lazy"/></div>
+      <div class="product-card" data-index="${index}">
+        <div class="product-image">
+          ${coloresLabel ? `<span class="product-colors-badge">${coloresLabel}</span>` : ``}
+          <img src="${(p.imagenes && p.imagenes[0]) || p.imagen || ""}" alt="${p.nombre || ""}" loading="lazy"/>
+        </div>
         <div class="product-title">${p.nombre || ""}</div>
         <div class="product-price">${precio} €</div>
         <button onclick="addToCart('${p ? (p.nombre || "") : ""}', ${p ? (p.precio || 0) : 0})">Añadir al carrito</button>
       </div>`;
   });
 
+  // Reenganchar apertura del modal
   if (typeof window.agregarEventosModalZara === "function") window.agregarEventosModalZara();
 };
+
+
+
+
+
+
 
 window.agregarEventosModalZara = function() {
   const cards = document.querySelectorAll(".product-image");
@@ -1258,6 +1352,10 @@ window.agregarEventosModalZara = function() {
     cards.forEach((card, index) => {
       // abrir modal al pulsar en cualquier parte de la tarjeta
       card.onclick = function () {
+        // Tomar color seleccionado en la tarjeta y pre-seleccionarlo en el modal
+        var pressed = card.querySelector('.card-variants .color-swatch[aria-pressed="true"]');
+        window.preselectedColor = pressed ? pressed.getAttribute('data-color') : null;
+    
         const producto = lista[index];
         if (!producto) return;
 
