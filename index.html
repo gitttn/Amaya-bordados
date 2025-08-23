@@ -474,6 +474,55 @@
 .size-picker .label{font-size:14px;margin-right:6px}
 .size-btn{padding:6px 12px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:13px}
 .size-btn[aria-pressed="true"]{border-color:#000;background:#f2f2f2}
+
+/* ==== Ajuste modal móvil: todo visible sin scroll de página ==== */
+@media (max-width: 480px){
+  .zara-modal-overlay{align-items:center;justify-content:center;}
+  .zara-modal{
+    width: 96vw;
+    max-height: 92vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border-radius: 16px;
+    padding: 16px;
+  }
+  evh;
+    object-fit: contain;
+    background: #fff;
+    margin-bottom: 12px;
+  }
+  .zara-modal-info{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: auto;
+    padding: 8px;
+  }
+  #zaraModalTitle{
+    font-size: 20px;
+    line-height: 1.2;
+    margin: 0;
+    text-align: center;
+  }
+  #zaraModalPrice{
+    margin: 4px 0 6px;
+    text-align: center;
+  }
+  .color-picker, .size-picker{
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .size-btn{padding: 6px 10px;}
+  .zara-add-button{
+    position: sticky;
+    bottom: 0;
+    margin-top: 8px;
+    padding: 12px 16px;
+    border-radius: 999px;
+  }
+}
+
 </style>
 
 </head>
