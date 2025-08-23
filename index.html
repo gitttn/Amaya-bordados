@@ -1006,5 +1006,51 @@ function renderSizePicker(nombreProd){
 }
 </script>
 
+
+<script>
+// ==== Carga robusta de imagen para variantes ====
+(function(){
+  function trySetImage(srcList){
+    const img = document.getElementById("zaraModalImage");
+    if(!img || !srcList || !srcList.length) return;
+    const prev = img.getAttribute("src") || "";
+    let i = 0;
+    function next(){
+      if(i >= srcList.length){ img.onerror = null; img.src = prev; return; }
+      const s = srcList[i++];
+      img.onerror = next;
+      img.src = s;
+    }
+    next();
+  }
+  // Helper: genera rutas alternativas razonables
+  function altPaths(original){
+    if(!original) return [];
+    const uniq = new Set();
+    const parts = [original];
+    // reemplazos: espacios -> _, minúsculas
+    parts.push(original.replace(/\s+/g,"_"));
+    parts.push(original.toLowerCase());
+    parts.push(original.toLowerCase().replace(/\s+/g,"_"));
+    // si no empieza por fotos/, lo probamos
+    if(!/^fotos\//i.test(original)){
+      const base = original.replace(/^\.\/?/, "");
+      parts.push("fotos/" + base);
+      parts.push("fotos/" + base.toLowerCase());
+      parts.push("fotos/" + base.toLowerCase().replace(/\s+/g,"_"));
+    }
+    parts.forEach(p=>uniq.add(p));
+    return Array.from(uniq);
+  }
+
+  // Exponer en global para usar desde renderColorPicker si existe
+  window.__trySetVariantImage = function(imgPath, fallback){
+    const list = altPaths(imgPath);
+    if(fallback){ list.push(fallback); }
+    trySetImage(list);
+  };
+})();
+</script>
+
 </body>
 </html>
