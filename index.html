@@ -523,6 +523,39 @@
   }
 }
 
+
+/* === Ajuste modal móvil: todo visible sin desplazar (override) === */
+@media (max-width: 600px){
+  .zara-modal{
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    width: 96vw !important;
+    max-width: 520px !important;
+    max-height: 92vh !important;
+    padding: 16px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+  }
+  .zara-modal img{
+    max-height: 45vh !important;   /* imagen nunca ocupa toda la altura */
+    width: 100% !important;
+    object-fit: contain !important;
+    margin-bottom: 12px !important;
+  }
+  .zara-modal-info{
+    flex: 1 1 auto !important;
+    overflow: auto !important;     /* si hay mucho contenido, solo esta parte hace scroll */
+    padding: 8px !important;
+  }
+  .zara-add-button{
+    position: sticky !important;
+    bottom: 0 !important;
+    margin-top: 8px !important;
+    border-radius: 999px !important;
+  }
+}
+
 </style>
 
 </head>
@@ -1096,6 +1129,58 @@ window.agregarEventosModalZara = function() {
     });
   });
 };
+</script>
+
+
+<!-- Fix: producto actual fiable y añadir correcto incluso con lista filtrada -->
+<script>
+(function(){
+  // Captura el producto visible al abrir el modal
+  const _agregar = window.agregarEventosModalZara;
+  window.agregarEventosModalZara = function(){
+    const cont = document.getElementById("lista-productos");
+    const cards = cont ? cont.querySelectorAll(".product-image") : [];
+    const lista = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : (window.productos || []);
+    cards.forEach((img, idx)=>{
+      img.onclick = null;
+      img.addEventListener("click", function(){
+        const producto = lista[idx];
+        if(!producto) return;
+        // Guarda el producto real seleccionado
+        window.__productoActual = producto;
+        // Abre el modal original con su index local (no nos fiamos del global)
+        if (typeof window.openZaraModal === "function") {
+          window.openZaraModal(
+            { image: (producto.imagenes && producto.imagenes[0]) || producto.imagen || "", name: producto.nombre, price: ((producto.precio && producto.precio.toFixed) ? producto.precio.toFixed(2) : producto.precio) + " €" },
+            idx
+          );
+        }
+        if (typeof window.renderColorPicker === "function") window.renderColorPicker(producto.nombre);
+        if (typeof window.renderSizePicker === "function") window.renderSizePicker(producto.nombre);
+      });
+    });
+  };
+  // Llamar una vez por si la lista ya está pintada
+  try { window.agregarEventosModalZara(); } catch(e){}
+
+  // Reescribe añadir al carrito usando el producto actual guardado
+  const _add = window.addToCartFromModal;
+  window.addToCartFromModal = function(){
+    const p = window.__productoActual;
+    if(p){
+      try{
+        const conf = (typeof VARIANTES !== "undefined") ? VARIANTES[p.nombre] : null;
+        const color = (conf ? (window.selectedColor || conf.default) : null);
+        const talla = window.selectedSize || "M";
+        const nombreMostrar = conf && color ? (p.nombre + " (" + color + " - " + talla + ")") : (p.nombre + " (" + talla + ")");
+        addToCart(nombreMostrar, p.precio);
+        closeZaraModal();
+        return;
+      }catch(e){ /* fallback a la función original */ }
+    }
+    if (typeof _add === "function") return _add();
+  };
+})();
 </script>
 
 </body>
