@@ -566,6 +566,55 @@
 }
 
 </style>
+
+<style>
+.product-card{ cursor:pointer; }
+.product-card button{ cursor:default; }
+</style>
+
+
+<style>
+.product-card {
+  cursor: pointer;
+  outline: none;
+}
+.product-card:focus {
+  outline: none;
+}
+.product-card * {
+  outline: none;
+}
+.product-card button {
+  cursor: default;
+}
+</style>
+
+
+<style>
+/* Quitar por completo el “flash” azul de Android/Chrome */
+.product-card,
+.product-card *,
+.product-card a,
+.product-card button,
+.product-card img {
+  -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+  -webkit-touch-callout: none;
+}
+/* Sin contorno en cualquier estado de foco/click */
+.product-card:focus,
+.product-card:focus-visible,
+.product-card:active,
+.product-card *:focus,
+.product-card *:focus-visible,
+.product-card *:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* Mantener el cursor correcto */
+.product-card { cursor: pointer; }
+.product-card button { cursor: default; }
+</style>
+
 </head>
 <body>
 <header>
@@ -1170,6 +1219,50 @@ window.agregarEventosModalZara = function() {
   };
   // Si el modal ya está abierto en este momento
   setTimeout(etiquetarBotonAnadir, 100);
+})();
+</script>
+
+
+<script>
+(function(){
+  // Engancha el click en toda la tarjeta, no solo en la imagen
+  window.agregarEventosModalZara = function() {
+    const cards = document.querySelectorAll(".product-card");
+    const lista = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : (window.productos || []);
+
+    cards.forEach((card, index) => {
+      // abrir modal al pulsar en cualquier parte de la tarjeta
+      card.onclick = function () {
+        const producto = lista[index];
+        if (!producto) return;
+
+        if (typeof window.openZaraModal === "function") {
+          window.openZaraModal(
+            { image: (producto.imagenes && producto.imagenes[0]) || "", name: producto.nombre, price: (Number(producto.precio)||0).toFixed(2) + " €" },
+            index
+          );
+        }
+        // Render de variantes si existen
+        if (typeof window.renderColorPicker === "function") window.renderColorPicker(producto.nombre);
+        if (typeof window.renderSizePicker === "function") window.renderSizePicker(producto.nombre);
+      };
+
+      // impedir que el botón abra el modal
+      const btn = card.querySelector("button");
+      if (btn) {
+        btn.addEventListener("click", function(ev){
+          ev.stopPropagation();
+          try {
+            const producto = lista[index];
+            if (producto && typeof window.addToCart === "function") {
+              const img0 = (producto.imagenes && producto.imagenes[0]) || "";
+              window.addToCart(producto.nombre, producto.precio, img0);
+            }
+          } catch(e){}
+        });
+      }
+    });
+  };
 })();
 </script>
 
