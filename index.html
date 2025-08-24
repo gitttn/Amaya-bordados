@@ -912,6 +912,24 @@ body.modal-open{ overflow: hidden; }
   object-fit: contain !important;
 }
 
+
+/* --- Modal centrado, justo y sin barras (override definitivo) --- */
+.zara-modal{
+  max-height: none !important;
+  height: auto !important;
+}
+.zara-modal .zara-modal-body{
+  max-height: none !important;
+  overflow: visible !important;
+  padding-bottom: 70px !important; /* hueco para el botón */
+}
+.zara-modal img{
+  max-height: 220px !important;  /* imagen contenida */
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
 </style>
 
 </head>
