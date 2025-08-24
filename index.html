@@ -1728,6 +1728,54 @@ setVH(); window.addEventListener('resize', setVH);
   window.__hideModalClasses = hideModalClasses;
 })();
 
+
+<script>
+/* --- PARCHE: imagen del hooking robusta (espacios, rutas, variantes) --- */
+(function(){
+  function normSrc(s){
+    if(!s) return "";
+    try{ return encodeURI(s); }catch(e){ return s; }
+  }
+  // Guardamos el original (si existe)
+  var _open = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    // 1) Llamada original para abrir modal y setear textos
+    if (typeof _open === 'function'){ _open(product, index); }
+
+    try{
+      // 2) Determinar la mejor ruta de imagen
+      var p = (Array.isArray(window.__listaActual) && window.__listaActual[index]) ? window.__listaActual[index]
+              : (Array.isArray(window.productos) && window.productos[index]) ? window.productos[index]
+              : null;
+      var nombre = (product && product.name) ? product.name : (p && p.nombre) ? p.nombre : "";
+      var src0   = (product && product.image) ? product.image : (p && p.imagenes && p.imagenes[0]) ? p.imagenes[0] : "";
+      var src    = normSrc(src0);
+
+      // 3) Si hay VARIANTES para ese producto, usar la imagen del color por defecto
+      var vConf = (typeof window.VARIANTES !== "undefined") ? window.VARIANTES[nombre] : null;
+      if (vConf && vConf.items){
+        var def = (window.preselectedColor && vConf.items[window.preselectedColor]) ? window.preselectedColor
+                  : (vConf.default && vConf.items[vConf.default]) ? vConf.default
+                  : Object.keys(vConf.items)[0];
+        if (def && vConf.items[def] && vConf.items[def].img){
+          src = normSrc(vConf.items[def].img);
+        }
+      }
+
+      // 4) Intento robusto: probar variaciones si falla (espacios, may/min)
+      var imgEl = document.getElementById('zaraModalImage');
+      if (imgEl){
+        if (typeof window.__trySetVariantImage === "function"){
+          window.__trySetVariantImage(src, normSrc(src0));
+        }else{
+          imgEl.src = src;
+        }
+      }
+    }catch(e){ /* silenciar para no romper la UX */ }
+  };
+})();
+</script>
+
 </script>
 
 </body>
