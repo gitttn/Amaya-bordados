@@ -412,16 +412,6 @@
   justify-content: center;
   z-index: 10000;
 }
-.zara-modal {
-  background: #fff;
-  padding: 30px;
-  border-radius: 16px;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0 0 40px rgba(0,0,0,0.4);
-  text-align: center;
-  position: relative;
-}
 .zara-modal-close {
   position: absolute;
   top: 10px;
@@ -824,7 +814,7 @@ const productos = [
   },
   {
     nombre: "Sudadera NK",
-    font-siz 21.99,
+    precio: 21.99,
     categoria: "hombre",
     imagenes: ["fotos/Sudadera NK.jpg"]
   },
@@ -1023,6 +1013,8 @@ function openZaraModal(product, index) {
   document.getElementById("zaraModalPrice").textContent = product.price;
   document.getElementById("zaraModal").style.display = "flex";
 }
+function openModal(i){ try{ const p=productos?.[i]; if(!p) return; openZaraModal({ image: p.imagenes?.[0]||'', name: p.nombre, price: ((Number(p.precio)||0).toFixed(2))+' €' }, i); }catch(e){} }
+
 function closeZaraModal() {
   document.getElementById("zaraModal").style.display = "none";
 }
