@@ -789,6 +789,58 @@
 .modal-overlay{ backdrop-filter: blur(2px); }
 body.modal-open{ overflow: hidden; }
 
+
+/* --- Centrado real del modal y correcciones de overlay --- */
+*{ box-sizing: border-box; }
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6vh 3vw;
+  background: rgba(0,0,0,.45);
+  overflow: auto;
+}
+.zara-modal{
+  margin: 0 auto;
+  max-height: calc(var(--vh, 1vh) * 100 - 12vh);
+  width: min(920px, 94vw);
+}
+@media (max-width: 768px){
+  .modal-overlay{
+    padding: 5vh 3vw;
+  }
+  .zara-modal{
+    width: 94vw;
+    max-height: calc(var(--vh, 1vh) * 100 - 10vh);
+  }
+  .zara-modal .zara-modal-body{
+    max-height: calc(var(--vh, 1vh) * 100 - 26vh);
+  }
+}
+
+
+/* --- SEGURIDAD: el overlay no intercepta clicks si está oculto --- */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  display: none;           /* oculto por defecto */
+  pointer-events: none;    /* sin clicks cuando está oculto */
+  background: rgba(0,0,0,.45);
+  z-index: 999;
+}
+.modal-overlay.is-visible{
+  display: flex;           /* visible solo con esta clase */
+  pointer-events: auto;
+}
+.zara-modal{
+  position: relative;
+  display: none;           /* oculto por defecto */
+  z-index: 1000;
+}
+.zara-modal.is-visible{ display: block; }
+
 </style>
 
 </head>
@@ -1462,6 +1514,130 @@ function setVH(){
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 setVH(); window.addEventListener('resize', setVH);
+
+
+/* --- PARCHE: Reemplazo seguro de renderizarProductos y binding de click --- */
+(function(){
+  if (typeof productos === "undefined") return;
+
+  window.renderizarProductos = function(lista){
+    var cont = document.getElementById("lista-productos");
+    if(!cont) return;
+    cont.innerHTML = "";
+    (lista||[]).forEach(function(p, i){
+      var card = document.createElement("div");
+      card.className = "product-card";
+
+      var imgWrap = document.createElement("div");
+      imgWrap.className = "product-image";
+
+      var img = document.createElement("img");
+      img.loading = "lazy";
+      img.alt = p?.nombre || "";
+      img.src = (p?.imagenes && p.imagenes[0]) ? p.imagenes[0] : "";
+      imgWrap.appendChild(img);
+
+      // nombre
+      var title = document.createElement("div");
+      title.className = "product-title";
+      title.textContent = p?.nombre || "";
+
+      var price = document.createElement("div");
+      price.className = "product-price";
+      var value = Number(p?.precio) || 0;
+      price.textContent = value.toFixed(2) + " €";
+
+      card.appendChild(imgWrap);
+      card.appendChild(title);
+      card.appendChild(price);
+      cont.appendChild(card);
+
+      // abrir modal al click
+      card.addEventListener("click", function(){
+        try{
+          var data = {
+            image: (p?.imagenes && p.imagenes[0]) ? p.imagenes[0] : "",
+            name: p?.nombre || "",
+            price: (Number(p?.precio)||0).toFixed(2) + " €"
+          };
+          if (typeof openZaraModal === "function"){
+            openZaraModal(data, i);
+            document.body.classList.add('modal-open');
+          } else if (typeof openModal === "function"){
+            openModal(i);
+            document.body.classList.add('modal-open');
+          }
+        }catch(e){ console && console.warn(e); }
+      });
+    });
+  };
+
+  // Re-render inicial por si la primera ejecución usó la versión corrupta
+  try{ renderizarProductos(productos); }catch(e){}
+})();
+
+
+/* --- SEGURIDAD: controla visibilidad del modal/overlay y evita que la web quede bloqueada --- */
+(function(){
+  // Esconde cualquier overlay suelto al cargar
+  function hideAllOverlays(){
+    document.querySelectorAll('#modalOverlay, #infoOverlay, #checkoutOverlay, .modal-overlay')
+      .forEach(el => { el.style.display = 'none'; el.classList.remove('is-visible'); });
+    document.querySelectorAll('.zara-modal').forEach(el => { el.style.display='none'; el.classList.remove('is-visible'); });
+    document.body.classList.remove('modal-open');
+  }
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', hideAllOverlays);
+  } else { hideAllOverlays(); }
+
+  // Helper para abrir/cerrar con clases
+  function showModalClasses(){
+    const overlay = document.getElementById('modalOverlay') || document.querySelector('.modal-overlay');
+    const modal   = document.getElementById('zaraModal')   || document.querySelector('.zara-modal');
+    if (overlay){ overlay.classList.add('is-visible'); overlay.style.display='flex'; }
+    if (modal){ modal.classList.add('is-visible'); modal.style.display='block'; }
+    document.body.classList.add('modal-open');
+  }
+  function hideModalClasses(){
+    const overlay = document.getElementById('modalOverlay') || document.querySelector('.modal-overlay');
+    const modal   = document.getElementById('zaraModal')   || document.querySelector('.zara-modal');
+    if (overlay){ overlay.classList.remove('is-visible'); overlay.style.display='none'; }
+    if (modal){ modal.classList.remove('is-visible'); modal.style.display='none'; }
+    document.body.classList.remove('modal-open');
+  }
+
+  // Envuelve openZaraModal si existe
+  if (typeof window.openZaraModal === 'function'){
+    const _origOpen = window.openZaraModal;
+    window.openZaraModal = function(data, i){
+      try{ _origOpen.call(this, data, i); }catch(e){}
+      showModalClasses();
+    };
+  }
+
+  // Envuelve closeZaraModal si existe
+  if (typeof window.closeZaraModal === 'function'){
+    const _origClose = window.closeZaraModal;
+    window.closeZaraModal = function(){
+      try{ _origClose.call(this); }catch(e){}
+      hideModalClasses();
+    };
+  }
+
+  // Cierre por overlay o botón con clase .modal-close
+  document.addEventListener('click', function(e){
+    if (e.target.classList && e.target.classList.contains('modal-overlay')){
+      hideModalClasses();
+    }
+    if (e.target.closest && e.target.closest('.modal-close')){
+      hideModalClasses();
+    }
+  });
+
+  // Exponer helpers por si los necesitas en tus handlers
+  window.__showModalClasses = showModalClasses;
+  window.__hideModalClasses = hideModalClasses;
+})();
 
 </script>
 
