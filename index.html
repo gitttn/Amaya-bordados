@@ -746,6 +746,49 @@
   color: #222;
   margin-top: 6px;
 }
+
+/* --- Fix modal en móvil (solo añade) --- */
+@media (max-width: 768px){
+  .zara-modal{
+    width: 92vw;
+    max-width: 920px;
+    margin: 6vh auto;
+    padding: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .zara-modal .zara-modal-body{
+    padding: 12px 14px 88px; /* deja hueco al botón */
+    max-height: calc(var(--vh, 1vh) * 100 - 24vh);
+    overflow: auto;
+  }
+  .zara-modal img{
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: calc(var(--vh, 1vh) * 100 - 48vh);
+    object-fit: contain;
+    background: #fff;
+    margin: 0;
+  }
+  .zara-modal .zara-modal-footer{
+    position: sticky;
+    bottom: 0;
+    left: 0; right: 0;
+    padding: 12px 14px;
+    background: #fff;
+    border-top: 1px solid rgba(0,0,0,.08);
+    z-index: 2;
+  }
+  .zara-modal .add-btn{
+    width: 100%;
+    border-radius: 999px;
+  }
+}
+.modal-overlay{ backdrop-filter: blur(2px); }
+body.modal-open{ overflow: hidden; }
+
 </style>
 
 </head>
@@ -1412,6 +1455,14 @@ window.agregarEventosModalZara = function() {
     });
   };
 })();
+
+/* Ajustar vh en móviles */
+function setVH(){
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+setVH(); window.addEventListener('resize', setVH);
+
 </script>
 
 </body>
