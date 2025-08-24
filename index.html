@@ -897,6 +897,21 @@ body.modal-open{ overflow: hidden; }
   .zara-modal img{ max-height: 30vh; }
 }
 
+
+/* --- Modal compacto sin barra (override final) --- */
+.zara-modal{
+  max-height: 80vh !important;
+}
+.zara-modal .zara-modal-body{
+  max-height: calc(80vh - 160px) !important;
+  overflow: hidden !important;
+  padding-bottom: 80px !important; /* espacio para el botón */
+}
+.zara-modal img{
+  max-height: 28vh !important;
+  object-fit: contain !important;
+}
+
 </style>
 
 </head>
