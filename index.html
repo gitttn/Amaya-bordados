@@ -1571,6 +1571,14 @@ function confirmarInfo() {
 
 function openZaraModal(product, index) {
   window.currentZaraProduct = index;
+  window.currentImageIndex = 0;
+  try{
+    var imgs = (window.productos && window.productos[index] && window.productos[index].imagenes) ? window.productos[index].imagenes : [];
+    var prevBtn = document.querySelector('.zara-prev');
+    var nextBtn = document.querySelector('.zara-next');
+    if(prevBtn) prevBtn.style.display = (imgs.length>1)?'block':'none';
+    if(nextBtn) nextBtn.style.display = (imgs.length>1)?'block':'none';
+  }catch(e){}
   document.getElementById("zaraModalImage").src = product.image;
   document.getElementById("zaraModalTitle").textContent = product.name;
   document.getElementById("zaraModalPrice").textContent = product.price;
@@ -1726,8 +1734,7 @@ exist.innerHTML = '<span class="label">Color:</span>' + entries.map(([nombre,dat
     });
   });
 
-  document.getElementById("zaraModalTitle").textContent = nombreProd + " - " + def;
-}
+  document.getElementById("zaraModalTitle").textContent = nombreProd + " - " + def;}
 
 // Parches suaves para openZaraModal y addToCartFromModal
 const _openZara = window.openZaraModal;
