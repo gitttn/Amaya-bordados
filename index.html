@@ -1637,29 +1637,16 @@ function addToCartFromModal() {
 
 <script>
 // Variantes de color por producto
+
+// Variantes de color por producto
 const VARIANTES = {
-
-  "Sudadera Goku NK": {
-    default: "Gris Jaspeado",
-    items: {
-      "Gris Jaspeado": { hex:"#b0b0b0", img:"fotos/Sudadera Goku NK.jpg" }
-    }
-  },
-  "Jersey Boss": {
-    default: "Azul Oscuro",
-    items: {
-      "Azul Oscuro": { hex:"#0d1b2a", img:"fotos/Boss1.jpg" }
-    }
-  },
-
-  
   "Sudadera NK": {
     default: "Gris",
     items: {
       "Gris": { hex:"#888888", img:"fotos/Sudadera NK.jpg" }
     }
   },
-"Sudadera M5": {
+  "Sudadera M5": {
     default: "Negro",
     items: {
       "Negro": { hex:"#111111", img:"fotos/sudadera_m5.jpg" }
@@ -1677,19 +1664,29 @@ const VARIANTES = {
   "Sudadera Sparco": {
     default: "Negro",
     items: {
-      "Negro": { hex:"#111111", img:"fotos/Sudadera Sparco.png" },
+      "Negro": { hex:"#111111", img:"fotos/Sudadera Sparco.png" }
     }
   },
   "Sudadera Kawasaki": {
     default: "Negro",
     items: {
-      "Negro": { hex:"#111111", img:"fotos/Sudadera Kawasaki.jpg" },
+      "Negro": { hex:"#111111", img:"fotos/Sudadera Kawasaki.jpg" }
     }
   },
-  
+  "Sudadera Goku NK": {
+    default: "Gris Jaspeado",
+    items: {
+      "Gris Jaspeado": { hex:"#b0b0b0", img:"fotos/Sudadera Goku NK.jpg" }
+    }
+  },
+  "Jersey Boss": {
+    default: "Azul Oscuro",
+    items: {
+      "Azul Oscuro": { hex:"#0d1b2a", img:"fotos/Boss1.jpg" }
     }
   }
 };
+
 
 function renderColorPicker(nombreProd){
   const conf = VARIANTES[nombreProd];
