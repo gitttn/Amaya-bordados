@@ -881,6 +881,36 @@ button, .btn, .pill, .seg-btn, .color-swatch {
   box-shadow: 0 0 0 2px #fff inset;
 }
 
+
+/* === Carrusel en modal Zara (flechas centradas, negras y simples con hover) === */
+.zara-prev,
+.zara-next {
+  position: absolute;
+  top: 50%;                   
+  transform: translateY(-50%);
+  background: none;           
+  color: #000;                
+  border: none;
+  font-size: 34px;            
+  padding: 0;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+.zara-prev { left: 14px; }    
+.zara-next { right: 14px; }
+
+/* Efecto hover: gris oscuro */
+.zara-prev:hover,
+.zara-next:hover {
+  color: #444;
+}
+
+@media (max-width:700px){
+  .zara-carousel img{ max-height:38vh; }
+  .zara-prev, .zara-next { font-size: 28px; }
+}
+
 </style>
 
 <style>
@@ -1200,6 +1230,36 @@ body.modal-open{ overflow: hidden; }
 .zara-prev{left:10px}.zara-next{right:10px}
 @media (max-width:700px){.zara-carousel img{max-height:38vh}}
 
+</style>
+<style>
+/* === Carrusel en modal Zara (flechas simples negras, sin círculo) === */
+.zara-prev,
+.zara-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #000 !important;
+  font-size: 34px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.zara-prev { left: 14px; }
+.zara-next { right: 14px; }
+
+/* Hover en gris oscuro */
+.zara-prev:hover,
+.zara-next:hover {
+  color: #444;
+}
+
+@media (max-width:700px){
+  .zara-prev, .zara-next { font-size: 28px; }
+}
 </style>
 </head>
 <body>
