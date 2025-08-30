@@ -882,6 +882,7 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 }
 
 </style>
+
 <style>
 
 /* === Modal móvil sin scroll general: botón AÑADIR siempre visible === */
@@ -925,12 +926,15 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
+
 <style>
 .product-card{ cursor:pointer; }
 .product-card button{ cursor:default; }
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
+
+
 <style>
 .product-card {
   cursor: pointer;
@@ -948,6 +952,8 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
+
+
 <style>
 /* Quitar por completo el “flash” azul de Android/Chrome */
 .product-card,
@@ -974,7 +980,9 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&amp;display=swap" rel="stylesheet"/>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
 <style>
   .product-title {
   font-family: 'Montserrat', sans-serif;
@@ -1169,6 +1177,8 @@ body.modal-open{ overflow: hidden; }
 }
 
 </style>
+
+
 <style>
   /* Conjuntos: tarjeta única sin imágenes */
   #seccion-conjuntos .card{ background:#f9f9f9; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; }
@@ -1179,36 +1189,16 @@ body.modal-open{ overflow: hidden; }
   #seccion-conjuntos .color-swatch{ width:22px; height:22px; border-radius:50%; border:1px solid #ccc; cursor:pointer; }
   #seccion-conjuntos .btn{ background:#fff; border:1px solid #000; color:#000; padding:10px 16px; border-radius:999px; cursor:pointer; font-size:14px; }
   #seccion-conjuntos .btn:hover{ background:#000; color:#fff; }
+</style>
 
-/* Flechas negras para el hooking */
-.zara-carousel {
-  position: relative;
-  width: 100%;
-  height: 280px;
-}
-.zara-carousel img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 10px;
-  background: #fff;
-}
-.zara-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  font-size: 22px;
-  cursor: pointer;
-  border-radius: 50%;
-  z-index: 10;
-  display: none;
-}
-.zara-arrow.left { left: 10px; }
-.zara-arrow.right { right: 10px; }
+<style>
+
+/* === Carrusel en modal Zara (no intrusivo) === */
+.zara-carousel{position:relative;display:flex;align-items:center;justify-content:center}
+.zara-carousel img{width:100%;height:auto;max-height:400px;object-fit:contain}
+.zara-prev,.zara-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;font-size:24px;padding:8px 12px;border-radius:50%;cursor:pointer}
+.zara-prev{left:10px}.zara-next{right:10px}
+@media (max-width:700px){.zara-carousel img{max-height:38vh}}
 
 </style>
 </head>
@@ -1249,74 +1239,85 @@ body.modal-open{ overflow: hidden; }
 <button onclick="filtrarCategoria('mujer', this)">Mujer</button>
 <button onclick="filtrarCategoria('hombre', this)">Hombre</button>
 <button onclick="filtrarCategoria('infantil', this)">Infantil</button>
-<button id="btnConjuntos" onclick="document.getElementById('seccion-conjuntos').scrollIntoView({behavior:'smooth'});" type="button">Conjuntos Personalizados</button>
+<button type="button" onclick="try{openConjuntos()}catch(e){var s=document.getElementById('seccion-conjuntos');var l=document.getElementById('lista-productos'); if(s){s.style.display='block';} if(l){l.style.display='none';} }" id="btnConjuntos" onclick="event.preventDefault(); event.stopPropagation(); mostrarConjuntos(); return false;" onclick="document.getElementById('seccion-conjuntos').scrollIntoView({behavior:'smooth'});">Conjuntos Personalizados</button>
 <button onclick="filtrarCategoria('regalos', this)">Regalos</button>
+
 </div>
 <!-- Sección Conjuntos Personalizados (oculta por defecto) -->
 <div id="seccion-conjuntos" style="display:none; padding:10px 10px 60px;">
-<div id="grid-conjuntos" style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px;">
-<div class="card">
-<div class="title">Conjunto personalizado</div>
-<div class="row">
-<span class="label">Tipo:</span>
-<div id="cj_tipo_grp">
-<button aria-pressed="true" class="seg-btn" data-id="doble_camiseta">Doble Camiseta</button>
-<button aria-pressed="false" class="seg-btn" data-id="doble_sudadera">Doble Sudadera</button>
-<button aria-pressed="false" class="seg-btn" data-id="camiseta_body">Camiseta + Body Bebé</button>
-<button aria-pressed="false" class="seg-btn" data-id="sudadera_body">Sudadera + Body Bebé</button>
-<button aria-pressed="false" class="seg-btn" data-id="camiseta_nino">Camiseta + Camiseta Niño</button>
-<button aria-pressed="false" class="seg-btn" data-id="sudadera_nino">Sudadera + Sudadera Niño</button>
-</div>
-</div>
-<div class="row">
-<span class="label">Color:</span>
-<div class="row" id="cj_colores">
-<button class="color-swatch" data-active="1" data-color="Blanco" style="background:#eaeaea" title="Blanco"></button>
-<button class="color-swatch" data-color="Negro" style="background:#111111" title="Negro"></button>
-</div>
-</div>
-<div class="row">
-<span class="label">Adulto:</span>
-<div class="pills" id="cj_adulto_grp">
-<button aria-pressed="true" class="pill" data-val="XS">XS</button>
-<button aria-pressed="false" class="pill" data-val="S">S</button>
-<button aria-pressed="false" class="pill" data-val="M">M</button>
-<button aria-pressed="false" class="pill" data-val="L">L</button>
-<button aria-pressed="false" class="pill" data-val="XL">XL</button>
-</div>
-<span class="label" id="cj_precio_adulto">(14.99 €)</span>
-</div>
-<div class="row" id="row_bebe" style="display:flex;">
-<span class="label">Bebé:</span>
-<div class="pills" id="cj_bebe_grp">
-<button aria-pressed="true" class="pill" data-val="0-3m">0-3m</button>
-<button aria-pressed="false" class="pill" data-val="3-6m">3-6m</button>
-<button aria-pressed="false" class="pill" data-val="6-9m">6-9m</button>
-<button aria-pressed="false" class="pill" data-val="9-12m">9-12m</button>
-</div>
-<span class="label" id="cj_precio_bebe">(11.99 €)</span>
-</div>
-<div class="row" id="row_nino" style="display:none;">
-<span class="label">Niño:</span>
-<div class="pills" id="cj_nino_grp">
-<button aria-pressed="true" class="pill" data-val="3-4">3-4</button>
-<button aria-pressed="false" class="pill" data-val="5-6">5-6</button>
-<button aria-pressed="false" class="pill" data-val="7-8">7-8</button>
-<button aria-pressed="false" class="pill" data-val="9-10">9-10</button>
-</div>
-<span class="label" id="cj_precio_nino">(0.00 €)</span>
-</div>
-<div class="row" style="justify-content:space-between; margin-top:8px;">
-<span class="label" style="font-weight:600;">Total:</span>
-<span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
-</div>
-<div class="row" style="justify-content:center;">
-<button class="btn" id="cj_add">Añadir conjunto</button>
-</div>
-</div>
-</div>
+  
+  <div id="grid-conjuntos" style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px;">
+      <div class="card">
+        <div class="title">Conjunto personalizado</div>
+
+        <div class="row">
+          <span class="label">Tipo:</span>
+          <div  id="cj_tipo_grp">
+            <button class="seg-btn" data-id="doble_camiseta" aria-pressed="true">Doble Camiseta</button>
+            <button class="seg-btn" data-id="doble_sudadera" aria-pressed="false">Doble Sudadera</button>
+            <button class="seg-btn" data-id="camiseta_body" aria-pressed="false">Camiseta + Body Bebé</button>
+            <button class="seg-btn" data-id="sudadera_body" aria-pressed="false">Sudadera + Body Bebé</button>
+            <button class="seg-btn" data-id="camiseta_nino" aria-pressed="false">Camiseta + Camiseta Niño</button>
+            <button class="seg-btn" data-id="sudadera_nino" aria-pressed="false">Sudadera + Sudadera Niño</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <span class="label">Color:</span>
+          <div class="row" id="cj_colores">
+      <button class="color-swatch" data-color="Blanco" title="Blanco" style="background:#eaeaea" data-active="1"></button>
+      <button class="color-swatch" data-color="Negro" title="Negro" style="background:#111111"></button>
+    </div>
+        </div>
+
+        <div class="row">
+          <span class="label">Adulto:</span>
+          <div class="pills" id="cj_adulto_grp">
+            <button class="pill" data-val="XS" aria-pressed="true">XS</button>
+            <button class="pill" data-val="S" aria-pressed="false">S</button>
+            <button class="pill" data-val="M" aria-pressed="false">M</button>
+            <button class="pill" data-val="L" aria-pressed="false">L</button>
+            <button class="pill" data-val="XL" aria-pressed="false">XL</button>
+          </div>
+          <span class="label" id="cj_precio_adulto">(14.99 €)</span>
+        </div>
+
+        <div class="row" id="row_bebe" style="display:flex;">
+          <span class="label">Bebé:</span>
+          <div class="pills" id="cj_bebe_grp">
+            <button class="pill" data-val="0-3m" aria-pressed="true">0-3m</button>
+            <button class="pill" data-val="3-6m" aria-pressed="false">3-6m</button>
+            <button class="pill" data-val="6-9m" aria-pressed="false">6-9m</button>
+            <button class="pill" data-val="9-12m" aria-pressed="false">9-12m</button>
+          </div>
+          <span class="label" id="cj_precio_bebe">(11.99 €)</span>
+        </div>
+
+        <div class="row" id="row_nino" style="display:none;">
+          <span class="label">Niño:</span>
+          <div class="pills" id="cj_nino_grp">
+            <button class="pill" data-val="3-4" aria-pressed="true">3-4</button>
+            <button class="pill" data-val="5-6" aria-pressed="false">5-6</button>
+            <button class="pill" data-val="7-8" aria-pressed="false">7-8</button>
+            <button class="pill" data-val="9-10" aria-pressed="false">9-10</button>
+          </div>
+          <span class="label" id="cj_precio_nino">(0.00 €)</span>
+        </div>
+
+        
+    <div class="row" style="justify-content:space-between; margin-top:8px;">
+      <span class="label" style="font-weight:600;">Total:</span>
+      <span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
+    </div>
+    <div class="row" style="justify-content:center;">
+          <button class="btn" id="cj_add">Añadir conjunto</button>
+        </div>
+    
+      </div>
+    </div>
 </div>
 <div class="product-list" id="lista-productos"></div>
+
 <script>
     
 
@@ -1331,7 +1332,7 @@ const productos = [
     nombre: "Sudadera Goku NK",
     precio: 24,
     categoria: "hombre",
-    imagenes: ["fotos/Sudadera Goku NK.jpg"]
+    imagenes: [ "fotos/Sudadera Goku NK.jpg", "fotos/Sudadera Goku NK.png" ]
   },
   {
     nombre: "Sudadera Sparco",
@@ -1590,7 +1591,7 @@ function addToCartFromModal() {
 <div class="zara-modal-overlay" id="zaraModal" style="display:none;">
 <div class="zara-modal">
 <button class="zara-modal-close" onclick="closeZaraModal()">✖</button>
-<img alt="Imagen del producto" id="zaraModalImage" src=""/>
+<div class="zara-carousel"><button class="zara-prev" type="button" onclick="cambiarImagen(-1)" aria-label="Anterior">‹</button><img alt="Imagen del producto" id="zaraModalImage" src=""/><button class="zara-next" type="button" onclick="cambiarImagen(1)" aria-label="Siguiente">›</button></div>
 <div class="zara-modal-info">
 <h2 id="zaraModalTitle"></h2>
 <p id="zaraModalPrice"></p>
@@ -1598,6 +1599,7 @@ function addToCartFromModal() {
 </div>
 </div>
 </div>
+
 <script>
 // Variantes de color por producto
 const VARIANTES = {
@@ -1614,7 +1616,7 @@ const VARIANTES = {
       "Negro": { hex:"#111111", img:"fotos/sudadera_m5.jpg" }
     }
   },
-  "Sudadera Goku NK": {
+  "Chaqueta NK": {
     default: "Beige",
     items: {
       "Beige": { hex:"#d9c7a6", img:"fotos/Chaqueta NK Beige.png" },
@@ -1626,7 +1628,7 @@ const VARIANTES = {
   "Sudadera Sparco": {
     default: "Negro",
     items: {
-      "Negro": { hex:"#111111", img:"fotos/Sudadera Sparco.jpg" },
+      "Negro": { hex:"#111111", img:"fotos/Sudadera Sparco.png" },
     }
   },
   "Sudadera Kawasaki": {
@@ -1635,14 +1637,10 @@ const VARIANTES = {
       "Negro": { hex:"#111111", img:"fotos/Sudadera Kawasaki.jpg" },
     }
   },
-  "Jersey Boss1": {
-    default: "Negro",
+  "Jersey Boss": {
+    default: "Azul Oscuro",
     items: {
-      "Beige": { hex:"#d9c7a6", img:"fotos/set_de_regalo_beige.jpg" },
-      "Negro": { hex:"#111111", img:"fotos/set_de_regalo_negro.jpg" },
-      "Blanco": { hex:"#eaeaea", img:"fotos/set_de_regalo_blanco.jpg" },
-      "Azul": { hex:"#1f6feb", img:"fotos/set_de_regalo_azul.jpg" },
-      "Rojo": { hex:"#e10600", img:"fotos/set_de_regalo_rojo.jpg" }
+      "Azul Oscuro": { hex:"#00001a", img:"fotos/Boss1.jpg" },
     }
   }
 };
@@ -1715,6 +1713,8 @@ window.addToCartFromModal = function(){
   _addToCart();
 };
 </script>
+
+
 <script>
 const DEFAULT_SIZES = ["XS","S","M","L","XL"];
 function renderSizePicker(nombreProd){
@@ -1744,6 +1744,8 @@ function renderSizePicker(nombreProd){
   });
 }
 </script>
+
+
 <script>
 // ==== Carga robusta de imagen para variantes ====
 (function(){
@@ -1788,6 +1790,8 @@ function renderSizePicker(nombreProd){
   };
 })();
 </script>
+
+
 <!-- Override mínimo y seguro: lista visible + reenganche modal -->
 <script>
 // Lista de productos visibles en pantalla
@@ -1855,6 +1859,8 @@ window.agregarEventosModalZara = function() {
   });
 };
 </script>
+
+
 <!-- Forzar botón AÑADIR visible y sticky en el modal (añade clase si falta) -->
 <script>
 (function(){
@@ -1883,6 +1889,8 @@ window.agregarEventosModalZara = function() {
   setTimeout(etiquetarBotonAnadir, 100);
 })();
 </script>
+
+
 <script>
 (function(){
   // Engancha el click en toda la tarjeta, no solo en la imagen
@@ -2107,6 +2115,9 @@ setVH(); window.addEventListener('resize', setVH);
   };
 })();
 </script>
+
+</script>
+
 
 <script>
 // === Datos base de tipos, colores y tallas ===
@@ -2467,6 +2478,8 @@ function volverATienda(){
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
 })();
 </script>
+
+
 <script>
 // ===== Attach professional sheet behavior to the product options modal =====
 (function(){
@@ -2515,6 +2528,8 @@ function volverATienda(){
   });
 })();
 </script>
+
+
 <script>
 (function(){
   function asegurarTarjeta(){
@@ -2538,6 +2553,8 @@ function volverATienda(){
   };
 })();
 </script>
+
+
 <script>
 (function(){
   const TIPOS = {
@@ -2628,6 +2645,8 @@ function volverATienda(){
     if (typeof addToCart === 'function'){ addToCart(nombre, precio); }});
 })();
 </script>
+
+
 <script>
 function mostrarConjuntos() {
   const lista = document.getElementById("lista-productos");
@@ -2659,6 +2678,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
   });
 });
 </script>
+
+
 <script>
 // Forzar que el botón activo del filtro se vea correctamente
 document.addEventListener("DOMContentLoaded", () => {
@@ -2679,6 +2700,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }, true);
 });
 </script>
+
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const filtros = document.querySelectorAll(".filters button");
@@ -2690,36 +2713,46 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+
+
 <script>
-let zaraImageIndex = 0;
-let zaraImageList = [];
-
-function changeZaraImage(dir) {
-  if (!zaraImageList.length) return;
-  zaraImageIndex = (zaraImageIndex + dir + zaraImageList.length) % zaraImageList.length;
-  document.getElementById("zaraModalImage").src = zaraImageList[zaraImageIndex];
-}
-
-// Hook para extender openZaraModal sin sobrescribirla
-const oldOpenZaraModal = window.openZaraModal;
-window.openZaraModal = function(prod, index){
-  if (typeof oldOpenZaraModal === "function") oldOpenZaraModal(prod, index);
-
-  // Activar carrusel si hay más de una imagen
-  if (prod.images && prod.images.length > 1) {
-    zaraImageList = prod.images;
-    zaraImageIndex = 0;
-    document.getElementById("zaraModalImage").src = zaraImageList[zaraImageIndex];
-    document.querySelector(".zara-arrow.left").style.display = "block";
-    document.querySelector(".zara-arrow.right").style.display = "block";
-  } else {
-    zaraImageList = [prod.image];
-    zaraImageIndex = 0;
-    document.getElementById("zaraModalImage").src = prod.image;
-    document.querySelector(".zara-arrow.left").style.display = "none";
-    document.querySelector(".zara-arrow.right").style.display = "none";
+// --- Carrusel para productos con múltiples imágenes (p.ej. Sudadera Goku NK) ---
+(function(){
+  var currentImageIndex = 0;
+  function setImageByIndex(index){
+    try{
+      var p = (typeof window.currentZaraProduct !== 'undefined') ? (window.productos && window.productos[window.currentZaraProduct]) : null;
+      if(!p || !p.imagenes || !p.imagenes.length) return;
+      currentImageIndex = (index + p.imagenes.length) % p.imagenes.length;
+      var el = document.getElementById('zaraModalImage');
+      if(el){ el.src = p.imagenes[currentImageIndex]; }
+    }catch(e){}
   }
-};
+  window.cambiarImagen = function(dir){
+    try{
+      var p = (typeof window.currentZaraProduct !== 'undefined') ? (window.productos && window.productos[window.currentZaraProduct]) : null;
+      if(!p || !p.imagenes || !p.imagenes.length) return;
+      setImageByIndex((currentImageIndex + (Number(dir)||0)));
+    }catch(e){}
+  };
+  // Envolver openZaraModal (manteniendo otros wrappers que ya tengas)
+  var __open = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    if(typeof __open === 'function'){ __open.apply(this, arguments); }
+    try{
+      window.currentZaraProduct = index;
+      currentImageIndex = 0;
+      var p = window.productos && window.productos[index];
+      if(p && p.imagenes && p.imagenes.length){
+        var el = document.getElementById('zaraModalImage');
+        if(el){ el.src = p.imagenes[0]; }
+      }else{
+        // fallback: dejar lo que ya puso tu modal
+      }
+    }catch(e){}
+  };
+})();
 </script>
+
 </body>
 </html>
