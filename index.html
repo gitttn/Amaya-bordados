@@ -1367,7 +1367,7 @@ const productos = [
     nombre: "Sudadera Goku NK",
     precio: 24,
     categoria: "hombre",
-    imagenes: ["fotos/Sudadera Goku NK.jpg", "fotos/Sudadera Goku NK.png"]
+    imagenes: [ "fotos/Sudadera Goku NK.jpg", "fotos/Sudadera Goku NK.png" ]
   },
   {
     nombre: "Sudadera Sparco",
@@ -1571,13 +1571,16 @@ function confirmarInfo() {
 
 function openZaraModal(product, index) {
   window.currentZaraProduct = index;
+  window.currentImages = (typeof window.getImagesFor==='function') ? window.getImagesFor(index) : [];
   window.currentImageIndex = 0;
   try{
-    var imgs = (window.productos && window.productos[index] && window.productos[index].imagenes) ? window.productos[index].imagenes : [];
+    var el = document.getElementById('zaraModalImage');
+    if(el && window.currentImages.length){ el.src = window.currentImages[0]; }
     var prevBtn = document.querySelector('.zara-prev');
     var nextBtn = document.querySelector('.zara-next');
-    if(prevBtn) prevBtn.style.display = (imgs.length>1)?'block':'none';
-    if(nextBtn) nextBtn.style.display = (imgs.length>1)?'block':'none';
+    var show = (window.currentImages.length>1);
+    if(prevBtn) prevBtn.style.display = show ? 'block' : 'none';
+    if(nextBtn) nextBtn.style.display = show ? 'block' : 'none';
   }catch(e){}
   document.getElementById("zaraModalImage").src = product.image;
   document.getElementById("zaraModalTitle").textContent = product.name;
@@ -1734,7 +1737,11 @@ exist.innerHTML = '<span class="label">Color:</span>' + entries.map(([nombre,dat
     });
   });
 
-  document.getElementById("zaraModalTitle").textContent = nombreProd + " - " + def;}
+  // Inicializar por defecto
+  const defData = conf.items[def];
+  if(defData?.img){ document.getElementById("zaraModalImage").src = defData.img; }
+  document.getElementById("zaraModalTitle").textContent = nombreProd + " - " + def;
+}
 
 // Parches suaves para openZaraModal y addToCartFromModal
 const _openZara = window.openZaraModal;
@@ -2797,6 +2804,33 @@ document.addEventListener("DOMContentLoaded", () => {
         // fallback: dejar lo que ya puso tu modal
       }
     }catch(e){}
+  };
+})();
+</script>
+
+
+<script>
+(function(){
+  function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
+  window.getImagesFor = function(index){
+    try{
+      var p = (window.productos && window.productos[index]) ? window.productos[index] : null;
+      if(!p) return [];
+      var imgs = [];
+      // Array de imágenes del producto
+      if (Array.isArray(p.imagenes) && p.imagenes.length){ imgs = imgs.concat(p.imagenes); }
+      // Campo 'imagen' simple
+      if (p.imagen) imgs.push(p.imagen);
+      // Imagen de variante por defecto (si existe)
+      if (typeof VARIANTES !== "undefined" && VARIANTES[p.nombre]){
+        var conf = VARIANTES[p.nombre];
+        var def = conf && conf.default;
+        if (def && conf.items && conf.items[def] && conf.items[def].img){
+          imgs.push(conf.items[def].img);
+        }
+      }
+      return unique(imgs);
+    }catch(e){ return []; }
   };
 })();
 </script>
