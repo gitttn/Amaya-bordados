@@ -2799,57 +2799,102 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 <style>
-/* Asegura que las flechas sean visibles y clicables encima de la imagen */
+/* Flechas SIEMPRE por encima y clicables */
 #zaraModal .zara-modal-media, #zaraModal .zara-carousel{ position:relative !important; }
 #zaraModal .zara-prev, #zaraModal .zara-next{
   position:absolute !important; top:50% !important; transform:translateY(-50%) !important;
   background:none !important; border:none !important; color:#000 !important; font-size:34px !important;
-  padding:0 !important; cursor:pointer !important; line-height:1 !important; z-index:9999 !important;
+  padding:0 !important; cursor:pointer !important; line-height:1 !important;
+  z-index:99999 !important; display:block !important; pointer-events:auto !important; user-select:none;
 }
 #zaraModal .zara-prev{ left:14px !important; }
 #zaraModal .zara-next{ right:14px !important; }
+/* Por si alguna capa tapa los botones */
+#zaraModal *{ pointer-events:auto; }
 </style>
 
 <script>
-/* === Carrusel integrado: usa productos[index].imagenes y conecta las flechas === */
 (function(){
-  // Devuelve la lista de imágenes del producto (JPG primero si está así en datos)
-  function getImages(index, product){
-    try{
-      const p = (window.productos && window.productos[index]) || null;
-      if (p && Array.isArray(p.imagenes)) return p.imagenes.filter(Boolean);
-      if (product && Array.isArray(product.imagenes)) return product.imagenes.filter(Boolean);
-      if (product && product.image) return [product.image];
-      return [];
-    }catch(e){ return []; }
+  const LOG = false; // pon a true si quieres logs en consola
+
+  function elImgModal(){
+    // prioriza #zaraModalImage; si no existe, coge el 1er <img> dentro del modal
+    return document.getElementById('zaraModalImage')
+        || document.querySelector('#zaraModal img')
+        || null;
   }
 
-  // Guarda referencia a tu openZaraModal original y lo envuelve
-  const _open = window.openZaraModal;
-  window.openZaraModal = function(product, index){
-    // Llama al original para mantener tu UI
-    if (typeof _open === "function") _open(product, index);
+  function getImages(index, product){
+    const p = (window.productos && window.productos[index]) || null;
+    let arr = [];
+    if (p && Array.isArray(p.imagenes)) arr = p.imagenes.slice();
+    else if (product && Array.isArray(product.imagenes)) arr = product.imagenes.slice();
+    else if (product && product.image) arr = [product.image];
+    // dedup + filtra falsy
+    return Array.from(new Set(arr.filter(Boolean)));
+  }
 
-    // Inicializa carrusel con todas las imágenes del producto
+  function ensureArrows(){
+    const img = elImgModal();
+    const media = document.querySelector('#zaraModal .zara-modal-media, #zaraModal .zara-carousel') || (img && img.parentElement);
+    if (!media || !img) return;
+    media.querySelectorAll('.zara-prev,.zara-next').forEach(n=>n.remove());
+    const prev = document.createElement('button');
+    prev.className = 'zara-prev'; prev.type='button'; prev.setAttribute('aria-label','Anterior'); prev.textContent='‹';
+    const next = document.createElement('button');
+    next.className = 'zara-next'; next.type='button'; next.setAttribute('aria-label','Siguiente'); next.textContent='›';
+    media.appendChild(prev); media.appendChild(next);
+  }
+
+  // Envolvemos SIEMPRE el openZaraModal que exista (o creamos uno dummy)
+  const _open = window.openZaraModal || function(){};
+  window.openZaraModal = function(product, index){
+    try { _open(product, index); } catch(e){ /* ignora */ }
+
+    // Guarda referencia del producto abierto
+    window.currentZaraProduct = index;
+
+    // Construye la lista de imágenes del producto (JPG -> PNG)
     window.currentImages = getImages(index, product);
     window.currentImageIndex = 0;
 
-    const img = document.getElementById('zaraModalImage');
+    const img = elImgModal();
     if (img && window.currentImages.length){
-      img.src = window.currentImages[0]; // abre con la primera (tu JPG)
+      img.src = window.currentImages[0];
     }
+
+    ensureArrows();
+
+    if (LOG) console.log('[Carrusel] index:', index, 'images:', window.currentImages);
   };
 
-  // Función que usan las flechas del HTML: onclick="cambiarImagen(±1)"
-  window.cambiarImagen = function(dir){
+  // Captura CUALQUIER click en flechas por delegación (aunque el DOM se regenere)
+  document.addEventListener('click', function(e){
+    const prev = e.target.closest('#zaraModal .zara-prev');
+    const next = e.target.closest('#zaraModal .zara-next');
+    if(!prev && !next) return;
+
     const list = Array.isArray(window.currentImages) ? window.currentImages : [];
-    if (!list.length) return;
+    if (!list.length) { if (LOG) console.warn('[Carrusel] Sin imágenes.'); return; }
+
     if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
+    const dir = prev ? -1 : 1;
+    window.currentImageIndex = (window.currentImageIndex + dir + list.length) % list.length;
 
-    window.currentImageIndex = (window.currentImageIndex + Number(dir) + list.length) % list.length;
-
-    const img = document.getElementById('zaraModalImage');
+    const img = elImgModal();
     if (img) img.src = list[window.currentImageIndex];
+    if (LOG) console.log('[Carrusel] nueva idx:', window.currentImageIndex, 'src:', list[window.currentImageIndex]);
+  }, true);
+
+  // (Opcional) evita que un render de variantes pise la imagen al abrir
+  const _rcp = window.renderColorPicker;
+  window.renderColorPicker = function(nombre){
+    const ret = (typeof _rcp === 'function') ? _rcp(nombre) : undefined;
+    if (Array.isArray(window.currentImages) && window.currentImages[0]){
+      const img = elImgModal();
+      if (img && !img.dataset.userChanged) img.src = window.currentImages[0];
+    }
+    return ret;
   };
 })();
 </script>
