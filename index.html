@@ -869,6 +869,18 @@ button, .btn, .pill, .seg-btn, .color-swatch {
   .zara-prev, .zara-next { font-size: 28px; }
 }
 
+
+/* Flechas SIEMPRE visibles en el modal */
+.zara-modal-media,.zara-carousel{ position:relative; }
+.zara-prev,.zara-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:none; border:none; color:#000; font-size:34px;
+  padding:0; cursor:pointer; line-height:1; z-index:50;
+  display:block !important; /* <- nunca ocultar por JS/CSS previos */
+}
+.zara-prev{ left:14px; }
+.zara-next{ right:14px; }
+
 </style>
 
 <style>
@@ -1630,7 +1642,7 @@ const VARIANTES = {
   "Sudadera Goku NK": {
     default: "Gris Jaspeado",
     items: {
-      "Gris Jaspeado": { hex:"#b0b0b0", img:"fotos/Goku atras.png" }
+      "Gris Jaspeado": { hex:"#b0b0b0", img:"fotos/Sudadera Goku NK.png" }
     }
   },
   "Jersey Boss": {
