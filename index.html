@@ -2798,75 +2798,95 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
-<!-- === Carrusel HARD-OVERRIDE integrado (modal original) === -->
+<!-- === CARRUSEL FINAL LIMPIO (flechas encima + delegación) === -->
 <style>
-#zaraModal .zara-modal-media, #zaraModal .zara-carousel{ position:relative !important; }
-#zaraModal .zara-prev, #zaraModal .zara-next{
-  position:absolute !important; top:50% !important; transform:translateY(-50%) !important;
-  background:none !important; border:none !important; color:#000 !important; font-size:34px !important;
-  padding:0 !important; cursor:pointer !important; line-height:1 !important; z-index:99999 !important;
-  display:block !important; pointer-events:auto !important; user-select:none;
+/* Contenedor del media dentro del modal */
+#zaraModal .zara-modal-media, 
+#zaraModal .zara-carousel { position: relative !important; }
+
+/* Imagen SIEMPRE por debajo de las flechas */
+#zaraModal img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 1;                 /* debajo de flechas */
+  pointer-events: auto;
 }
-#zaraModal .zara-prev{ left:14px !important; }
-#zaraModal .zara-next{ right:14px !important; }
+
+/* Flechas negras, encima de la imagen y clicables */
+#zaraModal .zara-prev,
+#zaraModal .zara-next {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  color: #000 !important;
+  font-size: 34px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  z-index: 99999 !important;  /* por ENCIMA de la imagen */
+  pointer-events: auto !important;
+  user-select: none !important;
+}
+#zaraModal .zara-prev  { left: 14px !important; }
+#zaraModal .zara-next  { right: 14px !important; }
 </style>
 
 <script>
 (function(){
   function dedup(a){ return Array.from(new Set((a||[]).filter(Boolean))); }
-  function elModal(){ return document.getElementById('zaraModal'); }
-  function elImg(){ return document.getElementById('zaraModalImage') || (elModal() && elModal().querySelector('img')) || null; }
-  function elMedia(){ return (elModal() && elModal().querySelector('.zara-modal-media, .zara-carousel')) || (elImg() && elImg().parentElement) || null; }
+  function $modal(){ return document.getElementById('zaraModal'); }
+  function $img(){
+    return document.getElementById('zaraModalImage') || ($modal() && $modal().querySelector('img')) || null;
+  }
+  function $media(){
+    return ($modal() && $modal().querySelector('.zara-modal-media, .zara-carousel')) || ($img() && $img().parentElement) || null;
+  }
+
+  // Listado de imágenes para el producto actual
   function getImages(product, index){
     try{
       let list = [];
       if (index!=null && Array.isArray(window.productos) && window.productos[index] && Array.isArray(window.productos[index].imagenes)){
         list = window.productos[index].imagenes.slice();
+      } else if (product && Array.isArray(product.imagenes)){
+        list = product.imagenes.slice();
+      } else if (product && product.image){
+        list = [product.image];
       }
-      if (!list.length && product && Array.isArray(product.imagenes)) list = product.imagenes.slice();
-      if (!list.length && product && product.image) list = [product.image];
       return dedup(list);
     }catch(e){ return []; }
   }
 
+  // Inserta flechas y elimina duplicadas
   function ensureArrows(){
-    const media = elMedia(); const img = elImg();
-    if(!media || !img) return;
-    media.querySelectorAll('.zara-prev,.zara-next').forEach(n=>n.remove());
-    const prev = document.createElement('button'); prev.className='zara-prev'; prev.type='button'; prev.setAttribute('aria-label','Anterior'); prev.textContent='‹';
-    const next = document.createElement('button'); next.className='zara-next'; next.type='button'; next.setAttribute('aria-label','Siguiente'); next.textContent='›';
-    media.appendChild(prev); media.appendChild(next);
+    const m = $media(), im = $img();
+    if(!m || !im) return;
+    m.querySelectorAll('.zara-prev,.zara-next').forEach(n=>n.remove());
+    const prev = document.createElement('button');
+    prev.className = 'zara-prev'; prev.type='button'; prev.setAttribute('aria-label','Anterior'); prev.textContent='‹';
+    const next = document.createElement('button');
+    next.className = 'zara-next'; next.type='button'; next.setAttribute('aria-label','Siguiente'); next.textContent='›';
+    m.appendChild(prev); m.appendChild(next);
   }
 
+  // Estado global del carrusel
   window.currentImages = [];
   window.currentImageIndex = 0;
-  let observer = null, suppressObserver = false;
 
   function setImageFromIndex(){
-    const img = elImg();
-    if (!img || !Array.isArray(window.currentImages) || !window.currentImages.length) return;
-    const i = ((window.currentImageIndex||0) + window.currentImages.length) % window.currentImages.length;
-    window.currentImageIndex = i;
-    const desired = window.currentImages[i];
-    if (!img.src.endsWith(desired)){
-      suppressObserver = true;
-      img.src = desired;
-      setTimeout(()=>{ suppressObserver = false; }, 0);
-    }
+    const im = $img();
+    if(!im || !Array.isArray(window.currentImages) || !window.currentImages.length) return;
+    window.currentImageIndex = ((window.currentImageIndex||0) + window.currentImages.length) % window.currentImages.length;
+    const src = window.currentImages[window.currentImageIndex];
+    // Evita trabajo si ya está puesta
+    if (!im.src.endsWith(src)) im.src = src;
   }
 
-  function startObserver(){
-    if (observer) { observer.disconnect(); observer = null; }
-    const target = elModal();
-    if (!target) return;
-    observer = new MutationObserver(function(){
-      if (suppressObserver) return;
-      ensureArrows();
-      setImageFromIndex();
-    });
-    observer.observe(target, { attributes:true, childList:true, subtree:true });
-  }
-
+  // Envolver openZaraModal: inicializa carrusel tras render original
   const _open = window.openZaraModal || function(){};
   window.openZaraModal = function(product, index){
     try{ _open(product, index); }catch(e){}
@@ -2875,11 +2895,12 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(()=>{
       ensureArrows();
       setImageFromIndex();
-      startObserver();
-      setTimeout(()=>{ ensureArrows(); setImageFromIndex(); }, 80);
+      // Refuerzo por si otro script modifica el DOM justo después
+      setTimeout(()=>{ ensureArrows(); setImageFromIndex(); }, 60);
     }, 0);
   };
 
+  // Delegación de clics en flechas (funciona aunque se regenere el DOM)
   document.addEventListener('click', function(e){
     const prev = e.target.closest('#zaraModal .zara-prev');
     const next = e.target.closest('#zaraModal .zara-next');
@@ -2887,48 +2908,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const list = Array.isArray(window.currentImages) ? window.currentImages : [];
     if(!list.length) return;
     const dir = prev ? -1 : 1;
-    window.currentImageIndex = ( (typeof window.currentImageIndex==='number'?window.currentImageIndex:0) + dir + list.length ) % list.length;
+    window.currentImageIndex = ((typeof window.currentImageIndex==='number'?window.currentImageIndex:0) + dir + list.length) % list.length;
     setImageFromIndex();
   }, true);
-
-  document.addEventListener('keydown', function(e){
-    const modal = elModal();
-    if (!modal || (modal.style.display && modal.style.display==='none')) return;
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
-      e.preventDefault();
-      const dir = e.key === 'ArrowLeft' ? -1 : 1;
-      const list = Array.isArray(window.currentImages) ? window.currentImages : [];
-      if(!list.length) return;
-      window.currentImageIndex = ((window.currentImageIndex||0) + dir + list.length) % list.length;
-      setImageFromIndex();
-    }
-  });
-
-  let startX=null;
-  document.addEventListener('touchstart', function(e){
-    const modal = elModal();
-    if (!modal || (modal.style.display && modal.style.display==='none')) return;
-    startX = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : null;
-  }, {passive:true});
-  document.addEventListener('touchend', function(e){
-    const modal = elModal();
-    if (!modal || (modal.style.display && modal.style.display==='none')) return;
-    if (startX==null) return;
-    const endX = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : null;
-    if (endX==null) return;
-    const dx = endX - startX;
-    if (Math.abs(dx) > 30){
-      const dir = dx>0 ? -1 : 1;
-      const list = Array.isArray(window.currentImages) ? window.currentImages : [];
-      if(!list.length) return;
-      window.currentImageIndex = ((window.currentImageIndex||0) + dir + list.length) % list.length;
-      setImageFromIndex();
-    }
-    startX = null;
-  }, {passive:true});
 })();
 </script>
-<!-- === Fin Carrusel HARD-OVERRIDE === -->
+<!-- === /CARRUSEL FINAL LIMPIO === -->
 
 </body>
 </html>
