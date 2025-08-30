@@ -519,7 +519,6 @@
     border-radius: 16px;
     padding: 16px;
   }
-  evh;
     object-fit: contain;
     background: #fff;
     margin-bottom: 12px;
@@ -2798,49 +2797,114 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
+<!-- BEGIN: CARRUSEL LIMPIO + VARIANTES SEGURO -->
+<style>
+/* Flechas visibles y clicables encima de la imagen del modal (negro simple) */
+#zaraModal .zara-modal-info { position: relative; }
+#zaraModal .zara-carousel{ position:relative; display:flex; align-items:center; justify-content:center; }
+#zaraModal .zara-prev, #zaraModal .zara-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:none; border:none; color:#000; font-size:34px;
+  padding:0; cursor:pointer; line-height:1; z-index:9999;
+  display:block; pointer-events:auto; user-select:none;
+}
+#zaraModal .zara-prev{ left:14px; } 
+#zaraModal .zara-next{ right:14px; }
+@media (max-width:700px){ #zaraModal .zara-prev, #zaraModal .zara-next{ font-size:28px; } }
+</style>
+
 <script>
 (function(){
-  // Devuelve la lista de imágenes de un producto
+  // --- Util: obtener SOLO el array imagenes del producto (orden tal cual en datos) ---
   function getImagesFor(index){
-    const p = (window.productos && window.productos[index]) || null;
-    if(!p) return [];
-    return Array.isArray(p.imagenes) ? p.imagenes.filter(Boolean) : [];
+    try{
+      var p = (window.productos && window.productos[index]) || null;
+      if(!p) return [];
+      var arr = Array.isArray(p.imagenes) ? p.imagenes.slice() : [];
+      return Array.from(new Set(arr.filter(Boolean)));
+    }catch(e){ return []; }
   }
 
-  // Guardamos original
-  const _open = window.openZaraModal;
+  // --- Asegurar flechas en el DOM (por si el HTML del modal cambiase) ---
+  function ensureArrows(){
+    var img = document.getElementById('zaraModalImage');
+    var media = document.querySelector('#zaraModal .zara-carousel, #zaraModal .zara-modal-media') || (img && img.parentElement);
+    if(!media || !img) return;
+    // Evitar duplicados
+    Array.from(media.querySelectorAll('.zara-prev,.zara-next')).forEach(function(n){ n.remove(); });
+    var prev=document.createElement('button'); prev.className='zara-prev'; prev.type='button'; prev.textContent='‹'; prev.setAttribute('aria-label','Anterior');
+    var next=document.createElement('button'); next.className='zara-next'; next.type='button'; next.textContent='›'; next.setAttribute('aria-label','Siguiente');
+    media.appendChild(prev); media.appendChild(next);
+  }
 
+  // --- Wrap a openZaraModal: inicializa carrusel (JPG primero) y evita que variantes lo pisen al abrir ---
+  var _open = window.openZaraModal;
   window.openZaraModal = function(product, index){
-    // Llamamos al original para no romper lo demás
     if (typeof _open === "function") _open(product, index);
-
-    // Generamos lista de imágenes
+    window.__openingModal = true;                 // bandera anti-pisado
+    window.currentZaraProduct = index;
     window.currentImages = getImagesFor(index);
     window.currentImageIndex = 0;
 
-    const img = document.getElementById("zaraModalImage");
-    if (img && window.currentImages.length){
-      img.src = window.currentImages[0];
+    var img = document.getElementById('zaraModalImage');
+    if (img && Array.isArray(window.currentImages) && window.currentImages.length){
+      img.src = window.currentImages[0];          // muestra JPG primero
+    }
+    ensureArrows();
+    setTimeout(function(){ window.__openingModal = false; }, 0);
+  };
+
+  // --- Wrap a renderColorPicker: no pisar al abrir y sincronizar al elegir color ---
+  var _rcp = window.renderColorPicker;
+  window.renderColorPicker = function(nombreProd){
+    var ret = (typeof _rcp === "function") ? _rcp(nombreProd) : undefined;
+
+    // Si el modal se está abriendo, no dejes que variantes cambien la imagen inicial
+    if (window.__openingModal && Array.isArray(window.currentImages) && window.currentImages[0]){
+      var img = document.getElementById('zaraModalImage');
+      if (img) img.src = window.currentImages[0];
     }
 
-    // Forzar flechas visibles
-    const prevBtn = document.querySelector('#zaraModal .zara-prev');
-    const nextBtn = document.querySelector('#zaraModal .zara-next');
-    if(prevBtn){ prevBtn.style.display = "block"; prevBtn.onclick = ()=>cambiarImagen(-1); }
-    if(nextBtn){ nextBtn.style.display = "block"; nextBtn.onclick = ()=>cambiarImagen(1); }
+    // Enganchar click en colores una sola vez para sincronizar carrusel
+    var picker = document.getElementById('colorPicker');
+    if (picker && !picker.dataset.hooked){
+      picker.dataset.hooked='1';
+      picker.addEventListener('click', function(e){
+        var btn = e.target.closest('.color-swatch');
+        if(!btn) return;
+        var color = btn.getAttribute('data-color');
+        var conf = (window.VARIANTES && window.VARIANTES[nombreProd]) ? window.VARIANTES[nombreProd] : null;
+        var data = conf && conf.items && conf.items[color] ? conf.items[color] : null;
+        var imgEl = document.getElementById('zaraModalImage');
+        if (data && data.img && imgEl){
+          imgEl.src = data.img;
+          if (Array.isArray(window.currentImages)){
+            if (!window.currentImages.includes(data.img)) window.currentImages.push(data.img);
+            window.currentImageIndex = window.currentImages.indexOf(data.img);
+          }
+        }
+      }, true);
+    }
+    return ret;
   };
 
-  // Función para cambiar de imagen
-  window.cambiarImagen = function(dir){
-    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
+  // --- Delegación global: capturar clicks de flechas aunque el DOM se regenere ---
+  document.addEventListener('click', function(e){
+    var prev = e.target.closest('#zaraModal .zara-prev');
+    var next = e.target.closest('#zaraModal .zara-next');
+    if(!prev && !next) return;
+
+    var list = Array.isArray(window.currentImages) ? window.currentImages : [];
     if(!list.length) return;
-    if(typeof window.currentImageIndex !== "number") window.currentImageIndex = 0;
+    if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
+    var dir = prev ? -1 : 1;
     window.currentImageIndex = (window.currentImageIndex + dir + list.length) % list.length;
-    const img = document.getElementById("zaraModalImage");
-    if(img) img.src = list[window.currentImageIndex];
-  };
+    var img = document.getElementById('zaraModalImage');
+    if (img) img.src = list[window.currentImageIndex];
+  }, true);
 })();
 </script>
+<!-- END: CARRUSEL LIMPIO + VARIANTES SEGURO -->
 
 </body>
 </html>
