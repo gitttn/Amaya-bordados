@@ -1189,6 +1189,38 @@ body.modal-open{ overflow: hidden; }
   #seccion-conjuntos .color-swatch{ width:22px; height:22px; border-radius:50%; border:1px solid #ccc; cursor:pointer; }
   #seccion-conjuntos .btn{ background:#fff; border:1px solid #000; color:#000; padding:10px 16px; border-radius:999px; cursor:pointer; font-size:14px; }
   #seccion-conjuntos .btn:hover{ background:#000; color:#fff; }
+
+/* === Ventana del hooking (Zara modal) con tamaño fijo === */
+.zara-modal {
+  width: clamp(320px, 86vw, 540px);  /* ancho adaptable con límites */
+  height: 520px;                     /* altura fija para todos los productos */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  overflow: hidden;
+}
+
+/* Imagen centrada y contenida dentro del modal */
+.zara-modal img {
+  max-width: 100%;
+  max-height: 80%;      /* ocupa hasta el 80% de la altura fija */
+  object-fit: contain;  /* nunca se deforma ni se recorta */
+  margin: 0 auto;
+  display: block;
+}
+
+/* Ajuste de la info para que no rompa el tamaño fijo */
+.zara-modal .zara-modal-info {
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
 </style>
 
 </head>
