@@ -400,18 +400,7 @@
 }
 
 /* Modal estilo Zara */
-.zara-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-}
+.zara-modal-overlay{ position: fixed !important; inset: 0 !important; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.45); z-index: 1000; }.zara-modal-overlay.open{ display:flex; }
 .zara-modal-close {
   position: absolute;
   top: 10px;
@@ -472,7 +461,7 @@
 
 /* ==== Ajuste modal móvil: todo visible sin scroll de página ==== */
 @media (max-width: 480px){
-  .zara-modal-overlay{align-items:center;justify-content:center;}
+  .zara-modal-overlay{ position: fixed !important; inset: 0 !important; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.45); z-index: 1000; }.zara-modal-overlay.open{ display:flex; }
   .zara-modal{
     width: 96vw;
     max-height: 92vh;
@@ -796,10 +785,7 @@
 
 /* Overlay: suave e integrado */
 .modal-overlay,
-.zara-modal-overlay{
-  background: rgba(0,0,0,.45) !important;
-  backdrop-filter: blur(2px);
-}
+.zara-modal-overlay{ position: fixed !important; inset: 0 !important; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.45); z-index: 1000; }.zara-modal-overlay.open{ display:flex; }
 /* Close button position for sheet */
 .zara-modal.pro-sheet .zara-modal-close{
   position: absolute;
@@ -1261,6 +1247,63 @@ body.modal-open{ overflow: hidden; }
   .zara-prev, .zara-next { font-size: 28px; }
 }
 </style>
+
+<style>
+/* --- Overlay fijo + bloqueo de scroll + controles visibles --- */
+.zara-modal-overlay{ position: fixed !important; inset: 0 !important; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.45); z-index: 1000; }.zara-modal-overlay.open{ display:flex; }
+body.modal-open { overflow: hidden !important; }
+.zara-modal{ position: relative; z-index: 1001; }
+.zara-modal-close{ 
+  position: absolute; top: 10px; right: 12px;
+  background: none !important; border: 0 !important;
+  color: #000 !important; font-size: 24px; line-height: 1;
+  z-index: 1002; cursor: pointer;
+}
+.zara-prev, .zara-next{
+  background: none !important; border: 0 !important; border-radius: 0 !important;
+  color: #000 !important; font-size: 32px; line-height: 1;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 1002; cursor: pointer; padding: 0;
+}
+.zara-prev{ left: 14px; } .zara-next{ right: 14px; }
+.zara-prev:hover, .zara-next:hover{ color:#444; }
+</style>
+
+
+<style>
+/* --- Centrado vertical y scroll interno en modal --- */
+.zara-modal-overlay{ position: fixed !important; inset: 0 !important; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.45); z-index: 1000; }.zara-modal-overlay.open{ display:flex; }
+.zara-modal{
+  margin: 0 auto;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+</style>
+
+
+<style>
+/* --- Centrado real del modal en todas las vistas --- */
+.zara-modal-overlay{
+  position: fixed !important;
+  inset: 0 !important;
+  height: 100vh !important;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.zara-modal-overlay.open{ display: flex !important; }
+.zara-modal{
+  position: relative !important;
+  top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+  margin: auto !important;
+  transform: none !important;
+  max-height: 88vh !important;
+  width: min(540px, 94vw) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+</style>
+
 </head>
 <body>
 <header>
@@ -2888,42 +2931,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 <script>
-// === Minimal slider patch: use producto.imagenes and show arrows only when needed ===
+// --- Overlay + Scroll lock integration ---
 (function(){
-  var __openPrev = window.openZaraModal;
+  var _open = window.openZaraModal;
   window.openZaraModal = function(product, index){
-    if (typeof __openPrev === "function") __openPrev.apply(this, arguments);
-    try{
-      var lista = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : (window.productos || []);
-      var p = lista[index] || (window.productos && window.productos[index]) || null;
-      var imgs = (p && Array.isArray(p.imagenes) && p.imagenes.length) ? p.imagenes.slice() : [ product && product.image ? product.image : "" ];
+    if (typeof _open === 'function') _open(product, index);
+    var modal = document.getElementById('zaraModal'); if (modal){ modal.classList.remove('open'); }
+    document.body.classList.add('modal-open');
+  };
+})();
 
-      window.currentZaraProduct = index;
-      window.currentZaraImages = imgs;
-      window.currentZaraImageIndex = 0;
-
-      var el = document.getElementById("zaraModalImage");
-      if (el && imgs.length) el.src = imgs[0];
-
-      var show = imgs.length > 1;
-      var prevBtn = document.querySelector(".zara-prev");
-      var nextBtn = document.querySelector(".zara-next");
-      if (prevBtn) prevBtn.style.display = show ? "block" : "none";
-      if (nextBtn) nextBtn.style.display = show ? "block" : "none";
-    }catch(e){}
+(function(){
+  var _close = window.closeZaraModal || function(){};
+  window.closeZaraModal = function(){
+    var modal = document.getElementById('zaraModal'); if (modal){ modal.classList.remove('open'); }
+    document.body.classList.remove('modal-open');
+    try{ _close(); }catch(e){}
   };
 
-  window.cambiarImagen = function(dir){
+  document.addEventListener('click', function(e){
+    var overlay = document.getElementById('zaraModal');
+    if (!overlay) return;
+    if (e.target === overlay){ window.closeZaraModal(); }
+  });
+})();
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    var modal = document.getElementById('zaraModal'); if (modal){ modal.classList.remove('open'); }
+    document.body.classList.remove('modal-open');
+  }catch(e){}
+});
+</script>
+
+
+<script>
+(function(){
+  var _open = window.openZaraModal;
+  window.openZaraModal = function(product, index){
     try{
-      var imgs = window.currentZaraImages;
-      if (!imgs || imgs.length <= 1) return;
-      var step = Number(dir) || 0;
-      window.currentZaraImageIndex = ((window.currentZaraImageIndex || 0) + step + imgs.length) % imgs.length;
-      var el = document.getElementById("zaraModalImage");
-      if (el) el.src = imgs[window.currentZaraImageIndex];
+      var hasProduct = product && (product.image || product.name || product.price);
+      var validIndex = (typeof index === 'number') && index >= 0;
+      var list = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : (window.productos || []);
+      var p = validIndex ? list[index] : null;
+      if (!hasProduct || !validIndex || !p) { return; } // no abrir si datos inválidos
+
+      if (typeof _open === 'function') _open(product, index);
+      var modal = document.getElementById('zaraModal'); if (modal){ modal.classList.add('open'); }
+      document.body.classList.add('modal-open');
     }catch(e){}
   };
 })();
+</script>
+
+
+<script>
+// --- Recentrar modal en móvil cuando aparece/desaparece teclado ---
+document.addEventListener('focusin', recenterModal);
+document.addEventListener('focusout', function(){
+  setTimeout(recenterModal, 300);
+});
+function recenterModal(){
+  const overlay = document.querySelector('.zara-modal-overlay.open');
+  if (!overlay) return;
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+}
 </script>
 
 </body>
