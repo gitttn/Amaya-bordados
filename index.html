@@ -412,15 +412,7 @@
   justify-content: center;
   z-index: 10000;
 }
-.zara-modal-close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
+
 .zara-modal img {
   width: 100%;
   max-height: 400px;
@@ -801,12 +793,7 @@
   backdrop-filter: blur(2px);
 }
 /* Close button position for sheet */
-.zara-modal.pro-sheet .zara-modal-close{
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  font-size: 22px;
-}
+.zara-modal.pro-sheet 
 
 
 /* === Controles pro: sin <select>, con botones segmentados/pills === */
@@ -1234,17 +1221,18 @@ body.modal-open{ overflow: hidden; }
 
 <style>
 .zara-modal-close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  background: none;
-  border: none;
-  color: #000;
-  cursor: pointer;
+  position: absolute !important;
+  top: 10px !important;
+  right: 15px !important;
+  font-size: 24px !important;
+  background: none !important;
+  border: none !important;
+  color: #000 !important;
+  cursor: pointer !important;
+  z-index: 9999 !important;
 }
 .zara-modal-close:hover {
-  color: #444;
+  color: #444 !important;
 }
 </style>
 
