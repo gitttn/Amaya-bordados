@@ -1236,6 +1236,27 @@ body.modal-open{ overflow: hidden; }
 }
 </style>
 
+
+<style>
+/* ——— Arreglos de clic: flechas siempre por encima y clicables ——— */
+.zara-carousel{ position: relative; }
+.zara-carousel img#zaraModalImage{
+  pointer-events: none; /* la imagen no bloquea clics */
+}
+.zara-prev, .zara-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  background: rgba(255,255,255,.6);
+  border:none; color:#000; font-size:34px; cursor:pointer;
+  z-index: 10010; /* por encima de cualquier cosa del modal */
+  border-radius:50%; width:50px; height:50px;
+  display:flex; align-items:center; justify-content:center;
+  transition: background .2s ease;
+  pointer-events: auto; /* asegura recepción de clics */
+}
+.zara-prev{ left:16px; } .zara-next{ right:16px; }
+.zara-prev:hover, .zara-next:hover{ background: rgba(255,255,255,.85); }
+</style>
+
 </head>
 <body>
 <header>
@@ -2793,6 +2814,90 @@ document.addEventListener("DOMContentLoaded", () => {
         // fallback: dejar lo que ya puso tu modal
       }
     }catch(e){}
+  };
+})();
+</script>
+
+
+<script>
+/* ——— Carrusel funcional en modal Zara ——— */
+(function(){
+  // índice actual de imagen
+  window.zaraImgIndex = 0;
+
+  function getListaImagenes(producto){
+    // Si hay variantes y hay imagen seleccionada por color, usar esa como primera
+    var lista = [];
+    if (producto && Array.isArray(producto.imagenes) && producto.imagenes.length){
+      lista = producto.imagenes.slice();
+    }
+    // Evita duplicados y falsy
+    var seen = new Set();
+    lista = lista.filter(function(p){
+      if(!p) return false;
+      var key = String(p).trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return lista;
+  }
+
+  // Exponer la función global que ya usan los botones
+  window.cambiarImagen = function(dir){
+    try{
+      var idxProd = window.currentZaraProduct;
+      if (typeof idxProd === "undefined" || idxProd === null) return;
+      var producto = (window.__listaActual && window.__listaActual[idxProd]) || (window.productos && window.productos[idxProd]);
+      if (!producto) return;
+
+      var lista = getListaImagenes(producto);
+      if (!lista.length) return;
+
+      // avanzar o retroceder circular
+      window.zaraImgIndex = ( (window.zaraImgIndex || 0) + (dir>0?1:-1) + lista.length ) % lista.length;
+
+      var img = document.getElementById("zaraModalImage");
+      if (img){ img.src = lista[window.zaraImgIndex]; }
+
+    }catch(e){ /* console.log(e) */ }
+  };
+
+  // Re-inicializa el índice al abrir el modal y muestra/oculta flechas
+  var __open = window.openZaraModal;
+  window.openZaraModal = function(data, idx){
+    if (typeof __open === "function") __open.apply(this, arguments);
+    window.zaraImgIndex = 0;
+
+    // decidir visibilidad flechas
+    setTimeout(function(){
+      try{
+        var lista = (window.__listaActual && window.__listaActual[idx]) || (window.productos && window.productos[idx]);
+        var imgs = getListaImagenes(lista);
+        var prev = document.querySelector(".zara-prev");
+        var next = document.querySelector(".zara-next");
+        var show = imgs && imgs.length > 1;
+        if (prev) prev.style.display = show ? "flex" : "none";
+        if (next) next.style.display = show ? "flex" : "none";
+      }catch(e){}
+    }, 0);
+  };
+
+  // Al cambiar de color (si el picker cambia la imagen), reiniciar índice
+  window.__resetCarouselIndex = function(){
+    window.zaraImgIndex = 0;
+  };
+
+  // Parchea color picker si existe
+  var _renderColorPicker = window.renderColorPicker;
+  window.renderColorPicker = function(nombreProd){
+    if (typeof _renderColorPicker === "function") _renderColorPicker.apply(this, arguments);
+    // cuando el usuario pulse un color, reseteamos índice
+    setTimeout(function(){
+      document.querySelectorAll("#colorPicker .color-swatch").forEach(function(btn){
+        btn.addEventListener("click", function(){ window.__resetCarouselIndex(); }, { once:false });
+      });
+    }, 0);
   };
 })();
 </script>
