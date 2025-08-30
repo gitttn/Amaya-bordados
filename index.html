@@ -882,7 +882,6 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 }
 
 </style>
-
 <style>
 
 /* === Modal móvil sin scroll general: botón AÑADIR siempre visible === */
@@ -926,15 +925,12 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
-
 <style>
 .product-card{ cursor:pointer; }
 .product-card button{ cursor:default; }
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
-
-
 <style>
 .product-card {
   cursor: pointer;
@@ -952,8 +948,6 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
-
-
 <style>
 /* Quitar por completo el “flash” azul de Android/Chrome */
 .product-card,
@@ -980,9 +974,7 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
-
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&amp;display=swap" rel="stylesheet"/>
 <style>
   .product-title {
   font-family: 'Montserrat', sans-serif;
@@ -1177,8 +1169,6 @@ body.modal-open{ overflow: hidden; }
 }
 
 </style>
-
-
 <style>
   /* Conjuntos: tarjeta única sin imágenes */
   #seccion-conjuntos .card{ background:#f9f9f9; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; }
@@ -1221,7 +1211,6 @@ body.modal-open{ overflow: hidden; }
 .zara-arrow.right { right: 10px; }
 
 </style>
-
 </head>
 <body>
 <header>
@@ -1260,85 +1249,74 @@ body.modal-open{ overflow: hidden; }
 <button onclick="filtrarCategoria('mujer', this)">Mujer</button>
 <button onclick="filtrarCategoria('hombre', this)">Hombre</button>
 <button onclick="filtrarCategoria('infantil', this)">Infantil</button>
-<button type="button" onclick="try{openConjuntos()}catch(e){var s=document.getElementById('seccion-conjuntos');var l=document.getElementById('lista-productos'); if(s){s.style.display='block';} if(l){l.style.display='none';} }" id="btnConjuntos" onclick="event.preventDefault(); event.stopPropagation(); mostrarConjuntos(); return false;" onclick="document.getElementById('seccion-conjuntos').scrollIntoView({behavior:'smooth'});">Conjuntos Personalizados</button>
+<button id="btnConjuntos" onclick="document.getElementById('seccion-conjuntos').scrollIntoView({behavior:'smooth'});" type="button">Conjuntos Personalizados</button>
 <button onclick="filtrarCategoria('regalos', this)">Regalos</button>
-
 </div>
 <!-- Sección Conjuntos Personalizados (oculta por defecto) -->
 <div id="seccion-conjuntos" style="display:none; padding:10px 10px 60px;">
-  
-  <div id="grid-conjuntos" style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px;">
-      <div class="card">
-        <div class="title">Conjunto personalizado</div>
-
-        <div class="row">
-          <span class="label">Tipo:</span>
-          <div  id="cj_tipo_grp">
-            <button class="seg-btn" data-id="doble_camiseta" aria-pressed="true">Doble Camiseta</button>
-            <button class="seg-btn" data-id="doble_sudadera" aria-pressed="false">Doble Sudadera</button>
-            <button class="seg-btn" data-id="camiseta_body" aria-pressed="false">Camiseta + Body Bebé</button>
-            <button class="seg-btn" data-id="sudadera_body" aria-pressed="false">Sudadera + Body Bebé</button>
-            <button class="seg-btn" data-id="camiseta_nino" aria-pressed="false">Camiseta + Camiseta Niño</button>
-            <button class="seg-btn" data-id="sudadera_nino" aria-pressed="false">Sudadera + Sudadera Niño</button>
-          </div>
-        </div>
-
-        <div class="row">
-          <span class="label">Color:</span>
-          <div class="row" id="cj_colores">
-      <button class="color-swatch" data-color="Blanco" title="Blanco" style="background:#eaeaea" data-active="1"></button>
-      <button class="color-swatch" data-color="Negro" title="Negro" style="background:#111111"></button>
-    </div>
-        </div>
-
-        <div class="row">
-          <span class="label">Adulto:</span>
-          <div class="pills" id="cj_adulto_grp">
-            <button class="pill" data-val="XS" aria-pressed="true">XS</button>
-            <button class="pill" data-val="S" aria-pressed="false">S</button>
-            <button class="pill" data-val="M" aria-pressed="false">M</button>
-            <button class="pill" data-val="L" aria-pressed="false">L</button>
-            <button class="pill" data-val="XL" aria-pressed="false">XL</button>
-          </div>
-          <span class="label" id="cj_precio_adulto">(14.99 €)</span>
-        </div>
-
-        <div class="row" id="row_bebe" style="display:flex;">
-          <span class="label">Bebé:</span>
-          <div class="pills" id="cj_bebe_grp">
-            <button class="pill" data-val="0-3m" aria-pressed="true">0-3m</button>
-            <button class="pill" data-val="3-6m" aria-pressed="false">3-6m</button>
-            <button class="pill" data-val="6-9m" aria-pressed="false">6-9m</button>
-            <button class="pill" data-val="9-12m" aria-pressed="false">9-12m</button>
-          </div>
-          <span class="label" id="cj_precio_bebe">(11.99 €)</span>
-        </div>
-
-        <div class="row" id="row_nino" style="display:none;">
-          <span class="label">Niño:</span>
-          <div class="pills" id="cj_nino_grp">
-            <button class="pill" data-val="3-4" aria-pressed="true">3-4</button>
-            <button class="pill" data-val="5-6" aria-pressed="false">5-6</button>
-            <button class="pill" data-val="7-8" aria-pressed="false">7-8</button>
-            <button class="pill" data-val="9-10" aria-pressed="false">9-10</button>
-          </div>
-          <span class="label" id="cj_precio_nino">(0.00 €)</span>
-        </div>
-
-        
-    <div class="row" style="justify-content:space-between; margin-top:8px;">
-      <span class="label" style="font-weight:600;">Total:</span>
-      <span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
-    </div>
-    <div class="row" style="justify-content:center;">
-          <button class="btn" id="cj_add">Añadir conjunto</button>
-        </div>
-    
-      </div>
-    </div>
+<div id="grid-conjuntos" style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px;">
+<div class="card">
+<div class="title">Conjunto personalizado</div>
+<div class="row">
+<span class="label">Tipo:</span>
+<div id="cj_tipo_grp">
+<button aria-pressed="true" class="seg-btn" data-id="doble_camiseta">Doble Camiseta</button>
+<button aria-pressed="false" class="seg-btn" data-id="doble_sudadera">Doble Sudadera</button>
+<button aria-pressed="false" class="seg-btn" data-id="camiseta_body">Camiseta + Body Bebé</button>
+<button aria-pressed="false" class="seg-btn" data-id="sudadera_body">Sudadera + Body Bebé</button>
+<button aria-pressed="false" class="seg-btn" data-id="camiseta_nino">Camiseta + Camiseta Niño</button>
+<button aria-pressed="false" class="seg-btn" data-id="sudadera_nino">Sudadera + Sudadera Niño</button>
+</div>
+</div>
+<div class="row">
+<span class="label">Color:</span>
+<div class="row" id="cj_colores">
+<button class="color-swatch" data-active="1" data-color="Blanco" style="background:#eaeaea" title="Blanco"></button>
+<button class="color-swatch" data-color="Negro" style="background:#111111" title="Negro"></button>
+</div>
+</div>
+<div class="row">
+<span class="label">Adulto:</span>
+<div class="pills" id="cj_adulto_grp">
+<button aria-pressed="true" class="pill" data-val="XS">XS</button>
+<button aria-pressed="false" class="pill" data-val="S">S</button>
+<button aria-pressed="false" class="pill" data-val="M">M</button>
+<button aria-pressed="false" class="pill" data-val="L">L</button>
+<button aria-pressed="false" class="pill" data-val="XL">XL</button>
+</div>
+<span class="label" id="cj_precio_adulto">(14.99 €)</span>
+</div>
+<div class="row" id="row_bebe" style="display:flex;">
+<span class="label">Bebé:</span>
+<div class="pills" id="cj_bebe_grp">
+<button aria-pressed="true" class="pill" data-val="0-3m">0-3m</button>
+<button aria-pressed="false" class="pill" data-val="3-6m">3-6m</button>
+<button aria-pressed="false" class="pill" data-val="6-9m">6-9m</button>
+<button aria-pressed="false" class="pill" data-val="9-12m">9-12m</button>
+</div>
+<span class="label" id="cj_precio_bebe">(11.99 €)</span>
+</div>
+<div class="row" id="row_nino" style="display:none;">
+<span class="label">Niño:</span>
+<div class="pills" id="cj_nino_grp">
+<button aria-pressed="true" class="pill" data-val="3-4">3-4</button>
+<button aria-pressed="false" class="pill" data-val="5-6">5-6</button>
+<button aria-pressed="false" class="pill" data-val="7-8">7-8</button>
+<button aria-pressed="false" class="pill" data-val="9-10">9-10</button>
+</div>
+<span class="label" id="cj_precio_nino">(0.00 €)</span>
+</div>
+<div class="row" style="justify-content:space-between; margin-top:8px;">
+<span class="label" style="font-weight:600;">Total:</span>
+<span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
+</div>
+<div class="row" style="justify-content:center;">
+<button class="btn" id="cj_add">Añadir conjunto</button>
+</div>
+</div>
+</div>
 </div>
 <div class="product-list" id="lista-productos"></div>
-
 <script>
     
 
@@ -1620,7 +1598,6 @@ function addToCartFromModal() {
 </div>
 </div>
 </div>
-
 <script>
 // Variantes de color por producto
 const VARIANTES = {
@@ -1738,8 +1715,6 @@ window.addToCartFromModal = function(){
   _addToCart();
 };
 </script>
-
-
 <script>
 const DEFAULT_SIZES = ["XS","S","M","L","XL"];
 function renderSizePicker(nombreProd){
@@ -1769,8 +1744,6 @@ function renderSizePicker(nombreProd){
   });
 }
 </script>
-
-
 <script>
 // ==== Carga robusta de imagen para variantes ====
 (function(){
@@ -1815,8 +1788,6 @@ function renderSizePicker(nombreProd){
   };
 })();
 </script>
-
-
 <!-- Override mínimo y seguro: lista visible + reenganche modal -->
 <script>
 // Lista de productos visibles en pantalla
@@ -1884,8 +1855,6 @@ window.agregarEventosModalZara = function() {
   });
 };
 </script>
-
-
 <!-- Forzar botón AÑADIR visible y sticky en el modal (añade clase si falta) -->
 <script>
 (function(){
@@ -1914,8 +1883,6 @@ window.agregarEventosModalZara = function() {
   setTimeout(etiquetarBotonAnadir, 100);
 })();
 </script>
-
-
 <script>
 (function(){
   // Engancha el click en toda la tarjeta, no solo en la imagen
@@ -2140,9 +2107,6 @@ setVH(); window.addEventListener('resize', setVH);
   };
 })();
 </script>
-
-</script>
-
 
 <script>
 // === Datos base de tipos, colores y tallas ===
@@ -2503,8 +2467,6 @@ function volverATienda(){
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind();
 })();
 </script>
-
-
 <script>
 // ===== Attach professional sheet behavior to the product options modal =====
 (function(){
@@ -2553,8 +2515,6 @@ function volverATienda(){
   });
 })();
 </script>
-
-
 <script>
 (function(){
   function asegurarTarjeta(){
@@ -2578,8 +2538,6 @@ function volverATienda(){
   };
 })();
 </script>
-
-
 <script>
 (function(){
   const TIPOS = {
@@ -2670,8 +2628,6 @@ function volverATienda(){
     if (typeof addToCart === 'function'){ addToCart(nombre, precio); }});
 })();
 </script>
-
-
 <script>
 function mostrarConjuntos() {
   const lista = document.getElementById("lista-productos");
@@ -2703,8 +2659,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
   });
 });
 </script>
-
-
 <script>
 // Forzar que el botón activo del filtro se vea correctamente
 document.addEventListener("DOMContentLoaded", () => {
@@ -2725,8 +2679,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }, true);
 });
 </script>
-
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const filtros = document.querySelectorAll(".filters button");
@@ -2738,8 +2690,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
-
-
 <script>
 let zaraImageIndex = 0;
 let zaraImageList = [];
@@ -2771,50 +2721,5 @@ window.openZaraModal = function(prod, index){
   }
 };
 </script>
-
-
-<script>
-(function(){
-  function recenterZara(){
-    try{
-      const modal = document.querySelector("#zaraModal .zara-modal");
-      if (!modal || document.getElementById("zaraModal").style.display === "none") return;
-
-      const vv = window.visualViewport;
-      const vw = vv ? vv.width : window.innerWidth;
-      const vh = vv ? vv.height : window.innerHeight;
-      const vo = vv ? vv.offsetTop : 0;
-
-      const W = Math.min(520, Math.floor(vw * 0.92));
-      const H = 560;
-
-      const left = Math.round((vw - W) / 2);
-      const top = Math.round(vo + (vh - H) / 2);
-
-      modal.style.position = "fixed";
-      modal.style.width = W + "px";
-      modal.style.height = H + "px";
-      modal.style.left = left + "px";
-      modal.style.top = top + "px";
-      modal.style.transform = "none";
-      modal.style.margin = "0";
-    } catch(e) {}
-  }
-
-  const oldOpen = window.openZaraModal;
-  window.openZaraModal = function(prod, idx){
-    if (typeof oldOpen === "function") oldOpen(prod, idx);
-    setTimeout(recenterZara, 30);
-  };
-
-  if (window.visualViewport) {
-    visualViewport.addEventListener("resize", recenterZara);
-    visualViewport.addEventListener("scroll", recenterZara);
-  }
-  window.addEventListener("scroll", recenterZara, { passive: true });
-  window.addEventListener("orientationchange", () => setTimeout(recenterZara, 60));
-})();
-</script>
-
 </body>
 </html>
