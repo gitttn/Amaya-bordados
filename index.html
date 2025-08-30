@@ -1571,17 +1571,6 @@ function confirmarInfo() {
 
 function openZaraModal(product, index) {
   window.currentZaraProduct = index;
-  window.currentImages = (typeof window.getImagesFor==='function') ? window.getImagesFor(index) : [];
-  window.currentImageIndex = 0;
-  try{
-    var el = document.getElementById('zaraModalImage');
-    if(el && window.currentImages.length){ el.src = window.currentImages[0]; }
-    var prevBtn = document.querySelector('.zara-prev');
-    var nextBtn = document.querySelector('.zara-next');
-    var show = (window.currentImages.length>1);
-    if(prevBtn) prevBtn.style.display = show ? 'block' : 'none';
-    if(nextBtn) nextBtn.style.display = show ? 'block' : 'none';
-  }catch(e){}
   document.getElementById("zaraModalImage").src = product.image;
   document.getElementById("zaraModalTitle").textContent = product.name;
   document.getElementById("zaraModalPrice").textContent = product.price;
@@ -2811,26 +2800,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <script>
 (function(){
-  function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
   window.getImagesFor = function(index){
-    try{
-      var p = (window.productos && window.productos[index]) ? window.productos[index] : null;
-      if(!p) return [];
-      var imgs = [];
-      // Array de imágenes del producto
-      if (Array.isArray(p.imagenes) && p.imagenes.length){ imgs = imgs.concat(p.imagenes); }
-      // Campo 'imagen' simple
-      if (p.imagen) imgs.push(p.imagen);
-      // Imagen de variante por defecto (si existe)
-      if (typeof VARIANTES !== "undefined" && VARIANTES[p.nombre]){
-        var conf = VARIANTES[p.nombre];
-        var def = conf && conf.default;
-        if (def && conf.items && conf.items[def] && conf.items[def].img){
-          imgs.push(conf.items[def].img);
-        }
-      }
-      return unique(imgs);
-    }catch(e){ return []; }
+    const p = (window.productos && window.productos[index]) || null;
+    if(!p) return [];
+    const arr = [];
+    if (Array.isArray(p.imagenes)) arr.push(...p.imagenes);
+    if (p.imagen) arr.push(p.imagen);
+    return Array.from(new Set(arr.filter(Boolean)));
+  };
+
+  const _open = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    if (typeof _open === "function") _open(product, index);
+    window.currentZaraProduct = index;
+    window.currentImages = getImagesFor(index);
+    window.currentImageIndex = 0;
+    const img = document.getElementById('zaraModalImage');
+    if (img && currentImages.length) img.src = currentImages[0];
+    const prevBtn = document.querySelector('.zara-prev');
+    const nextBtn = document.querySelector('.zara-next');
+    const show = currentImages.length > 1;
+    if (prevBtn) prevBtn.style.display = show ? 'block' : 'none';
+    if (nextBtn) nextBtn.style.display = show ? 'block' : 'none';
+  };
+
+  window.cambiarImagen = function(dir){
+    if (!Array.isArray(window.currentImages) || !currentImages.length) return;
+    if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
+    window.currentImageIndex = (currentImageIndex + dir + currentImages.length) % currentImages.length;
+    const img = document.getElementById('zaraModalImage');
+    if (img) img.src = currentImages[currentImageIndex];
+  };
+
+  const _rcp = window.renderColorPicker;
+  window.renderColorPicker = function(nombreProd){
+    if (typeof _rcp === "function") _rcp(nombreProd);
   };
 })();
 </script>
