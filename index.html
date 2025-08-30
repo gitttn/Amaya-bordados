@@ -1190,35 +1190,54 @@ body.modal-open{ overflow: hidden; }
   #seccion-conjuntos .btn{ background:#fff; border:1px solid #000; color:#000; padding:10px 16px; border-radius:999px; cursor:pointer; font-size:14px; }
   #seccion-conjuntos .btn:hover{ background:#000; color:#fff; }
 
-/* === Ventana del hooking (Zara modal) con tamaño fijo === */
-.zara-modal {
-  width: clamp(320px, 86vw, 540px);  /* ancho adaptable con límites */
-  height: 520px;                     /* altura fija para todos los productos */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 10px 30px rgba(0,0,0,.18);
-  overflow: hidden;
+/* === Hooking fijo, igual para todos los productos === */
+/* Ajusta solo estos dos números si quieres otra medida */
+:root{
+  --hook-w-max: 540px;  /* ancho máximo del cuadro */
+  --hook-h: 640px;      /* alto total del cuadro (como en tu foto) */
+  --hook-img-h: 360px;  /* alto del área de imagen */
 }
 
-/* Imagen centrada y contenida dentro del modal */
-.zara-modal img {
-  max-width: 100%;
-  max-height: 80%;      /* ocupa hasta el 80% de la altura fija */
-  object-fit: contain;  /* nunca se deforma ni se recorta */
-  margin: 0 auto;
-  display: block;
+#zaraModal.zara-modal-overlay > .zara-modal{
+  width: min(var(--hook-w-max), 92vw) !important;
+  height: var(--hook-h) !important;
+  max-height: var(--hook-h) !important;
+  min-height: var(--hook-h) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  padding: 16px !important;
 }
 
-/* Ajuste de la info para que no rompa el tamaño fijo */
-.zara-modal .zara-modal-info {
-  width: 100%;
-  text-align: center;
-  padding: 10px;
-  box-sizing: border-box;
+/* Imagen con altura fija y sin recortes */
+#zaraModal #zaraModalImage{
+  flex: 0 0 var(--hook-img-h) !important;
+  width: 100% !important;
+  height: var(--hook-img-h) !important;
+  max-height: var(--hook-img-h) !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+  display: block !important;
+  background: #fff !important;
+  border-radius: 10px !important;
+}
+
+/* El resto del contenido ocupa el espacio sobrante */
+#zaraModal .zara-modal-info{
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+  padding: 10px 12px 12px !important;
+}
+
+/* Seguridad en móviles muy bajos: que nunca se salga del viewport */
+@media (max-height: 660px){
+  :root{
+    --hook-h: calc(100vh - 24px);
+    --hook-img-h: min(360px, calc(var(--hook-h) * 0.55));
+  }
 }
 
 </style>
@@ -2734,6 +2753,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+</script>
+
+
+<script>
+/* Reaplica el tamaño fijo al abrir el hooking por si otra regla lo pisa */
+(function(){
+  const _open = window.openZaraModal;
+  window.openZaraModal = function(prod, idx){
+    if (typeof _open === "function") _open.apply(this, arguments);
+    setTimeout(function(){
+      const modal = document.querySelector('#zaraModal .zara-modal');
+      const img   = document.getElementById('zaraModalImage');
+      if(!modal || !img) return;
+      modal.style.width     = `min(var(--hook-w-max), 92vw)`;
+      modal.style.height    = `var(--hook-h)`;
+      modal.style.maxHeight = `var(--hook-h)`;
+      modal.style.minHeight = `var(--hook-h)`;
+      img.style.height      = `var(--hook-img-h)`;
+      img.style.maxHeight   = `var(--hook-img-h)`;
+      img.style.objectFit   = `contain`;
+    }, 30);
+  };
+})();
 </script>
 
 </body>
