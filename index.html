@@ -2814,5 +2814,187 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 </script>
 
+
+<script>
+// === Fix carrusel: asegurar currentZaraProduct y cambio de imagen ===
+(function(){
+  var __open_final = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    if (typeof __open_final === 'function') __open_final.apply(this, arguments);
+    try{
+      window.currentZaraProduct = index;
+      window.__gokuSlideIndex = 0;
+      var list = (window.productos && window.productos[index] && window.productos[index].imagenes) || null;
+      var el = document.getElementById('zaraModalImage');
+      if (el && list && list.length){ el.src = list[0]; }
+    }catch(e){}
+  };
+
+  window.cambiarImagen = function(dir){
+    try{
+      var idx = (typeof window.currentZaraProduct !== 'undefined') ? window.currentZaraProduct : null;
+      if (idx === null) return;
+      var p = (window.productos && window.productos[idx]) || null;
+      var list = (p && p.imagenes) ? p.imagenes : null;
+      if (!list || !list.length) return;
+      var step = Number(dir) || 0;
+      window.__gokuSlideIndex = ((window.__gokuSlideIndex || 0) + step + list.length) % list.length;
+      var el = document.getElementById('zaraModalImage');
+      if (el){ el.src = list[window.__gokuSlideIndex]; }
+    }catch(e){}
+  };
+})();
+</script>
+
+
+<script>
+// === Carrusel final: flechas solo si hay >1 imagen ===
+(function(){
+  var __open_prev = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    if (typeof __open_prev === 'function') __open_prev.apply(this, arguments);
+    try{
+      window.currentZaraProduct = index;
+      window.__gokuSlideIndex = 0;
+
+      var p = (window.productos && window.productos[index]) || null;
+      var list = (p && p.imagenes) ? p.imagenes : [];
+      var el = document.getElementById('zaraModalImage');
+      if (el && list.length){ el.src = list[0]; }
+
+      var prevBtn = document.querySelector('.zara-prev');
+      var nextBtn = document.querySelector('.zara-next');
+      var show = list.length > 1;
+      if (prevBtn) prevBtn.style.display = show ? 'block' : 'none';
+      if (nextBtn) nextBtn.style.display = show ? 'block' : 'none';
+    }catch(e){}
+  };
+
+  window.cambiarImagen = function(dir){
+    try{
+      var idx = (typeof window.currentZaraProduct !== 'undefined') ? window.currentZaraProduct : null;
+      if (idx === null) return;
+      var p = (window.productos && window.productos[idx]) || null;
+      var list = (p && p.imagenes) ? p.imagenes : null;
+      if (!list || list.length <= 1) return;
+      var step = Number(dir) || 0;
+      window.__gokuSlideIndex = ((window.__gokuSlideIndex || 0) + step + list.length) % list.length;
+      var el = document.getElementById('zaraModalImage');
+      if (el){ el.src = list[window.__gokuSlideIndex]; }
+    }catch(e){}
+  };
+})();
+</script>
+
+
+<script>
+// ==== OPENZARAMODAL — Implementación unificada ====
+// Reemplaza cualquier wrapper anterior y centraliza toda la lógica.
+(function(){
+  window.openZaraModal = function(product, index){
+    try{
+      // Datos base del producto
+      var p = (window.productos && window.productos[index]) || null;
+      var list = (p && Array.isArray(p.imagenes) && p.imagenes.length) ? p.imagenes.slice() : [];
+      var img0 = (list[0]) || (product && product.image) || "";
+      var priceText = (p && p.precio != null && p.precio.toFixed) ? p.precio.toFixed(2) + " €" : (product && product.price) || "";
+
+      // Estado global
+      window.currentZaraProduct = index;
+      window.__gokuSlideIndex = 0;
+
+      // Pinta modal base
+      var modal = document.getElementById("zaraModal");
+      var imgEl = document.getElementById("zaraModalImage");
+      var titleEl = document.getElementById("zaraModalTitle");
+      var priceEl = document.getElementById("zaraModalPrice");
+
+      if (imgEl)  imgEl.src = img0 || "";
+      if (titleEl) titleEl.textContent = (p && p.nombre) || (product && product.name) || "";
+      if (priceEl) priceEl.textContent = priceText;
+      if (modal) modal.style.display = "flex";
+
+      // Mostrar/ocultar flechas si hay más de una imagen
+      var prevBtn = document.querySelector(".zara-prev");
+      var nextBtn = document.querySelector(".zara-next");
+      var multi = list.length > 1;
+      if (prevBtn) prevBtn.style.display = multi ? "block" : "none";
+      if (nextBtn) nextBtn.style.display = multi ? "block" : "none";
+
+      // Render de variantes (si existen)
+      if (typeof window.renderColorPicker === "function") window.renderColorPicker((p && p.nombre) || (product && product.name) || "");
+      if (typeof window.renderSizePicker  === "function") window.renderSizePicker((p && p.nombre) || (product && product.name) || "");
+
+      // Etiquetar botón AÑADIR con clase del estilo si hiciera falta
+      (function etiquetarBotonAnadir(){
+        try{
+          var btns = modal ? modal.querySelectorAll("button, .btn, .add-to-cart") : [];
+          for (var i=0;i<btns.length;i++){
+            var t = (btns[i].textContent || "").trim().toUpperCase();
+            if (t.includes("AÑADIR")){
+              btns[i].classList.add("zara-add-button");
+              break;
+            }
+          }
+        }catch(e){}
+      })();
+
+    }catch(e){ /* silencio para robustez */ }
+  };
+
+  // Cambio de imagen del carrusel
+  window.cambiarImagen = function(dir){
+    try{
+      var idx = (typeof window.currentZaraProduct !== "undefined") ? window.currentZaraProduct : null;
+      if (idx === null) return;
+      var p = (window.productos && window.productos[idx]) || null;
+      var list = (p && p.imagenes) ? p.imagenes : null;
+      if (!list || list.length <= 1) return;
+
+      var step = Number(dir) || 0;
+      window.__gokuSlideIndex = ((window.__gokuSlideIndex || 0) + step + list.length) % list.length;
+      var el = document.getElementById("zaraModalImage");
+      if (el){ el.src = list[window.__gokuSlideIndex]; }
+    }catch(e){}
+  };
+})();
+</script>
+
+
+<script>
+// === Carrusel funcional: usar lista de imágenes del producto ===
+(function(){
+  var __openPrev = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    if (typeof __openPrev === "function") __openPrev(product, index);
+    try{
+      var p = (window.productos && window.productos[index]) || null;
+      window.currentZaraProduct = index;
+      window.currentZaraImages = (p && Array.isArray(p.imagenes) && p.imagenes.length) ? p.imagenes.slice() : [product && product.image ? product.image : ""];
+      window.currentZaraImageIndex = 0;
+
+      var imgEl = document.getElementById("zaraModalImage");
+      if (imgEl && window.currentZaraImages.length){ imgEl.src = window.currentZaraImages[0]; }
+
+      var show = window.currentZaraImages.length > 1;
+      var prevBtn = document.querySelector(".zara-prev");
+      var nextBtn = document.querySelector(".zara-next");
+      if (prevBtn) prevBtn.style.display = show ? "block" : "none";
+      if (nextBtn) nextBtn.style.display = show ? "block" : "none";
+    }catch(e){}
+  };
+
+  window.cambiarImagen = function(dir){
+    try{
+      if (!window.currentZaraImages || window.currentZaraImages.length <= 1) return;
+      var step = Number(dir) || 0;
+      window.currentZaraImageIndex = ((window.currentZaraImageIndex || 0) + step + window.currentZaraImages.length) % window.currentZaraImages.length;
+      var imgEl = document.getElementById("zaraModalImage");
+      if (imgEl) imgEl.src = window.currentZaraImages[window.currentZaraImageIndex];
+    }catch(e){}
+  };
+})();
+</script>
+
 </body>
 </html>
