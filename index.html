@@ -1623,10 +1623,7 @@ function addToCartFromModal() {
 <button class="finalizar" onclick="confirmarInfo()">Aceptar</button>
 </div>
 <!-- Modal Zara -->
-<div class="zara-modal-overlay" id="zaraModal" style="display:none;">
-<div class="zara-modal">
-<button class="zara-modal-close" onclick="closeZaraModal()">✖</button>
-<div class="zara-carousel"><button class="zara-prev" type="button" onclick="cambiarImagen(-1)" aria-label="Anterior">‹</button><img alt="Imagen del producto" id="zaraModalImage" src=""/><button class="zara-next" type="button" onclick="cambiarImagen(1)" aria-label="Siguiente">›</button></div>
+
 <div class="zara-modal-info">
 <h2 id="zaraModalTitle"></h2>
 <p id="zaraModalPrice"></p>
@@ -1734,12 +1731,6 @@ exist.innerHTML = '<span class="label">Color:</span>' + entries.map(([nombre,dat
 
 // Parches suaves para openZaraModal y addToCartFromModal
 const _openZara = window.openZaraModal;
-window.openZaraModal = function(product, index){
-  _openZara(product, index);
-  renderColorPicker(product.name);
-  renderSizePicker(product.name);
-};
-
 const _addToCart = window.addToCartFromModal;
 window.addToCartFromModal = function(){
   if(window.currentZaraProduct !== undefined){
@@ -1924,10 +1915,6 @@ window.agregarEventosModalZara = function() {
   }
   // Al abrir el modal, etiquetar el botón
   var _open = window.openZaraModal;
-  window.openZaraModal = function(data, idx){
-    if (typeof _open === 'function') _open.apply(this, arguments);
-    setTimeout(etiquetarBotonAnadir, 50);
-  };
   // Si el modal ya está abierto en este momento
   setTimeout(etiquetarBotonAnadir, 100);
 })();
@@ -2081,11 +2068,7 @@ setVH(); window.addEventListener('resize', setVH);
   // Envuelve openZaraModal si existe
   if (typeof window.openZaraModal === 'function'){
     const _origOpen = window.openZaraModal;
-    window.openZaraModal = function(data, i){
-      try{ _origOpen.call(this, data, i); }catch(e){}
-      showModalClasses();
-    };
-  }
+    }
 
   // Envuelve closeZaraModal si existe
   if (typeof window.closeZaraModal === 'function'){
@@ -2121,42 +2104,7 @@ setVH(); window.addEventListener('resize', setVH);
   }
   // Guardamos el original (si existe)
   var _open = window.openZaraModal;
-  window.openZaraModal = function(product, index){
-    // 1) Llamada original para abrir modal y setear textos
-    if (typeof _open === 'function'){ _open(product, index); }
-
-    try{
-      // 2) Determinar la mejor ruta de imagen
-      var p = (Array.isArray(window.__listaActual) && window.__listaActual[index]) ? window.__listaActual[index]
-              : (Array.isArray(window.productos) && window.productos[index]) ? window.productos[index]
-              : null;
-      var nombre = (product && product.name) ? product.name : (p && p.nombre) ? p.nombre : "";
-      var src0   = (product && product.image) ? product.image : (p && p.imagenes && p.imagenes[0]) ? p.imagenes[0] : "";
-      var src    = normSrc(src0);
-
-      // 3) Si hay VARIANTES para ese producto, usar la imagen del color por defecto
-      var vConf = (typeof window.VARIANTES !== "undefined") ? window.VARIANTES[nombre] : null;
-      if (vConf && vConf.items){
-        var def = (window.preselectedColor && vConf.items[window.preselectedColor]) ? window.preselectedColor
-                  : (vConf.default && vConf.items[vConf.default]) ? vConf.default
-                  : Object.keys(vConf.items)[0];
-        if (def && vConf.items[def] && vConf.items[def].img){
-          src = normSrc(vConf.items[def].img);
-        }
-      }
-
-      // 4) Intento robusto: probar variaciones si falla (espacios, may/min)
-      var imgEl = document.getElementById('zaraModalImage');
-      if (imgEl){
-        if (typeof window.__trySetVariantImage === "function"){
-          window.__trySetVariantImage(src, normSrc(src0));
-        }else{
-          imgEl.src = src;
-        }
-      }
-    }catch(e){ /* silenciar para no romper la UX */ }
-  };
-})();
+  })();
 </script>
 
 </script>
@@ -2551,12 +2499,6 @@ function volverATienda(){
 
   // Wrap existing open/close functions safely
   const _open = window.openZaraModal;
-  window.openZaraModal = function(data, idx){
-    if (typeof _open === 'function') { _open.apply(this, arguments); }
-    // apply sheet styling
-    addSheetClass();
-  };
-
   const _close = window.closeZaraModal;
   window.closeZaraModal = function(){
     if (typeof _close === 'function') { _close.apply(this, arguments); }
@@ -2771,111 +2713,169 @@ document.addEventListener("DOMContentLoaded", () => {
       if(el){ el.src = p.imagenes[currentImageIndex]; }
     }catch(e){}
   }
-  window.cambiarImagen = function(dir){
-    try{
-      var p = (typeof window.currentZaraProduct !== 'undefined') ? (window.productos && window.productos[window.currentZaraProduct]) : null;
-      if(!p || !p.imagenes || !p.imagenes.length) return;
-      setImageByIndex((currentImageIndex + (Number(dir)||0)));
-    }catch(e){}
-  };
   // Envolver openZaraModal (manteniendo otros wrappers que ya tengas)
   var __open = window.openZaraModal;
-  window.openZaraModal = function(product, index){
-    if(typeof __open === 'function'){ __open.apply(this, arguments); }
-    try{
-      window.currentZaraProduct = index;
-      currentImageIndex = 0;
-      var p = window.productos && window.productos[index];
-      if(p && p.imagenes && p.imagenes.length){
-        var el = document.getElementById('zaraModalImage');
-        if(el){ el.src = p.imagenes[0]; }
-      }else{
-        // fallback: dejar lo que ya puso tu modal
-      }
-    }catch(e){}
-  };
-})();
+  })();
 </script>
 
 
-<!-- === RESCATE: abrir modal sí o sí === -->
+<!-- === OVERLAY NUEVO LIMPIO (sin flechas, listo para adaptarlas) === -->
 <style>
-#zaraModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.65);z-index:99999;}
-#zaraModal .zara-modal-media{max-width:92vw;max-height:92vh;background:#fff;border-radius:12px;padding:10px;position:relative}
-#zaraModal .zara-carousel{position:relative;display:flex;align-items:center;justify-content:center}
-#zaraModalImage{display:block;max-width:86vw;max-height:80vh}
-#zaraClose{position:absolute;right:14px;top:14px;background:#000;color:#fff;border:none;border-radius:999px;width:32px;height:32px;cursor:pointer}
-#debugOpenBtn{position:fixed;right:12px;bottom:12px;z-index:100000;background:#111;color:#fff;border:none;border-radius:999px;padding:10px 14px;cursor:pointer;font:14px system-ui}
+/* Overlay pantalla completa */
+#zaraModal{
+  position: fixed;
+  inset: 0;
+  display: none;                 /* .open -> flex */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.65);
+  z-index: 99999;
+}
+#zaraModal.open{ display: flex; }
+
+/* Caja del modal */
+#zaraModal .zara-dialog{
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  max-width: 92vw;
+  max-height: 92vh;
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
+
+/* Área media (donde irán imagen y, más tarde, flechas) */
+#zaraModal .zara-media{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Imagen principal */
+#zaraModalImage{
+  display: block;
+  max-width: 86vw;
+  max-height: 80vh;
+  height: auto;
+  position: relative;
+  z-index: 1;              /* flechas irán por encima cuando se añadan */
+  pointer-events: none;    /* la imagen no bloqueará clics de flechas */
+}
+
+/* Botón cerrar */
+#zaraClose{
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  line-height: 32px;
+  font-weight: 700;
+  z-index: 3;
+}
+
+/* Placeholder para flechas/control (aquí las añadiremos luego) */
+#zaraModal .zara-controls{
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* las flechas internas activarán pointer-events */
+  z-index: 2;
+}
 </style>
 
+<!-- Estructura del modal limpia -->
 <div id="zaraModal" aria-hidden="true">
-  <div class="zara-modal-media">
-    <div class="zara-carousel">
+  <div class="zara-dialog" role="dialog" aria-modal="true" aria-label="Vista rápida">
+    <button id="zaraClose" type="button" aria-label="Cerrar">✕</button>
+    <div class="zara-media">
       <img id="zaraModalImage" alt="Imagen del producto">
+      <div class="zara-controls"></div>
     </div>
   </div>
-  <button id="zaraClose" type="button" aria-label="Cerrar">✕</button>
 </div>
-<button id="debugOpenBtn" type="button">Abrir Goku NK</button>
 
 <script>
+// API limpia para el overlay + carrusel (sin UI de flechas todavía)
 (function(){
   const $ = (s, r=document)=>r.querySelector(s);
+  const modal = ()=>$('#zaraModal');
+  const img   = ()=>$('#zaraModalImage');
 
-  function ensureModalVisible(){
-    const m = $('#zaraModal');
-    if (!m) return null;
-    m.classList.remove('hidden','is-hidden','d-none','u-hidden');
-    m.style.display = 'flex';
-    m.style.visibility = 'visible';
-    m.style.opacity = '1';
-    m.removeAttribute('aria-hidden');
-    return m;
+  // Estado de carrusel
+  const state = {
+    images: [],
+    index: 0,
+    isOpen: false
+  };
+
+  function dedup(a){ return Array.from(new Set((a||[]).filter(Boolean))); }
+
+  function setImages(list){
+    state.images = dedup(Array.isArray(list) ? list.slice() : []);
+    state.index = 0;
+    renderImage();
   }
 
-  // Abre por índice del array "productos"
-  window.forceOpenZaraModal = function(idx){
-    const m = ensureModalVisible();
-    if (!m || !Array.isArray(window.productos)) return;
-    const p = window.productos[idx];
-    if (!p) return;
+  function renderImage(){
+    const el = img();
+    if (!el || !state.images.length) return;
+    const src = state.images[((state.index||0)+state.images.length)%state.images.length];
+    if (!el.src.endsWith(src)) el.src = src;
+  }
 
-    const imgs = Array.isArray(p.imagenes) && p.imagenes.length ? p.imagenes : (p.image ? [p.image] : []);
-    const img = $('#zaraModalImage');
-    if (img && imgs.length){ img.src = imgs[0]; }
-  };
+  function next(){ if (!state.images.length) return; state.index = (state.index+1)%state.images.length; renderImage(); }
+  function prev(){ if (!state.images.length) return; state.index = (state.index-1+state.images.length)%state.images.length; renderImage(); }
 
-  // Botón de prueba: abre el modal con "Sudadera Goku NK"
-  $('#debugOpenBtn').addEventListener('click', function(){
-    if (!Array.isArray(window.productos)) return alert('No encuentro "productos"');
-    const i = window.productos.findIndex(p => p && p.nombre === 'Sudadera Goku NK');
-    if (i === -1) return alert('No encuentro "Sudadera Goku NK" en productos');
-    window.forceOpenZaraModal(i);
-  });
+  function open(product, index){
+    // Derivar imágenes desde tu data
+    let list = [];
+    try{
+      if (typeof index === 'number' && window.productos && window.productos[index] && Array.isArray(window.productos[index].imagenes)){
+        list = window.productos[index].imagenes.slice();
+      } else if (product && Array.isArray(product.imagenes)){
+        list = product.imagenes.slice();
+      } else if (product && product.image){
+        list = [product.image];
+      }
+    }catch(e){}
+    setImages(list);
 
-  // Cerrar
+    // Mostrar overlay
+    const m = modal();
+    if (m){ m.classList.add('open'); m.removeAttribute('aria-hidden'); state.isOpen = true; }
+  }
+
+  function close(){
+    const m = modal();
+    if (m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); state.isOpen = false; }
+  }
+
+  // Exponer API pública para que puedas enganchar flechas luego
+  window.zaraOverlay = { open, close, next, prev, setImages, state };
+
+  // Compatibilidad con tu código: openZaraModal + cambiarImagen
+  window.openZaraModal = function(product, index){ open(product, index); };
+  window.cambiarImagen = function(dir){ (Number(dir)||1) > 0 ? next() : prev(); };
+
+  // Cerrar con botón y con Escape
   document.addEventListener('click', (e)=>{
-    if (e.target && e.target.id === 'zaraClose'){
-      const m = $('#zaraModal'); if (m) m.style.display = 'none';
-    }
+    if (e.target && e.target.id === 'zaraClose') close();
   });
-
-  // Gancho: si tu código llama openZaraModal(product, index), lo forzamos a abrir
-  const _open = window.openZaraModal || function(){};
-  window.openZaraModal = function(product, index){
-    try{ _open(product, index); }catch(e){}
-    if (typeof index === 'number') {
-      window.forceOpenZaraModal(index);
-    } else if (product && product.nombre && Array.isArray(window.productos)) {
-      const i = window.productos.findIndex(p => p && p.nombre === product.nombre);
-      if (i !== -1) window.forceOpenZaraModal(i);
-    } else {
-      window.forceOpenZaraModal(0);
-    }
-  };
+  document.addEventListener('keydown', (e)=>{
+    if (!state.isOpen) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
 })();
 </script>
-<!-- === /RESCATE === -->
+<!-- === FIN OVERLAY NUEVO LIMPIO === -->
 
 </body>
 </html>
