@@ -1190,14 +1190,12 @@ body.modal-open{ overflow: hidden; }
   #seccion-conjuntos .btn{ background:#fff; border:1px solid #000; color:#000; padding:10px 16px; border-radius:999px; cursor:pointer; font-size:14px; }
   #seccion-conjuntos .btn:hover{ background:#000; color:#fff; }
 
-/* === Hooking fijo, igual para todos los productos === */
-/* Ajusta solo estos dos números si quieres otra medida */
+/* === Hooking fijo y compacto (como en la captura) === */
 :root{
-  --hook-w-max: 540px;  /* ancho máximo del cuadro */
-  --hook-h: 640px;      /* alto total del cuadro (como en tu foto) */
-  --hook-img-h: 360px;  /* alto del área de imagen */
+  --hook-w-max: 520px;   /* ancho máximo del cuadro */
+  --hook-h: 560px;       /* alto total del cuadro */
+  --hook-img-h: 300px;   /* alto del área de imagen */
 }
-
 #zaraModal.zara-modal-overlay > .zara-modal{
   width: min(var(--hook-w-max), 92vw) !important;
   height: var(--hook-h) !important;
@@ -1211,33 +1209,21 @@ body.modal-open{ overflow: hidden; }
   overflow: hidden !important;
   padding: 16px !important;
 }
-
-/* Imagen con altura fija y sin recortes */
 #zaraModal #zaraModalImage{
   flex: 0 0 var(--hook-img-h) !important;
   width: 100% !important;
   height: var(--hook-img-h) !important;
   max-height: var(--hook-img-h) !important;
   object-fit: contain !important;
-  margin: 0 !important;
   display: block !important;
+  margin: 0 !important;
   background: #fff !important;
   border-radius: 10px !important;
 }
-
-/* El resto del contenido ocupa el espacio sobrante */
 #zaraModal .zara-modal-info{
   flex: 1 1 auto !important;
-  overflow: auto !important;
+  overflow: hidden !important;
   padding: 10px 12px 12px !important;
-}
-
-/* Seguridad en móviles muy bajos: que nunca se salga del viewport */
-@media (max-height: 660px){
-  :root{
-    --hook-h: calc(100vh - 24px);
-    --hook-img-h: min(360px, calc(var(--hook-h) * 0.55));
-  }
 }
 
 </style>
@@ -2757,7 +2743,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 <script>
-/* Reaplica el tamaño fijo al abrir el hooking por si otra regla lo pisa */
+/* Reaplica el tamaño compacto al abrir el hooking */
 (function(){
   const _open = window.openZaraModal;
   window.openZaraModal = function(prod, idx){
