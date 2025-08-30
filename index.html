@@ -215,7 +215,7 @@
       cursor: pointer;
       margin-top: auto;
     }
-
+  
 /* Modal de imagen */
 .modal-overlay {
   position: fixed;
@@ -236,6 +236,7 @@
   display: flex;
   opacity: 1;
 }
+
 
 .modal-content {
   background: #fff;
@@ -288,6 +289,7 @@
   transform: translateY(-50%);
 }
 
+
     /* White frame and centered images */
     .product-image {
       background-color: #fff !important;
@@ -298,6 +300,7 @@
       background-size: cover !important;
       background-position: center !important;
     }
+
 
     /* Correct overlay and modal sizing */
     .overlay, .checkout-overlay {
@@ -310,6 +313,7 @@
       border-radius: 12px !important;
       box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
     }
+
 
     /* Centrar marcos de imágenes y mantener texto ancho completo */
     .product-card {
@@ -329,12 +333,14 @@
       text-align: center;
     }
 
+
     /* Reducir margen blanco alrededor de las imágenes */
     .product-image {
       padding: 4px !important;
       margin: 0 auto 12px auto !important;
       border-radius: 10px !important;
     }
+
 
     /* Hacer imágenes más grandes y cuadradas */
     .product-image {
@@ -346,10 +352,12 @@
       border-radius: 12px !important;
     }
 
+
     /* Reducir espacio entre productos */
     .product-list {
       gap: 8px !important;
     }
+
 
     /* Reducir espacio entre header y barra de búsqueda */
     header {
@@ -360,6 +368,7 @@
       padding-top: 0 !important;
     }
 
+
     /* Reducir padding de header y espacio de búsqueda */
     header {
       padding: 5px 0 !important;
@@ -369,6 +378,8 @@
       margin-top: 5px !important;
       padding: 0 !important;
     }
+
+
 
 .product-image {
   background: #fff;
@@ -436,12 +447,14 @@
   color: #fff;
 }
 
+
 /* ---- Selector de color para modal de producto ---- */
 .color-picker{margin:10px 0 16px;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}
 .color-picker .label{font-size:14px;margin-right:6px}
 .color-swatch{width:28px;height:28px;border-radius:50%;border:1px solid #ccc;cursor:pointer;outline:none}
 .color-swatch[aria-pressed="true"]{box-shadow:0 0 0 2px #000 inset;border-color:#000}
 .color-name{width:100%;text-align:center;font-size:12px;color:#555;margin-top:6px}
+
 
 /* ===== Selector de talla (añadido) ===== */
 .size-picker{margin:8px 0 16px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
@@ -543,17 +556,19 @@
   }
 }
 
+
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 
 /* === Variantes en tarjetas: reutilizamos estilos del modal === */
-.card-variants {
-  margin: 8px 0 4px;
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
+.card-variants { 
+  margin: 8px 0 4px; 
+  display: flex; 
+  gap: 8px; 
+  justify-content: center; 
+  align-items: center; 
   flex-wrap: wrap;
 }
+
 
 /* === Variantes en tarjetas con el MISMO estilo que el hooking === */
 .card-variants.color-picker{margin:8px 0 6px}
@@ -561,6 +576,7 @@
 .card-variants .color-swatch{width:28px;height:28px;border-radius:50%;border:1px solid #ccc;cursor:pointer;outline:none}
 .card-variants .color-swatch[aria-pressed="true"]{box-shadow:0 0 0 2px #000 inset;border-color:#000}
 .card-variants .color-name{width:100%;text-align:center;font-size:12px;color:#555;margin-top:6px}
+
 
 /* === Variantes en tarjetas: estilo minimal (solo círculos) === */
 .card-variants {
@@ -583,6 +599,7 @@
   border-color: #000;
 }
 
+
 /* Texto con cantidad de colores en tarjetas */
 .product-colors{
   font-family: 'Montserrat', sans-serif;
@@ -591,6 +608,7 @@
   text-align: center;
   margin-top: 4px;
 }
+
 
 /* Badge profesional "X colores" en esquina de la imagen */
 .product-card .product-image{ position: relative; }
@@ -609,6 +627,7 @@
   backdrop-filter: blur(2px);
 }
 
+
 /* Conjuntos: tarjeta única tipo formulario elegante */
 #seccion-conjuntos #grid-conjuntos {
   display: flex;
@@ -624,6 +643,7 @@
   padding: 20px;
   box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
+
 
 /* --- Ajustes de acople (mobile-first) --- */
 #seccion-conjuntos{ padding: 4px 0 56px !important; }
@@ -674,6 +694,7 @@
 
 /* micro-ajustes tipográficos */
 #seccion-conjuntos .title{ font-size:16px !important; margin-bottom:4px !important; }
+
 
 /* ====== Product Options: Professional In‑Page Sheet ====== */
 .zara-modal.pro-sheet{
@@ -772,7 +793,8 @@
   backdrop-filter: blur(2px);
 }
 /* Close button position for sheet */
-.zara-modal.pro-sheet
+.zara-modal.pro-sheet 
+
 
 /* === Controles pro: sin <select>, con botones segmentados/pills === */
 #seccion-conjuntos .segmented{ display:flex; gap:8px; background:#f1f1f1; padding:6px; border-radius:999px; width:100%; overflow:auto; }
@@ -788,8 +810,10 @@
 }
 #seccion-conjuntos .pill[aria-pressed="true"]{ border-color:#111; box-shadow: inset 0 0 0 2px #1110; }
 
+
 /* Garantiza espacio visible para el grid de conjuntos */
 #seccion-conjuntos #grid-conjuntos{ min-height: 120px; }
+
 
 /* Asegura estado activo del filtro (negro) */
 .filters button.active{
@@ -797,6 +821,7 @@
   color:#fff !important;
   border-color:#111 !important;
 }
+
 
 /* Botón de filtro activo: SIEMPRE negro con texto blanco */
 .filters button.active,
@@ -806,11 +831,13 @@
   border-color: #000 !important;
 }
 
+
 /* Eliminar flash azul en móviles al pulsar botones/opciones */
 button, .btn, .pill, .seg-btn, .color-swatch {
   -webkit-tap-highlight-color: transparent;
   outline: none;
 }
+
 
 /* Selector de tipo en cuadrícula 2 columnas */
 #cj_tipo_grp {
@@ -834,28 +861,30 @@ button, .btn, .pill, .seg-btn, .color-swatch {
   border-color: #111;
 }
 
+
 /* Estilo para color seleccionado */
 .color-swatch[data-active="1"] {
   outline: 2px solid #111;
   box-shadow: 0 0 0 2px #fff inset;
 }
 
+
 /* === Carrusel en modal Zara (flechas centradas, negras y simples con hover) === */
 .zara-prev,
 .zara-next {
   position: absolute;
-  top: 50%;
+  top: 50%;                   
   transform: translateY(-50%);
-  background: none;
-  color: #000;
+  background: none;           
+  color: #000;                
   border: none;
-  font-size: 34px;
+  font-size: 34px;            
   padding: 0;
   cursor: pointer;
   line-height: 1;
   transition: color 0.2s ease;
 }
-.zara-prev { left: 14px; }
+.zara-prev { left: 14px; }    
 .zara-next { right: 14px; }
 
 /* Efecto hover: gris oscuro */
@@ -868,18 +897,6 @@ button, .btn, .pill, .seg-btn, .color-swatch {
   .zara-carousel img{ max-height:38vh; }
   .zara-prev, .zara-next { font-size: 28px; }
 }
-
-
-/* Flechas SIEMPRE visibles en el modal */
-.zara-modal-media,.zara-carousel{ position:relative; }
-.zara-prev,.zara-next{
-  position:absolute; top:50%; transform:translateY(-50%);
-  background:none; border:none; color:#000; font-size:34px;
-  padding:0; cursor:pointer; line-height:1; z-index:50;
-  display:block !important; /* <- nunca ocultar por JS/CSS previos */
-}
-.zara-prev{ left:14px; }
-.zara-next{ right:14px; }
 
 </style>
 
@@ -923,6 +940,7 @@ button, .btn, .pill, .seg-btn, .color-swatch {
   }
 }
 
+
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
 
@@ -932,6 +950,7 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
+
 
 <style>
 .product-card {
@@ -950,6 +969,7 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
+
 
 <style>
 /* Quitar por completo el “flash” azul de Android/Chrome */
@@ -977,6 +997,7 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 
 .product-card button:not(.color-swatch):not(.size-btn){display:none !important;}
 </style>
+
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -1031,6 +1052,7 @@ button, .btn, .pill, .seg-btn, .color-swatch {
 .modal-overlay{ backdrop-filter: blur(2px); }
 body.modal-open{ overflow: hidden; }
 
+
 /* --- Centrado real del modal y correcciones de overlay --- */
 *{ box-sizing: border-box; }
 .modal-overlay{
@@ -1061,6 +1083,7 @@ body.modal-open{ overflow: hidden; }
   }
 }
 
+
 /* --- SEGURIDAD: el overlay no intercepta clicks si está oculto --- */
 .modal-overlay{
   position: fixed;
@@ -1080,6 +1103,7 @@ body.modal-open{ overflow: hidden; }
   z-index: 1000;
 }
 .zara-modal.is-visible{ display: block; }
+
 
 /* --- Modal centrado, compacto y sin desplazamientos --- */
 .modal-overlay{
@@ -1136,6 +1160,7 @@ body.modal-open{ overflow: hidden; }
   .zara-modal img{ max-height: 30vh; }
 }
 
+
 /* --- Modal compacto sin barra (override final) --- */
 .zara-modal{
   max-height: 80vh !important;
@@ -1149,6 +1174,7 @@ body.modal-open{ overflow: hidden; }
   max-height: 28vh !important;
   object-fit: contain !important;
 }
+
 
 /* --- Modal centrado, justo y sin barras (override definitivo) --- */
 .zara-modal{
@@ -1168,6 +1194,7 @@ body.modal-open{ overflow: hidden; }
 }
 
 </style>
+
 
 <style>
   /* Conjuntos: tarjeta única sin imágenes */
@@ -1253,7 +1280,7 @@ body.modal-open{ overflow: hidden; }
 </div>
 <!-- Sección Conjuntos Personalizados (oculta por defecto) -->
 <div id="seccion-conjuntos" style="display:none; padding:10px 10px 60px;">
-
+  
   <div id="grid-conjuntos" style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px;">
       <div class="card">
         <div class="title">Conjunto personalizado</div>
@@ -1312,6 +1339,7 @@ body.modal-open{ overflow: hidden; }
           <span class="label" id="cj_precio_nino">(0.00 €)</span>
         </div>
 
+        
     <div class="row" style="justify-content:space-between; margin-top:8px;">
       <span class="label" style="font-weight:600;">Total:</span>
       <span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
@@ -1319,13 +1347,14 @@ body.modal-open{ overflow: hidden; }
     <div class="row" style="justify-content:center;">
           <button class="btn" id="cj_add">Añadir conjunto</button>
         </div>
-
+    
       </div>
     </div>
 </div>
 <div class="product-list" id="lista-productos"></div>
 
 <script>
+    
 
 const productos = [
   {
@@ -1338,7 +1367,7 @@ const productos = [
     nombre: "Sudadera Goku NK",
     precio: 24,
     categoria: "hombre",
-    imagenes: [ "fotos/Sudadera Goku NK.jpg", "fotos/Goku atras.png" ]
+    imagenes: [ "fotos/Sudadera Goku NK.jpg", "fotos/Sudadera Goku NK.png" ]
   },
   {
     nombre: "Sudadera Sparco",
@@ -1372,6 +1401,8 @@ const productos = [
       },
 
 ];
+
+
 
     let carrito = [];
 
@@ -1510,6 +1541,9 @@ const productos = [
       actualizarContadorCarrito();
       window.open(`https://wa.me/34603603321?text=${mensaje}`, "_blank");
     }
+  
+
+
 
 function abrirInfo() {
   if (carrito.length === 0) {
@@ -1555,6 +1589,8 @@ function agregarEventosModalZara() {
     });
   });
 }
+
+
 
 function addToCartFromModal() {
   if (window.currentZaraProduct !== undefined) {
@@ -1603,8 +1639,6 @@ function addToCartFromModal() {
 // Variantes de color por producto
 
 // Variantes de color por producto
-
-// Variantes de color por producto (items)
 const VARIANTES = {
   "Sudadera NK": {
     default: "Gris",
@@ -1642,7 +1676,7 @@ const VARIANTES = {
   "Sudadera Goku NK": {
     default: "Gris Jaspeado",
     items: {
-      "Gris Jaspeado": { hex:"#b0b0b0", img:"fotos/Sudadera Goku NK.png" }
+      "Gris Jaspeado": { hex:"#b0b0b0", img:"fotos/Sudadera Goku NK.jpg" }
     }
   },
   "Jersey Boss": {
@@ -1692,6 +1726,9 @@ exist.innerHTML = '<span class="label">Color:</span>' + entries.map(([nombre,dat
     });
   });
 
+  // Inicializar por defecto
+  const defData = conf.items[def];
+  if(defData?.img){ document.getElementById("zaraModalImage").src = defData.img; }
   document.getElementById("zaraModalTitle").textContent = nombreProd + " - " + def;
 }
 
@@ -1719,6 +1756,7 @@ window.addToCartFromModal = function(){
   _addToCart();
 };
 </script>
+
 
 <script>
 const DEFAULT_SIZES = ["XS","S","M","L","XL"];
@@ -1749,6 +1787,7 @@ function renderSizePicker(nombreProd){
   });
 }
 </script>
+
 
 <script>
 // ==== Carga robusta de imagen para variantes ====
@@ -1795,12 +1834,18 @@ function renderSizePicker(nombreProd){
 })();
 </script>
 
+
 <!-- Override mínimo y seguro: lista visible + reenganche modal -->
 <script>
 // Lista de productos visibles en pantalla
 window.__listaActual = window.productos || [];
 
 // Sobrescribe de forma no intrusiva (la última definición gana)
+
+
+
+
+
 
 window.renderizarProductos = function(lista) {
   const contenedor = document.getElementById("lista-productos");
@@ -1830,6 +1875,12 @@ window.renderizarProductos = function(lista) {
   if (typeof window.agregarEventosModalZara === "function") window.agregarEventosModalZara();
 };
 
+
+
+
+
+
+
 window.agregarEventosModalZara = function() {
   const cards = document.querySelectorAll(".product-image");
   cards.forEach((img, index) => {
@@ -1851,6 +1902,7 @@ window.agregarEventosModalZara = function() {
   });
 };
 </script>
+
 
 <!-- Forzar botón AÑADIR visible y sticky en el modal (añade clase si falta) -->
 <script>
@@ -1881,6 +1933,7 @@ window.agregarEventosModalZara = function() {
 })();
 </script>
 
+
 <script>
 (function(){
   // Engancha el click en toda la tarjeta, no solo en la imagen
@@ -1894,7 +1947,7 @@ window.agregarEventosModalZara = function() {
         // Tomar color seleccionado en la tarjeta y pre-seleccionarlo en el modal
         var pressed = card.querySelector('.card-variants .color-swatch[aria-pressed="true"]');
         window.preselectedColor = pressed ? pressed.getAttribute('data-color') : null;
-
+    
         const producto = lista[index];
         if (!producto) return;
 
@@ -1933,6 +1986,7 @@ function setVH(){
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 setVH(); window.addEventListener('resize', setVH);
+
 
 /* --- PARCHE: Reemplazo seguro de renderizarProductos y binding de click --- */
 (function(){
@@ -1993,6 +2047,7 @@ setVH(); window.addEventListener('resize', setVH);
   // Re-render inicial por si la primera ejecución usó la versión corrupta
   try{ renderizarProductos(productos); }catch(e){}
 })();
+
 
 /* --- SEGURIDAD: controla visibilidad del modal/overlay y evita que la web quede bloqueada --- */
 (function(){
@@ -2056,6 +2111,7 @@ setVH(); window.addEventListener('resize', setVH);
   window.__hideModalClasses = hideModalClasses;
 })();
 
+
 <script>
 /* --- PARCHE: imagen del hooking robusta (espacios, rutas, variantes) --- */
 (function(){
@@ -2104,6 +2160,7 @@ setVH(); window.addEventListener('resize', setVH);
 </script>
 
 </script>
+
 
 <script>
 // === Datos base de tipos, colores y tallas ===
@@ -2183,6 +2240,7 @@ function renderConjuntosEnPagina(){
       <span class="label" id="cj_precio_nino">(0.00 €)</span>
     </div>
 
+    
     <div class="row" style="justify-content:space-between; margin-top:8px;">
       <span class="label" style="font-weight:600;">Total:</span>
       <span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
@@ -2190,7 +2248,7 @@ function renderConjuntosEnPagina(){
     <div class="row" style="justify-content:center;">
       <button class="btn" id="cj_add">Añadir conjunto</button>
     </div>
-
+    
   `;
   host.appendChild(card);
 
@@ -2316,7 +2374,7 @@ function renderConjuntosEnPagina(){
       <select id="cj_talla_nino">${__CONJ_TALLAS_NINO.map(t=>`<option value="${t}">${t}</option>`).join("")}</select>
       <span class="label" id="cj_precio_nino">(0.00 €)</span>
     </div>
-
+    
     <div class="row" style="justify-content:space-between; margin-top:8px;">
       <span class="label" style="font-weight:600;">Total:</span>
       <span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
@@ -2324,7 +2382,7 @@ function renderConjuntosEnPagina(){
     <div class="row" style="justify-content:center;">
       <button class="btn" id="cj_add">Añadir conjunto</button>
     </div>
-
+    
   `;
   host.appendChild(card);
 
@@ -2464,6 +2522,7 @@ function volverATienda(){
 })();
 </script>
 
+
 <script>
 // ===== Attach professional sheet behavior to the product options modal =====
 (function(){
@@ -2513,6 +2572,7 @@ function volverATienda(){
 })();
 </script>
 
+
 <script>
 (function(){
   function asegurarTarjeta(){
@@ -2536,6 +2596,7 @@ function volverATienda(){
   };
 })();
 </script>
+
 
 <script>
 (function(){
@@ -2628,6 +2689,7 @@ function volverATienda(){
 })();
 </script>
 
+
 <script>
 function mostrarConjuntos() {
   const lista = document.getElementById("lista-productos");
@@ -2660,6 +2722,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 </script>
 
+
 <script>
 // Forzar que el botón activo del filtro se vea correctamente
 document.addEventListener("DOMContentLoaded", () => {
@@ -2681,6 +2744,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const filtros = document.querySelectorAll(".filters button");
@@ -2692,6 +2756,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+
 
 <script>
 // --- Carrusel para productos con múltiples imágenes (p.ej. Sudadera Goku NK) ---
@@ -2728,51 +2793,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // fallback: dejar lo que ya puso tu modal
       }
     }catch(e){}
-  };
-})();
-</script>
-
-
-<script>
-(function(){
-  window.getImagesFor = function(index){
-    const p = (window.productos && window.productos[index]) || null;
-    if(!p) return [];
-    const arr = [];
-    if (Array.isArray(p.imagenes)) arr.push(...p.imagenes); // orden que definas en datos
-    if (p.imagen) arr.push(p.imagen);
-    // deduplicar y filtrar vacíos
-    return Array.from(new Set(arr.filter(Boolean)));
-  };
-
-  const _open = window.openZaraModal;
-  window.openZaraModal = function(product, index){
-    if (typeof _open === "function") _open(product, index);
-    window.currentZaraProduct = index;
-    window.currentImages = getImagesFor(index);
-    window.currentImageIndex = 0;
-    const img = document.getElementById('zaraModalImage');
-    if (img && currentImages.length) img.src = currentImages[0]; // JPG primero si está así en datos
-    const prevBtn = document.querySelector('.zara-prev');
-    const nextBtn = document.querySelector('.zara-next');
-    const show = currentImages.length > 1;
-    if (prevBtn) prevBtn.style.display = show ? 'block' : 'none';
-    if (nextBtn) nextBtn.style.display = show ? 'block' : 'none';
-  };
-
-  window.cambiarImagen = function(dir){
-    if (!Array.isArray(window.currentImages) || !currentImages.length) return;
-    if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
-    window.currentImageIndex = (currentImageIndex + dir + currentImages.length) % currentImages.length;
-    const img = document.getElementById('zaraModalImage');
-    if (img) img.src = currentImages[currentImageIndex];
-  };
-
-  // No pisar la imagen inicial desde renderColorPicker al abrir;
-  // solo actualizar al hacer clic en un color (tu listener ya lo hace).
-  const _rcp = window.renderColorPicker;
-  window.renderColorPicker = function(nombreProd){
-    if (typeof _rcp === "function") _rcp(nombreProd);
   };
 })();
 </script>
