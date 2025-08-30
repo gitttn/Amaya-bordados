@@ -2906,5 +2906,76 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 <!-- END: CARRUSEL LIMPIO + VARIANTES SEGURO -->
 
+
+<!-- === Carrusel robusto integrado === -->
+<style>
+#zaraModal .zara-modal-media, #zaraModal .zara-carousel{ position:relative !important; }
+#zaraModal .zara-prev, #zaraModal .zara-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:none; border:none; color:#000; font-size:34px;
+  padding:0; cursor:pointer; line-height:1; z-index:9999;
+}
+#zaraModal .zara-prev{ left:14px; }
+#zaraModal .zara-next{ right:14px; }
+</style>
+
+<script>
+(function(){
+  function dedup(a){ return Array.from(new Set((a||[]).filter(Boolean))); }
+
+  function getImages(product, index){
+    try{
+      let list = [];
+      if(index!=null && window.productos && window.productos[index] && Array.isArray(window.productos[index].imagenes)){
+        list = window.productos[index].imagenes.slice();
+      }
+      if(!list.length && product && Array.isArray(product.imagenes)){
+        list = product.imagenes.slice();
+      }
+      if(!list.length && product && product.image){
+        list = [product.image];
+      }
+      return dedup(list);
+    }catch(e){ return []; }
+  }
+
+  function ensureArrows(){
+    const img = document.getElementById('zaraModalImage');
+    const media = document.querySelector('#zaraModal .zara-carousel, #zaraModal .zara-modal-media') || (img && img.parentElement);
+    if(!media || !img) return;
+    media.querySelectorAll('.zara-prev,.zara-next').forEach(n=>n.remove());
+    const prev=document.createElement('button'); prev.className='zara-prev'; prev.type='button'; prev.textContent='‹'; prev.setAttribute('aria-label','Anterior');
+    const next=document.createElement('button'); next.className='zara-next'; next.type='button'; next.textContent='›'; next.setAttribute('aria-label','Siguiente');
+    media.appendChild(prev); media.appendChild(next);
+  }
+
+  const _open = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    if(typeof _open === "function") _open(product, index);
+    window.currentImages = getImages(product, index);
+    window.currentImageIndex = 0;
+    const img = document.getElementById('zaraModalImage');
+    if(img && window.currentImages.length){
+      img.src = window.currentImages[0];
+    }
+    ensureArrows();
+  };
+
+  document.addEventListener('click', function(e){
+    const prev = e.target.closest('#zaraModal .zara-prev');
+    const next = e.target.closest('#zaraModal .zara-next');
+    if(!prev && !next) return;
+    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
+    if(!list.length) return;
+    if(typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
+    const dir = prev ? -1 : 1;
+    window.currentImageIndex = (window.currentImageIndex + dir + list.length) % list.length;
+    const img = document.getElementById('zaraModalImage');
+    if(img) img.src = list[window.currentImageIndex];
+  }, true);
+})();
+</script>
+<!-- === Fin carrusel robusto === -->
+
 </body>
 </html>
