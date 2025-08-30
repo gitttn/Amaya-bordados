@@ -2798,7 +2798,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
-<!-- === Carrusel FINAL integrado (flechas + teclado + swipe) === -->
+<!-- === Carrusel HARD-OVERRIDE integrado (modal original) === -->
 <style>
 #zaraModal .zara-modal-media, #zaraModal .zara-carousel{ position:relative !important; }
 #zaraModal .zara-prev, #zaraModal .zara-next{
@@ -2814,83 +2814,104 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 (function(){
   function dedup(a){ return Array.from(new Set((a||[]).filter(Boolean))); }
-  function imgEl(){ return document.getElementById('zaraModalImage') || document.querySelector('#zaraModal img') || null; }
-  function mediaEl(){ return document.querySelector('#zaraModal .zara-modal-media, #zaraModal .zara-carousel') || (imgEl() && imgEl().parentElement) || null; }
+  function elModal(){ return document.getElementById('zaraModal'); }
+  function elImg(){ return document.getElementById('zaraModalImage') || (elModal() && elModal().querySelector('img')) || null; }
+  function elMedia(){ return (elModal() && elModal().querySelector('.zara-modal-media, .zara-carousel')) || (elImg() && elImg().parentElement) || null; }
   function getImages(product, index){
     try{
       let list = [];
-      if (index!=null && window.productos && window.productos[index] && Array.isArray(window.productos[index].imagenes)){
+      if (index!=null && Array.isArray(window.productos) && window.productos[index] && Array.isArray(window.productos[index].imagenes)){
         list = window.productos[index].imagenes.slice();
-      } else if (product && Array.isArray(product.imagenes)){
-        list = product.imagenes.slice();
-      } else if (product && product.image){
-        list = [product.image];
       }
+      if (!list.length && product && Array.isArray(product.imagenes)) list = product.imagenes.slice();
+      if (!list.length && product && product.image) list = [product.image];
       return dedup(list);
     }catch(e){ return []; }
   }
 
   function ensureArrows(){
-    const m = mediaEl(); const im = imgEl();
-    if(!m || !im) return;
-    m.querySelectorAll('.zara-prev,.zara-next').forEach(n=>n.remove());
+    const media = elMedia(); const img = elImg();
+    if(!media || !img) return;
+    media.querySelectorAll('.zara-prev,.zara-next').forEach(n=>n.remove());
     const prev = document.createElement('button'); prev.className='zara-prev'; prev.type='button'; prev.setAttribute('aria-label','Anterior'); prev.textContent='‹';
     const next = document.createElement('button'); next.className='zara-next'; next.type='button'; next.setAttribute('aria-label','Siguiente'); next.textContent='›';
-    m.appendChild(prev); m.appendChild(next);
+    media.appendChild(prev); media.appendChild(next);
   }
 
-  // Wrap del modal original
+  window.currentImages = [];
+  window.currentImageIndex = 0;
+  let observer = null, suppressObserver = false;
+
+  function setImageFromIndex(){
+    const img = elImg();
+    if (!img || !Array.isArray(window.currentImages) || !window.currentImages.length) return;
+    const i = ((window.currentImageIndex||0) + window.currentImages.length) % window.currentImages.length;
+    window.currentImageIndex = i;
+    const desired = window.currentImages[i];
+    if (!img.src.endsWith(desired)){
+      suppressObserver = true;
+      img.src = desired;
+      setTimeout(()=>{ suppressObserver = false; }, 0);
+    }
+  }
+
+  function startObserver(){
+    if (observer) { observer.disconnect(); observer = null; }
+    const target = elModal();
+    if (!target) return;
+    observer = new MutationObserver(function(){
+      if (suppressObserver) return;
+      ensureArrows();
+      setImageFromIndex();
+    });
+    observer.observe(target, { attributes:true, childList:true, subtree:true });
+  }
+
   const _open = window.openZaraModal || function(){};
   window.openZaraModal = function(product, index){
     try{ _open(product, index); }catch(e){}
     window.currentImages = getImages(product, index);
     window.currentImageIndex = 0;
-    ensureArrows();
-    const im = imgEl();
-    if (im && Array.isArray(window.currentImages) && window.currentImages.length){
-      im.src = window.currentImages[0]; // abre con la primera (JPG)
-    }
+    setTimeout(()=>{
+      ensureArrows();
+      setImageFromIndex();
+      startObserver();
+      setTimeout(()=>{ ensureArrows(); setImageFromIndex(); }, 80);
+    }, 0);
   };
 
-  // Delegación: flechas
   document.addEventListener('click', function(e){
     const prev = e.target.closest('#zaraModal .zara-prev');
     const next = e.target.closest('#zaraModal .zara-next');
     if(!prev && !next) return;
     const list = Array.isArray(window.currentImages) ? window.currentImages : [];
     if(!list.length) return;
-    if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
     const dir = prev ? -1 : 1;
-    window.currentImageIndex = (window.currentImageIndex + dir + list.length) % list.length;
-    const im = imgEl();
-    if (im) im.src = list[window.currentImageIndex];
+    window.currentImageIndex = ( (typeof window.currentImageIndex==='number'?window.currentImageIndex:0) + dir + list.length ) % list.length;
+    setImageFromIndex();
   }, true);
 
-  // Teclado (solo cuando el modal está visible)
   document.addEventListener('keydown', function(e){
-    const modal = document.getElementById('zaraModal');
+    const modal = elModal();
     if (!modal || (modal.style.display && modal.style.display==='none')) return;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
       e.preventDefault();
-      const dir = (e.key === 'ArrowLeft') ? -1 : 1;
+      const dir = e.key === 'ArrowLeft' ? -1 : 1;
       const list = Array.isArray(window.currentImages) ? window.currentImages : [];
       if(!list.length) return;
-      if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
-      window.currentImageIndex = (window.currentImageIndex + dir + list.length) % list.length;
-      const im = imgEl();
-      if (im) im.src = list[window.currentImageIndex];
+      window.currentImageIndex = ((window.currentImageIndex||0) + dir + list.length) % list.length;
+      setImageFromIndex();
     }
   });
 
-  // Swipe móvil
   let startX=null;
   document.addEventListener('touchstart', function(e){
-    const modal = document.getElementById('zaraModal');
+    const modal = elModal();
     if (!modal || (modal.style.display && modal.style.display==='none')) return;
     startX = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : null;
   }, {passive:true});
   document.addEventListener('touchend', function(e){
-    const modal = document.getElementById('zaraModal');
+    const modal = elModal();
     if (!modal || (modal.style.display && modal.style.display==='none')) return;
     if (startX==null) return;
     const endX = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : null;
@@ -2900,16 +2921,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const dir = dx>0 ? -1 : 1;
       const list = Array.isArray(window.currentImages) ? window.currentImages : [];
       if(!list.length) return;
-      if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
-      window.currentImageIndex = (window.currentImageIndex + dir + list.length) % list.length;
-      const im = imgEl();
-      if (im) im.src = list[window.currentImageIndex];
+      window.currentImageIndex = ((window.currentImageIndex||0) + dir + list.length) % list.length;
+      setImageFromIndex();
     }
     startX = null;
   }, {passive:true});
 })();
 </script>
-<!-- === Fin Carrusel FINAL integrado === -->
+<!-- === Fin Carrusel HARD-OVERRIDE === -->
 
 </body>
 </html>
