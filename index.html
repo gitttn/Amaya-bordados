@@ -2798,55 +2798,47 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
-<!-- === CARRUSEL FINAL LIMPIO (flechas encima + delegación) === -->
+<!-- === FLECHAS NUEVAS (IDs dedicados, por encima de la imagen) === -->
 <style>
-/* Contenedor del media dentro del modal */
 #zaraModal .zara-modal-media, 
 #zaraModal .zara-carousel { position: relative !important; }
 
-/* Imagen SIEMPRE por debajo de las flechas */
 #zaraModal img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  position: relative;
-  z-index: 1;                 /* debajo de flechas */
-  pointer-events: auto;
+  display:block; max-width:100%; height:auto;
+  position:relative; z-index:1;
+  pointer-events:none; /* la imagen no tapa los clics */
 }
 
-/* Flechas negras, encima de la imagen y clicables */
-#zaraModal .zara-prev,
-#zaraModal .zara-next {
-  position: absolute !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  background: none !important;
-  border: none !important;
-  color: #000 !important;
-  font-size: 34px !important;
-  line-height: 1 !important;
-  padding: 0 !important;
-  cursor: pointer !important;
-  z-index: 99999 !important;  /* por ENCIMA de la imagen */
-  pointer-events: auto !important;
-  user-select: none !important;
+#zaraPrevBtn, #zaraNextBtn{
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:rgba(255,255,255,.0); border:none;
+  font-size:34px; line-height:1; color:#000;
+  width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; user-select:none;
+  z-index:999999; pointer-events:auto;
 }
-#zaraModal .zara-prev  { left: 14px !important; }
-#zaraModal .zara-next  { right: 14px !important; }
+#zaraPrevBtn{ left:12px; }
+#zaraNextBtn{ right:12px; }
+
+#zaraHitLeft, #zaraHitRight{
+  position:absolute; top:0; bottom:0; width:36%; z-index:999998; cursor:pointer;
+}
+#zaraHitLeft{ left:0; }
+#zaraHitRight{ right:0; }
+
+#zaraPrevBtn, #zaraNextBtn, #zaraHitLeft, #zaraHitRight{
+  visibility:visible !important; opacity:1 !important; pointer-events:auto !important;
+}
 </style>
 
 <script>
 (function(){
-  function dedup(a){ return Array.from(new Set((a||[]).filter(Boolean))); }
-  function $modal(){ return document.getElementById('zaraModal'); }
-  function $img(){
-    return document.getElementById('zaraModalImage') || ($modal() && $modal().querySelector('img')) || null;
-  }
-  function $media(){
-    return ($modal() && $modal().querySelector('.zara-modal-media, .zara-carousel')) || ($img() && $img().parentElement) || null;
-  }
+  const $ = (s, r=document) => r.querySelector(s);
+  function modal(){ return $('#zaraModal'); }
+  function imgEl(){ return $('#zaraModalImage') || $('#zaraModal img'); }
+  function mediaEl(){ return $('#zaraModal .zara-modal-media, #zaraModal .zara-carousel') || (imgEl() && imgEl().parentElement) || null; }
 
-  // Listado de imágenes para el producto actual
+  function dedup(a){ return Array.from(new Set((a||[]).filter(Boolean))); }
   function getImages(product, index){
     try{
       let list = [];
@@ -2861,59 +2853,77 @@ document.addEventListener("DOMContentLoaded", () => {
     }catch(e){ return []; }
   }
 
-  // Inserta flechas y elimina duplicadas
-  function ensureArrows(){
-    const m = $media(), im = $img();
+  function ensureNewArrows(){
+    const m = mediaEl(); const im = imgEl();
     if(!m || !im) return;
-    m.querySelectorAll('.zara-prev,.zara-next').forEach(n=>n.remove());
+    ['#zaraPrevBtn','#zaraNextBtn','#zaraHitLeft','#zaraHitRight'].forEach(sel=>{
+      const n = $(sel); if(n) n.remove();
+    });
     const prev = document.createElement('button');
-    prev.className = 'zara-prev'; prev.type='button'; prev.setAttribute('aria-label','Anterior'); prev.textContent='‹';
+    prev.id='zaraPrevBtn'; prev.type='button'; prev.setAttribute('aria-label','Anterior'); prev.textContent='‹';
     const next = document.createElement('button');
-    next.className = 'zara-next'; next.type='button'; next.setAttribute('aria-label','Siguiente'); next.textContent='›';
+    next.id='zaraNextBtn'; next.type='button'; next.setAttribute('aria-label','Siguiente'); next.textContent='›';
+    const hitL = document.createElement('div'); hitL.id='zaraHitLeft';
+    const hitR = document.createElement('div'); hitR.id='zaraHitRight';
     m.appendChild(prev); m.appendChild(next);
+    m.appendChild(hitL); m.appendChild(hitR);
   }
 
-  // Estado global del carrusel
-  window.currentImages = [];
-  window.currentImageIndex = 0;
+  window.currentImages = window.currentImages || [];
+  window.currentImageIndex = window.currentImageIndex || 0;
 
-  function setImageFromIndex(){
-    const im = $img();
-    if(!im || !Array.isArray(window.currentImages) || !window.currentImages.length) return;
-    window.currentImageIndex = ((window.currentImageIndex||0) + window.currentImages.length) % window.currentImages.length;
-    const src = window.currentImages[window.currentImageIndex];
-    // Evita trabajo si ya está puesta
+  function setImageByIndex(){
+    const im = imgEl();
+    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
+    if(!im || !list.length) return;
+    window.currentImageIndex = ((window.currentImageIndex||0) + list.length) % list.length;
+    const src = list[window.currentImageIndex];
     if (!im.src.endsWith(src)) im.src = src;
   }
+  function move(dir){
+    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
+    if(!list.length) return;
+    window.currentImageIndex = ((typeof window.currentImageIndex==='number'?window.currentImageIndex:0) + dir + list.length) % list.length;
+    setImageByIndex();
+  }
 
-  // Envolver openZaraModal: inicializa carrusel tras render original
   const _open = window.openZaraModal || function(){};
   window.openZaraModal = function(product, index){
     try{ _open(product, index); }catch(e){}
     window.currentImages = getImages(product, index);
     window.currentImageIndex = 0;
     setTimeout(()=>{
-      ensureArrows();
-      setImageFromIndex();
-      // Refuerzo por si otro script modifica el DOM justo después
-      setTimeout(()=>{ ensureArrows(); setImageFromIndex(); }, 60);
+      ensureNewArrows();
+      setImageByIndex();
+      setTimeout(()=>{ ensureNewArrows(); setImageByIndex(); }, 60);
     }, 0);
   };
 
-  // Delegación de clics en flechas (funciona aunque se regenere el DOM)
   document.addEventListener('click', function(e){
-    const prev = e.target.closest('#zaraModal .zara-prev');
-    const next = e.target.closest('#zaraModal .zara-next');
-    if(!prev && !next) return;
-    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
-    if(!list.length) return;
-    const dir = prev ? -1 : 1;
-    window.currentImageIndex = ((typeof window.currentImageIndex==='number'?window.currentImageIndex:0) + dir + list.length) % list.length;
-    setImageFromIndex();
+    if (e.target && (e.target.id === 'zaraPrevBtn' || e.target.id === 'zaraHitLeft')) { e.preventDefault(); move(-1); }
+    if (e.target && (e.target.id === 'zaraNextBtn' || e.target.id === 'zaraHitRight')){ e.preventDefault(); move(1); }
   }, true);
+
+  document.addEventListener('mousedown', function(e){
+    if (e.target && (e.target.id === 'zaraPrevBtn' || e.target.id === 'zaraHitLeft')) { e.preventDefault(); move(-1); }
+    if (e.target && (e.target.id === 'zaraNextBtn' || e.target.id === 'zaraHitRight')){ e.preventDefault(); move(1); }
+  }, true);
+
+  document.addEventListener('touchstart', function(e){
+    const t = e.target && e.target.id;
+    if (t === 'zaraPrevBtn' || t === 'zaraHitLeft'){ e.preventDefault(); move(-1); }
+    if (t === 'zaraNextBtn' || t === 'zaraHitRight'){ e.preventDefault(); move(1); }
+  }, {passive:false});
+
+  document.addEventListener('keydown', function(e){
+    const m = modal();
+    if (!m || (m.style.display && m.style.display==='none')) return;
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); move(-1); }
+    if (e.key === 'ArrowRight'){ e.preventDefault(); move(1); }
+  });
 })();
 </script>
-<!-- === /CARRUSEL FINAL LIMPIO === -->
+<!-- === /FLECHAS NUEVAS === -->
 
 </body>
 </html>
