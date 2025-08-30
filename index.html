@@ -2798,132 +2798,139 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
-<!-- === FLECHAS NUEVAS (IDs dedicados, por encima de la imagen) === -->
+<!-- === MODAL DROP-IN + CARRUSEL LIMPIO === -->
 <style>
-#zaraModal .zara-modal-media, 
-#zaraModal .zara-carousel { position: relative !important; }
-
-#zaraModal img {
-  display:block; max-width:100%; height:auto;
+/* Modal overlay */
+#zaraModal{
+  position:fixed; inset:0; display:none;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.65); z-index:99999;
+}
+#zaraModal .zara-modal-media{
+  max-width:92vw; max-height:92vh; background:#fff;
+  border-radius:12px; padding:10px; position:relative;
+}
+#zaraModal .zara-carousel{
+  position:relative; display:flex; align-items:center; justify-content:center;
+}
+#zaraModalImage{
+  display:block; max-width:86vw; max-height:80vh;
   position:relative; z-index:1;
-  pointer-events:none; /* la imagen no tapa los clics */
+  pointer-events:none; /* la imagen no tapa las flechas */
 }
-
-#zaraPrevBtn, #zaraNextBtn{
+#zaraModal .zara-prev, #zaraModal .zara-next{
   position:absolute; top:50%; transform:translateY(-50%);
-  background:rgba(255,255,255,.0); border:none;
-  font-size:34px; line-height:1; color:#000;
+  background:none; border:none; color:#000; font-size:34px; line-height:1;
   width:44px; height:44px; display:flex; align-items:center; justify-content:center;
-  cursor:pointer; user-select:none;
-  z-index:999999; pointer-events:auto;
+  cursor:pointer; user-select:none; z-index:9999; pointer-events:auto;
 }
-#zaraPrevBtn{ left:12px; }
-#zaraNextBtn{ right:12px; }
-
-#zaraHitLeft, #zaraHitRight{
-  position:absolute; top:0; bottom:0; width:36%; z-index:999998; cursor:pointer;
-}
-#zaraHitLeft{ left:0; }
-#zaraHitRight{ right:0; }
-
-#zaraPrevBtn, #zaraNextBtn, #zaraHitLeft, #zaraHitRight{
-  visibility:visible !important; opacity:1 !important; pointer-events:auto !important;
+#zaraModal .zara-prev{ left:12px; }
+#zaraModal .zara-next{ right:12px; }
+#zaraClose{
+  position:absolute; right:14px; top:14px; background:#000; color:#fff;
+  border:none; border-radius:999px; width:32px; height:32px; line-height:32px; cursor:pointer; z-index:10000;
 }
 </style>
 
 <script>
 (function(){
-  const $ = (s, r=document) => r.querySelector(s);
-  function modal(){ return $('#zaraModal'); }
-  function imgEl(){ return $('#zaraModalImage') || $('#zaraModal img'); }
-  function mediaEl(){ return $('#zaraModal .zara-modal-media, #zaraModal .zara-carousel') || (imgEl() && imgEl().parentElement) || null; }
-
+  /* ===== Helpers ===== */
+  const $ = (s, r=document)=>r.querySelector(s);
   function dedup(a){ return Array.from(new Set((a||[]).filter(Boolean))); }
+
+  /* ===== Rebuild modal DOM (drop-in) preserving existing #zaraModal element ===== */
+  function rebuildModal(){
+    const m = $('#zaraModal');
+    if (!m) return;
+    // Preserve current display state (in case it's already visible)
+    const prevDisplay = m.style.display;
+    m.innerHTML = [
+      '<div class="zara-modal-media">',
+        '<div class="zara-carousel">',
+          '<img id="zaraModalImage" alt="Imagen del producto">',
+          '<button class="zara-prev" type="button" aria-label="Anterior">‹</button>',
+          '<button class="zara-next" type="button" aria-label="Siguiente">›</button>',
+        '</div>',
+      '</div>',
+      '<button id="zaraClose" type="button" aria-label="Cerrar">✕</button>'
+    ].join('');
+    if (prevDisplay) m.style.display = prevDisplay;
+  }
+
+  /* ===== Carousel state ===== */
+  let currentImages = [];
+  let currentIndex = 0;
+
+  function img(){ return $('#zaraModalImage'); }
+  function modal(){ return $('#zaraModal'); }
+
   function getImages(product, index){
     try{
-      let list = [];
-      if (index!=null && Array.isArray(window.productos) && window.productos[index] && Array.isArray(window.productos[index].imagenes)){
-        list = window.productos[index].imagenes.slice();
-      } else if (product && Array.isArray(product.imagenes)){
-        list = product.imagenes.slice();
-      } else if (product && product.image){
-        list = [product.image];
+      if (index!=null && window.productos && window.productos[index] && Array.isArray(window.productos[index].imagenes)){
+        return dedup(window.productos[index].imagenes.slice());
       }
-      return dedup(list);
-    }catch(e){ return []; }
+      if (product && Array.isArray(product.imagenes)) return dedup(product.imagenes.slice());
+      if (product && product.image) return [product.image];
+    }catch(e){}
+    return [];
   }
-
-  function ensureNewArrows(){
-    const m = mediaEl(); const im = imgEl();
-    if(!m || !im) return;
-    ['#zaraPrevBtn','#zaraNextBtn','#zaraHitLeft','#zaraHitRight'].forEach(sel=>{
-      const n = $(sel); if(n) n.remove();
-    });
-    const prev = document.createElement('button');
-    prev.id='zaraPrevBtn'; prev.type='button'; prev.setAttribute('aria-label','Anterior'); prev.textContent='‹';
-    const next = document.createElement('button');
-    next.id='zaraNextBtn'; next.type='button'; next.setAttribute('aria-label','Siguiente'); next.textContent='›';
-    const hitL = document.createElement('div'); hitL.id='zaraHitLeft';
-    const hitR = document.createElement('div'); hitR.id='zaraHitRight';
-    m.appendChild(prev); m.appendChild(next);
-    m.appendChild(hitL); m.appendChild(hitR);
-  }
-
-  window.currentImages = window.currentImages || [];
-  window.currentImageIndex = window.currentImageIndex || 0;
-
-  function setImageByIndex(){
-    const im = imgEl();
-    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
-    if(!im || !list.length) return;
-    window.currentImageIndex = ((window.currentImageIndex||0) + list.length) % list.length;
-    const src = list[window.currentImageIndex];
+  function setImage(){
+    const im = img();
+    if (!im || !currentImages.length) return;
+    currentIndex = ((currentIndex||0) + currentImages.length) % currentImages.length;
+    const src = currentImages[currentIndex];
     if (!im.src.endsWith(src)) im.src = src;
   }
   function move(dir){
-    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
-    if(!list.length) return;
-    window.currentImageIndex = ((typeof window.currentImageIndex==='number'?window.currentImageIndex:0) + dir + list.length) % list.length;
-    setImageByIndex();
+    if (!currentImages.length) return;
+    currentIndex = ((typeof currentIndex==='number'?currentIndex:0) + dir + currentImages.length) % currentImages.length;
+    setImage();
   }
+  // Compat: inline handlers
+  window.cambiarImagen = function(dir){ move(Number(dir)||1); };
 
+  /* ===== Wrap your openZaraModal and force our structure + logic ===== */
   const _open = window.openZaraModal || function(){};
   window.openZaraModal = function(product, index){
     try{ _open(product, index); }catch(e){}
-    window.currentImages = getImages(product, index);
-    window.currentImageIndex = 0;
-    setTimeout(()=>{
-      ensureNewArrows();
-      setImageByIndex();
-      setTimeout(()=>{ ensureNewArrows(); setImageByIndex(); }, 60);
-    }, 0);
+    // Ensure modal structure is ours
+    rebuildModal();
+    // Build images list
+    currentImages = getImages(product, index);
+    currentIndex = 0;
+    // Show modal (in case original didn't)
+    if (modal()) modal().style.display = 'flex';
+    // Next tick: ensure first image and buttons work
+    setTimeout(()=>{ setImage(); setTimeout(setImage, 60); }, 0);
   };
 
-  document.addEventListener('click', function(e){
-    if (e.target && (e.target.id === 'zaraPrevBtn' || e.target.id === 'zaraHitLeft')) { e.preventDefault(); move(-1); }
-    if (e.target && (e.target.id === 'zaraNextBtn' || e.target.id === 'zaraHitRight')){ e.preventDefault(); move(1); }
-  }, true);
-
-  document.addEventListener('mousedown', function(e){
-    if (e.target && (e.target.id === 'zaraPrevBtn' || e.target.id === 'zaraHitLeft')) { e.preventDefault(); move(-1); }
-    if (e.target && (e.target.id === 'zaraNextBtn' || e.target.id === 'zaraHitRight')){ e.preventDefault(); move(1); }
-  }, true);
-
-  document.addEventListener('touchstart', function(e){
-    const t = e.target && e.target.id;
-    if (t === 'zaraPrevBtn' || t === 'zaraHitLeft'){ e.preventDefault(); move(-1); }
-    if (t === 'zaraNextBtn' || t === 'zaraHitRight'){ e.preventDefault(); move(1); }
-  }, {passive:false});
-
-  document.addEventListener('keydown', function(e){
-    const m = modal();
-    if (!m || (m.style.display && m.style.display==='none')) return;
-    if (e.key === 'ArrowLeft'){ e.preventDefault(); move(-1); }
-    if (e.key === 'ArrowRight'){ e.preventDefault(); move(1); }
+  /* ===== Event wiring ===== */
+  // Close
+  document.addEventListener('click', (e)=>{
+    if (e.target && e.target.id==='zaraClose' && modal()){ modal().style.display='none'; }
   });
+  // Arrows (delegation)
+  document.addEventListener('click', (e)=>{
+    if (e.target && e.target.closest('#zaraModal .zara-prev')){ e.preventDefault(); move(-1); }
+    if (e.target && e.target.closest('#zaraModal .zara-next')){ e.preventDefault(); move(1); }
+  }, true);
+  // Keyboard
+  document.addEventListener('keydown', (e)=>{
+    if (!modal() || modal().style.display==='none') return;
+    if (e.key==='ArrowLeft'){ e.preventDefault(); move(-1); }
+    if (e.key==='ArrowRight'){ e.preventDefault(); move(1); }
+    if (e.key==='Escape'){ modal().style.display='none'; }
+  });
+
+  // Build modal on DOM ready (once)
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', rebuildModal, {once:true});
+  } else {
+    rebuildModal();
+  }
 })();
 </script>
-<!-- === /FLECHAS NUEVAS === -->
+<!-- === /MODAL DROP-IN === -->
 
 </body>
 </html>
