@@ -1190,70 +1190,35 @@ body.modal-open{ overflow: hidden; }
   #seccion-conjuntos .btn{ background:#fff; border:1px solid #000; color:#000; padding:10px 16px; border-radius:999px; cursor:pointer; font-size:14px; }
   #seccion-conjuntos .btn:hover{ background:#000; color:#fff; }
 
-/* === Hooking compacto, centrado 100% por posición fija === */
-:root{
-  --hook-w-max: 520px;   /* ancho máximo del modal */
-  --hook-h: 560px;       /* alto total del modal */
-  --hook-img-h: 280px;   /* alto del área de imagen */
+/* Flechas negras para el hooking */
+.zara-carousel {
+  position: relative;
+  width: 100%;
+  height: 280px;
 }
-
-/* Overlay: no lo forzamos visible; solo garantizamos que ocupa toda la pantalla */
-#zaraModal.zara-modal-overlay{
-  position: fixed !important;
-  inset: 0 !important;
-  display: none; /* tu JS lo pone en flex o block */
-  background: rgba(0,0,0,.45) !important;
-  z-index: 10000 !important;
+.zara-carousel img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff;
 }
-
-/* Cuadro del modal: centrado por viewport, tamaño fijo */
-#zaraModal.zara-modal-overlay > .zara-modal{
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: min(var(--hook-w-max), 92vw) !important;
-  height: var(--hook-h) !important;
-  max-height: var(--hook-h) !important;
-  min-height: var(--hook-h) !important;
-  margin: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  align-items: stretch !important;
-  border-radius: 18px !important;
-  overflow: hidden !important;
-  padding: 16px !important;
-  background: #fff !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,.18) !important;
+.zara-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  font-size: 22px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 10;
+  display: none;
 }
-
-/* Imagen contenida con altura fija para dejar aire a variantes */
-#zaraModal #zaraModalImage{
-  flex: 0 0 var(--hook-img-h) !important;
-  width: 100% !important;
-  height: var(--hook-img-h) !important;
-  object-fit: contain !important;
-  display: block !important;
-  margin: 0 !important;
-  background: #fff !important;
-  border-radius: 10px !important;
-}
-
-/* Info con scroll interno mínimo si hace falta */
-#zaraModal .zara-modal-info{
-  flex: 1 1 auto !important;
-  overflow: auto !important;
-  padding: 8px 12px 12px !important;
-}
-
-/* X anclada al cuadro */
-#zaraModal .zara-modal-close{
-  position: absolute !important;
-  top: 10px !important;
-  right: 12px !important;
-  z-index: 5 !important;
-}
+.zara-arrow.left { left: 10px; }
+.zara-arrow.right { right: 10px; }
 
 </style>
 
@@ -1380,39 +1345,39 @@ body.modal-open{ overflow: hidden; }
 const productos = [
   {
     nombre: "Sudadera M5",
-    precio: 22,
+    precio: 21.99,
     categoria: "hombre",
     imagenes: ["fotos/sudadera_m5.jpg"]
   },
   {
-    nombre: "Sudadera Goku NK",
-    precio: 24,
+    nombre: "Chaqueta NK",
+    precio: 18.99,
     categoria: "hombre",
-    imagenes: ["fotos/Sudadera Goku NK.jpg"]
+    imagenes: ["fotos/Chaqueta NK Beige.png"]
   },
   {
     nombre: "Sudadera Sparco",
-    precio: 22,
+    precio: 21.99,
     categoria: "hombre",
-    imagenes: ["fotos/Sudadera Sparco.png"]
+    imagenes: ["fotos/Sudadera Sparco.jpg"]
   },
   {
     nombre: "Sudadera NK",
-    precio: 22,
+    precio: 21.99,
     categoria: "hombre",
     imagenes: ["fotos/Sudadera NK.jpg"]
   },
   {
     nombre: "Sudadera Kawasaki",
-    precio: 22,
+    precio: 21.99,
     categoria: "hombre",
     imagenes: ["fotos/Sudadera Kawasaki.jpg"]
   },
       {
-        nombre: "Jersey Boss",
-        precio: 21,
+        nombre: "Jersey Dior",
+        precio: 20.99,
         categoria: "hombre",
-        imagenes: ["fotos/Boss1.jpg"]
+        imagenes: ["fotos/Jersey Dior.jpg"]
       },
       {
         nombre: "Set de Regalo",
@@ -1684,7 +1649,7 @@ const VARIANTES = {
   "Sudadera Sparco": {
     default: "Negro",
     items: {
-      "Negro": { hex:"#111111", img:"fotos/Sudadera Sparco.png" },
+      "Negro": { hex:"#111111", img:"fotos/Sudadera Sparco.jpg" },
     }
   },
   "Sudadera Kawasaki": {
@@ -1693,10 +1658,14 @@ const VARIANTES = {
       "Negro": { hex:"#111111", img:"fotos/Sudadera Kawasaki.jpg" },
     }
   },
-  "Jersey Boss": {
-    default: "Azul Oscuro",
+  "Jersey Dior": {
+    default: "Negro",
     items: {
-      "Azul Oscuro": { hex:"#00001a", img:"fotos/Boss1.jpg" },
+      "Beige": { hex:"#d9c7a6", img:"fotos/set_de_regalo_beige.jpg" },
+      "Negro": { hex:"#111111", img:"fotos/set_de_regalo_negro.jpg" },
+      "Blanco": { hex:"#eaeaea", img:"fotos/set_de_regalo_blanco.jpg" },
+      "Azul": { hex:"#1f6feb", img:"fotos/set_de_regalo_azul.jpg" },
+      "Rojo": { hex:"#e10600", img:"fotos/set_de_regalo_rojo.jpg" }
     }
   }
 };
@@ -2768,6 +2737,39 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+</script>
+
+
+<script>
+let zaraImageIndex = 0;
+let zaraImageList = [];
+
+function changeZaraImage(dir) {
+  if (!zaraImageList.length) return;
+  zaraImageIndex = (zaraImageIndex + dir + zaraImageList.length) % zaraImageList.length;
+  document.getElementById("zaraModalImage").src = zaraImageList[zaraImageIndex];
+}
+
+// Hook para extender openZaraModal sin sobrescribirla
+const oldOpenZaraModal = window.openZaraModal;
+window.openZaraModal = function(prod, index){
+  if (typeof oldOpenZaraModal === "function") oldOpenZaraModal(prod, index);
+
+  // Activar carrusel si hay más de una imagen
+  if (prod.images && prod.images.length > 1) {
+    zaraImageList = prod.images;
+    zaraImageIndex = 0;
+    document.getElementById("zaraModalImage").src = zaraImageList[zaraImageIndex];
+    document.querySelector(".zara-arrow.left").style.display = "block";
+    document.querySelector(".zara-arrow.right").style.display = "block";
+  } else {
+    zaraImageList = [prod.image];
+    zaraImageIndex = 0;
+    document.getElementById("zaraModalImage").src = prod.image;
+    document.querySelector(".zara-arrow.left").style.display = "none";
+    document.querySelector(".zara-arrow.right").style.display = "none";
+  }
+};
 </script>
 
 </body>
