@@ -2797,5 +2797,50 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 </script>
 
+
+<script>
+(function(){
+  // Devuelve la lista de imágenes de un producto
+  function getImagesFor(index){
+    const p = (window.productos && window.productos[index]) || null;
+    if(!p) return [];
+    return Array.isArray(p.imagenes) ? p.imagenes.filter(Boolean) : [];
+  }
+
+  // Guardamos original
+  const _open = window.openZaraModal;
+
+  window.openZaraModal = function(product, index){
+    // Llamamos al original para no romper lo demás
+    if (typeof _open === "function") _open(product, index);
+
+    // Generamos lista de imágenes
+    window.currentImages = getImagesFor(index);
+    window.currentImageIndex = 0;
+
+    const img = document.getElementById("zaraModalImage");
+    if (img && window.currentImages.length){
+      img.src = window.currentImages[0];
+    }
+
+    // Forzar flechas visibles
+    const prevBtn = document.querySelector('#zaraModal .zara-prev');
+    const nextBtn = document.querySelector('#zaraModal .zara-next');
+    if(prevBtn){ prevBtn.style.display = "block"; prevBtn.onclick = ()=>cambiarImagen(-1); }
+    if(nextBtn){ nextBtn.style.display = "block"; nextBtn.onclick = ()=>cambiarImagen(1); }
+  };
+
+  // Función para cambiar de imagen
+  window.cambiarImagen = function(dir){
+    const list = Array.isArray(window.currentImages) ? window.currentImages : [];
+    if(!list.length) return;
+    if(typeof window.currentImageIndex !== "number") window.currentImageIndex = 0;
+    window.currentImageIndex = (window.currentImageIndex + dir + list.length) % list.length;
+    const img = document.getElementById("zaraModalImage");
+    if(img) img.src = list[window.currentImageIndex];
+  };
+})();
+</script>
+
 </body>
 </html>
