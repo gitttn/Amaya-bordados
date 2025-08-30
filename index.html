@@ -1191,6 +1191,16 @@ body.modal-open{ overflow: hidden; }
   #seccion-conjuntos .btn:hover{ background:#000; color:#fff; }
 </style>
 
+<style>
+
+/* === Carrusel en modal Zara (no intrusivo) === */
+.zara-carousel{position:relative;display:flex;align-items:center;justify-content:center}
+.zara-carousel img{width:100%;height:auto;max-height:400px;object-fit:contain}
+.zara-prev,.zara-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;font-size:24px;padding:8px 12px;border-radius:50%;cursor:pointer}
+.zara-prev{left:10px}.zara-next{right:10px}
+@media (max-width:700px){.zara-carousel img{max-height:38vh}}
+
+</style>
 </head>
 <body>
 <header>
@@ -1322,7 +1332,7 @@ const productos = [
     nombre: "Sudadera Goku NK",
     precio: 24,
     categoria: "hombre",
-    imagenes: ["fotos/Sudadera Goku NK.jpg"]
+    imagenes: [ "fotos/Sudadera Goku NK.jpg", "fotos/Sudadera Goku NK.png" ]
   },
   {
     nombre: "Sudadera Sparco",
@@ -1581,7 +1591,7 @@ function addToCartFromModal() {
 <div class="zara-modal-overlay" id="zaraModal" style="display:none;">
 <div class="zara-modal">
 <button class="zara-modal-close" onclick="closeZaraModal()">✖</button>
-<img alt="Imagen del producto" id="zaraModalImage" src=""/>
+<div class="zara-carousel"><button class="zara-prev" type="button" onclick="cambiarImagen(-1)" aria-label="Anterior">‹</button><img alt="Imagen del producto" id="zaraModalImage" src=""/><button class="zara-next" type="button" onclick="cambiarImagen(1)" aria-label="Siguiente">›</button></div>
 <div class="zara-modal-info">
 <h2 id="zaraModalTitle"></h2>
 <p id="zaraModalPrice"></p>
@@ -2702,6 +2712,46 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+</script>
+
+
+<script>
+// --- Carrusel para productos con múltiples imágenes (p.ej. Sudadera Goku NK) ---
+(function(){
+  var currentImageIndex = 0;
+  function setImageByIndex(index){
+    try{
+      var p = (typeof window.currentZaraProduct !== 'undefined') ? (window.productos && window.productos[window.currentZaraProduct]) : null;
+      if(!p || !p.imagenes || !p.imagenes.length) return;
+      currentImageIndex = (index + p.imagenes.length) % p.imagenes.length;
+      var el = document.getElementById('zaraModalImage');
+      if(el){ el.src = p.imagenes[currentImageIndex]; }
+    }catch(e){}
+  }
+  window.cambiarImagen = function(dir){
+    try{
+      var p = (typeof window.currentZaraProduct !== 'undefined') ? (window.productos && window.productos[window.currentZaraProduct]) : null;
+      if(!p || !p.imagenes || !p.imagenes.length) return;
+      setImageByIndex((currentImageIndex + (Number(dir)||0)));
+    }catch(e){}
+  };
+  // Envolver openZaraModal (manteniendo otros wrappers que ya tengas)
+  var __open = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    if(typeof __open === 'function'){ __open.apply(this, arguments); }
+    try{
+      window.currentZaraProduct = index;
+      currentImageIndex = 0;
+      var p = window.productos && window.productos[index];
+      if(p && p.imagenes && p.imagenes.length){
+        var el = document.getElementById('zaraModalImage');
+        if(el){ el.src = p.imagenes[0]; }
+      }else{
+        // fallback: dejar lo que ya puso tu modal
+      }
+    }catch(e){}
+  };
+})();
 </script>
 
 </body>
