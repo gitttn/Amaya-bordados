@@ -519,7 +519,6 @@
     border-radius: 16px;
     padding: 16px;
   }
-  evh;
     object-fit: contain;
     background: #fff;
     margin-bottom: 12px;
@@ -1295,7 +1294,7 @@ body.modal-open{ overflow: hidden; }
 <button onclick="filtrarCategoria('mujer', this)">Mujer</button>
 <button onclick="filtrarCategoria('hombre', this)">Hombre</button>
 <button onclick="filtrarCategoria('infantil', this)">Infantil</button>
-<button type="button" onclick="try{openConjuntos()}catch(e){var s=document.getElementById('seccion-conjuntos');var l=document.getElementById('lista-productos'); if(s){s.style.display='block';} if(l){l.style.display='none';} }" id="btnConjuntos" onclick="event.preventDefault(); event.stopPropagation(); mostrarConjuntos(); return false;" onclick="document.getElementById('seccion-conjuntos').scrollIntoView({behavior:'smooth'});">Conjuntos Personalizados</button>
+<button type="button" id="btnConjuntos" onclick="try{openConjuntos()}catch(e){var s=document.getElementById('seccion-conjuntos');var l=document.getElementById('lista-productos'); if(s){s.style.display='block';} if(l){l.style.display='none';} }">Conjuntos Personalizados</button>
 <button onclick="filtrarCategoria('regalos', this)">Regalos</button>
 
 </div>
@@ -1608,7 +1607,9 @@ function confirmarInfo() {
 
 function openZaraModal(product, index) {
   window.currentZaraProduct = index;
-  document.getElementById("zaraModalImage").src = product.image;
+  
+  window.currentImageIndex = 0;
+document.getElementById("zaraModalImage").src = product.image;
   document.getElementById("zaraModalTitle").textContent = product.name;
   document.getElementById("zaraModalPrice").textContent = product.price;
   document.getElementById("zaraModal").style.display = "flex";
@@ -1636,6 +1637,19 @@ function addToCartFromModal() {
     closeZaraModal();
   }
 }
+
+// Función para mover en el carrusel del modal Zara
+function cambiarImagen(direccion) {
+  if (window.currentZaraProduct === undefined) return;
+  const producto = productos[window.currentZaraProduct];
+  if (!producto || !producto.imagenes || producto.imagenes.length === 0) return;
+
+  if (window.currentImageIndex === undefined) window.currentImageIndex = 0;
+  window.currentImageIndex = (window.currentImageIndex + direccion + producto.imagenes.length) % producto.imagenes.length;
+
+  document.getElementById("zaraModalImage").src = producto.imagenes[window.currentImageIndex];
+}
+
 </script>
 <!-- Modal -->
 <div class="modal-overlay" id="imageModal">
@@ -1722,8 +1736,7 @@ const VARIANTES = {
   "Sudadera Balenciaga overside": {
     default: "Negro",
     items: {
-      "Rosa": { hex:"#ff69b4", img:"fotos/Sudadera Balenciaga overside.jpg" },
-    }
+      "Rosa": { hex:"#ff69b4", img:"fotos/Sudadera Balenciaga overside.jpg" }}
   },
   "Camiseta Dior": {
     default: "Blanco",
