@@ -1318,13 +1318,7 @@ body.modal-open{ overflow: hidden; }
           </div>
         </div>
 
-        <div class="row">
-          <span class="label">Color:</span>
-          <div class="row" id="cj_colores">
-      <button class="color-swatch" data-color="Blanco" title="Blanco" style="background:#eaeaea" data-active="1"></button>
-      <button class="color-swatch" data-color="Negro" title="Negro" style="background:#111111"></button>
-    </div>
-        </div>
+        
 
         <div class="row">
           <span class="label">Adulto:</span>
@@ -1364,7 +1358,11 @@ body.modal-open{ overflow: hidden; }
     <div class="row" style="justify-content:space-between; margin-top:8px;">
       <span class="label" style="font-weight:600;">Total:</span>
       <span id="cj_total" style="font-size:16px; font-weight:600;">0.00 €</span>
-    </div>
+    </div><div class="row">
+  <span class="label">Descripción:</span>
+  <textarea id="cj_desc" placeholder="Escribe aquí tu personalización..." style="flex:1; padding:6px; border:1px solid #ccc; border-radius:6px; resize:vertical;"></textarea>
+</div>
+
     <div class="row" style="justify-content:center;">
           <button class="btn" id="cj_add">Añadir conjunto</button>
         </div>
@@ -1512,10 +1510,10 @@ const productos = [
       document.getElementById("checkoutOverlay").style.display = "none";
     }
 
-    function addToCart(nombre, precio) {
-      const index = carrito.findIndex(p => p.nombre === nombre);
+    function addToCart(nombre, precio, desc) {
+const index = carrito.findIndex(p => p.nombre === nombre);
       if (index !== -1) carrito[index].cantidad++;
-      else carrito.push({ nombre, precio, cantidad: 1 });
+      else carrito.push({ nombre, precio, cantidad: 1, desc: (desc || '') });
       localStorage.setItem("carrito", JSON.stringify(carrito));
       mostrarCarrito();
       actualizarBarraEnvio();
@@ -1568,6 +1566,7 @@ const productos = [
       let total = 0;
       carrito.forEach(p => {
         mensaje += `- ${p.nombre} x${p.cantidad}: ${(p.precio * p.cantidad).toFixed(2)} €%0A`;
+        if (p.desc) mensaje += `  Nota: ${encodeURIComponent(p.desc)}%0A`;
         total += p.precio * p.cantidad;
       });
       mensaje += `%0A*Total:* ${total.toFixed(2)} €`;
@@ -2274,13 +2273,7 @@ function renderConjuntosEnPagina(){
           </div>
     </div>
 
-    <div class="row">
-      <span class="label">Color:</span>
-      <div class="row" id="cj_colores">
-      <button class="color-swatch" data-color="Blanco" title="Blanco" style="background:#eaeaea" data-active="1"></button>
-      <button class="color-swatch" data-color="Negro" title="Negro" style="background:#111111"></button>
-    </div>
-    </div>
+    
 
     <div class="row">
       <span class="label">Adulto:</span>
@@ -2364,8 +2357,12 @@ function renderConjuntosEnPagina(){
   });
 
   // Colores
-  const colorBtns = card.querySelectorAll('#cj_colores .color-swatch');
+  const colorWrap = card.querySelector('#cj_colores');
+let colorSel = (typeof colorSel !== 'undefined' && colorSel) ? colorSel : '';
+if (colorWrap) {
+  const colorBtns = colorWrap.querySelectorAll('.color-swatch');
   colorBtns[0]?.setAttribute('data-active','1');
+  colorSel = colorSel || (colorBtns[0]?.getAttribute('data-color') || '');
   colorBtns.forEach(btn=>{
     btn.addEventListener('click', ()=>{
       colorBtns.forEach(b=>b.removeAttribute('data-active'));
@@ -2373,62 +2370,32 @@ function renderConjuntosEnPagina(){
       colorSel = btn.getAttribute('data-color');
     });
   });
+} else {
+  colorSel = '';
+}
 
-  // Tallas – adulto (pills)
-  const adultoGrp = card.querySelector('#cj_adulto_grp');
-  adultoGrp.querySelectorAll('.pill')[0]?.setAttribute('aria-pressed','true');
-  adultoGrp.addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.pill');
-    if(!btn) return;
-    adultoGrp.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    tallaAdulto = btn.getAttribute('data-val');
-  });
-
-  // Tallas – bebé
-  const bebeGrp = card.querySelector('#cj_bebe_grp');
-  bebeGrp.querySelectorAll('.pill')[0]?.setAttribute('aria-pressed','true');
-  bebeGrp.addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.pill');
-    if(!btn) return;
-    bebeGrp.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    tallaBebe = btn.getAttribute('data-val');
-  });
-
-  // Tallas – niño
-  const ninoGrp = card.querySelector('#cj_nino_grp');
-  ninoGrp.querySelectorAll('.pill')[0]?.setAttribute('aria-pressed','true');
-  ninoGrp.addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.pill');
-    if(!btn) return;
-    ninoGrp.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    tallaNino = btn.getAttribute('data-val');
-  });
-
-  actualizarTotal();
-
-  // Añadir al carrito
-  const btnAdd = card.querySelector('#cj_add');
-  btnAdd.addEventListener('click', ()=>{
+// Añadir al carrito
+const btnAdd = card.querySelector('#cj_add');
+btnAdd.addEventListener('click', ()=>{
+  const precio = __precioConjunto(tipoSel);
+  let nombre = `${tipoSel.nombre} ${colorSel? '('+colorSel+' · ' : '('}Adulto ${tallaAdulto}`;
+  if (tipoSel.bebe) nombre += ` · Bebé ${tallaBebe}`;
+  if (tipoSel.nino) nombre += ` · Niño ${tallaNino}`;
+  nombre += `)`;
+  if (typeof addToCart === 'function') addToCart(nombre, precio, desc);
+});
+('click', ()=>{
     const precio = __precioConjunto(tipoSel);
-    let nombre = `${tipoSel.nombre} (${colorSel} · Adulto ${tallaAdulto}`;
+    let nombre = `${tipoSel.nombre} ${(colorSel? '('+colorSel+' · ' : '(')}Adulto ${tallaAdulto}`;
     if (tipoSel.bebe) nombre += ` · Bebé ${tallaBebe}`;
     if (tipoSel.nino) nombre += ` · Niño ${tallaNino}`;
     nombre += `)`;
-    if (typeof addToCart === "function") addToCart(nombre, precio);});
+    if (typeof addToCart === "function") addToCart(nombre, precio, desc);});
 }
 
       </select>
     </div>
-    <div class="row">
-      <span class="label">Color:</span>
-      <div class="row" id="cj_colores">
-      <button class="color-swatch" data-color="Blanco" title="Blanco" style="background:#eaeaea" data-active="1"></button>
-      <button class="color-swatch" data-color="Negro" title="Negro" style="background:#111111"></button>
-    </div>
-    </div>
+    
     <div class="row">
       <span class="label">Adulto:</span>
       <select id="cj_talla_adulto">${__CONJ_TALLAS_ADULTO.map(t=>`<option value="${t}">${t}</option>`).join("")}</select>
@@ -2499,11 +2466,11 @@ function renderConjuntosEnPagina(){
     const tallaB = card.querySelector("#cj_talla_bebe")?.value || null;
     const tallaN = card.querySelector("#cj_talla_nino")?.value || null;
     const precio = __precioConjunto(tipoSel);
-    let nombre = `${tipoSel.nombre} (${colorSel} · Adulto ${tallaA}`;
+    let nombre = `${tipoSel.nombre} ${(colorSel? '('+colorSel+' · ' : '(')}Adulto ${tallaA}`;
     if (tipoSel.bebe && tallaB) nombre += ` · Bebé ${tallaB}`;
     if (tipoSel.nino && tallaN) nombre += ` · Niño ${tallaN}`;
     nombre += `)`;
-    if (typeof addToCart === "function") addToCart(nombre, precio);});
+    if (typeof addToCart === "function") addToCart(nombre, precio, desc);});
 }
 
 // Mostrar/ocultar el apartado manteniendo filtros/buscador visibles
@@ -2670,6 +2637,7 @@ function volverATienda(){
 
 <script>
 (function(){
+  // ====== Conjuntos Personalizados (sin colores) ======
   const TIPOS = {
     doble_camiseta: { nombre:"Doble Camiseta", precioAdulto:14.99*2, bebe:false, nino:false },
     doble_sudadera: { nombre:"Doble Sudadera", precioAdulto:21.99*2, bebe:false, nino:false },
@@ -2677,86 +2645,100 @@ function volverATienda(){
     sudadera_body: { nombre:"Sudadera + Body Bebé", precioAdulto:21.99, precioBebe:11.99, bebe:true,  nino:false },
     camiseta_nino: { nombre:"Camiseta + Camiseta Niño", precioAdulto:14.99, precioNino:9.99, bebe:false, nino:true },
     sudadera_nino: { nombre:"Sudadera + Sudadera Niño", precioAdulto:21.99, precioNino:14.99, bebe:false, nino:true }
-};
+  };
+
   let tipo = 'camiseta_body';
-  function precioTotal(){ const t = TIPOS[tipo]; return (t.precioAdulto||0)+(t.precioBebe||0)+(t.precioNino||0); }
-  function actualizarTotal(){ const el = document.getElementById('cj_total'); if(el){ el.textContent = precioTotal().toFixed(2) + ' €'; } }
-  let color = 'Negro';
   let tallaA = 'XS';
   let tallaB = '0-3m';
   let tallaN = '3-4';
 
-  // Tipo
+  function precioTotal(){
+    const t = TIPOS[tipo];
+    return (t.precioAdulto||0) + (t.precioBebe||0) + (t.precioNino||0);
+  }
+  function actualizarTotal(){
+    const el = document.getElementById('cj_total');
+    if (el) el.textContent = precioTotal().toFixed(2) + ' €';
+  }
+
+  function refrescarFilas(){
+    const t = TIPOS[tipo];
+    const rowBebe = document.getElementById('row_bebe');
+    const rowNino = document.getElementById('row_nino');
+    const pAdulto = document.getElementById('cj_precio_adulto');
+    const pBebe   = document.getElementById('cj_precio_bebe');
+    const pNino   = document.getElementById('cj_precio_nino');
+    if (rowBebe) rowBebe.style.display = t.bebe ? 'flex' : 'none';
+    if (rowNino) rowNino.style.display = t.nino ? 'flex' : 'none';
+    if (pAdulto) pAdulto.textContent = `(${(t.precioAdulto||0).toFixed(2)} €)`;
+    if (pBebe)   pBebe.textContent   = `(${(t.precioBebe||0).toFixed(2)} €)`;
+    if (pNino)   pNino.textContent   = `(${(t.precioNino||0).toFixed(2)} €)`;
+  }
+
   const tipoGrp = document.getElementById('cj_tipo_grp');
-  const rowBebe = document.getElementById('row_bebe');
-  const rowNino = document.getElementById('row_nino');
-  const pAdulto = document.getElementById('cj_precio_adulto');
-  const pBebe   = document.getElementById('cj_precio_bebe');
-  const pNino   = document.getElementById('cj_precio_nino');
+  if (tipoGrp){
+    tipoGrp.addEventListener('click', (ev)=>{
+      const btn = ev.target.closest('.seg-btn'); if(!btn) return;
+      tipoGrp.querySelectorAll('.seg-btn').forEach(b=>b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      tipo = btn.getAttribute('data-id');
+      refrescarFilas();
+      actualizarTotal();
+    });
+  }
 
-  tipoGrp.addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.seg-btn'); if(!btn) return;
-    tipoGrp.querySelectorAll('.seg-btn').forEach(b=>b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    tipo = btn.getAttribute('data-id');
-    const t = TIPOS[tipo];
-    pAdulto.textContent = `(${(t.precioAdulto||0).toFixed(2)} €)`;
-    if (t.bebe){ rowBebe.style.display='flex'; pBebe.textContent = `(${(t.precioBebe||0).toFixed(2)} €)`; } else { rowBebe.style.display='none'; }
-    if (t.nino){ rowNino.style.display='flex'; pNino.textContent = `(${(t.precioNino||0).toFixed(2)} €)`; } else { rowNino.style.display='none'; }
-    actualizarTotal();
-  });
+  const grpA = document.getElementById('cj_adulto_grp');
+  if (grpA){
+    grpA.addEventListener('click', (ev)=>{
+      const btn = ev.target.closest('.pill'); if(!btn) return;
+      grpA.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      tallaA = btn.getAttribute('data-val');
+      actualizarTotal();
+    });
+  }
 
-  // Color
-  document.getElementById('cj_colores').addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.color-swatch'); if(!btn) return;
-    document.querySelectorAll('#cj_colores .color-swatch').forEach(b=>b.removeAttribute('data-active'));
-    btn.setAttribute('data-active','1');
-    color = btn.getAttribute('data-color');
-    actualizarTotal();
-  });
+  const grpB = document.getElementById('cj_bebe_grp');
+  if (grpB){
+    grpB.addEventListener('click', (ev)=>{
+      const btn = ev.target.closest('.pill'); if(!btn) return;
+      grpB.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      tallaB = btn.getAttribute('data-val');
+      actualizarTotal();
+    });
+  }
 
-  // Adulto
-  document.getElementById('cj_adulto_grp').addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.pill'); if(!btn) return;
-    const grp = document.getElementById('cj_adulto_grp');
-    grp.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    tallaA = btn.getAttribute('data-val');
-    actualizarTotal();
-  });
+  const grpN = document.getElementById('cj_nino_grp');
+  if (grpN){
+    grpN.addEventListener('click', (ev)=>{
+      const btn = ev.target.closest('.pill'); if(!btn) return;
+      grpN.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      tallaN = btn.getAttribute('data-val');
+      actualizarTotal();
+    });
+  }
 
-  // Bebe
-  document.getElementById('cj_bebe_grp').addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.pill'); if(!btn) return;
-    const grp = document.getElementById('cj_bebe_grp');
-    grp.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    tallaB = btn.getAttribute('data-val');
-    actualizarTotal();
-  });
+  const btnAdd = document.getElementById('cj_add');
+  if (btnAdd){
+    btnAdd.addEventListener('click', ()=>{
+      const t = TIPOS[tipo];
+      const precio = precioTotal();
+      let nombre = `${t.nombre} (Adulto ${tallaA}`;
+    const desc = document.getElementById('cj_desc')?.value.trim();
+    if (desc) nombre += ``;
 
-  // Niño
-  document.getElementById('cj_nino_grp').addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('.pill'); if(!btn) return;
-    const grp = document.getElementById('cj_nino_grp');
-    grp.querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    tallaN = btn.getAttribute('data-val');
-    actualizarTotal();
-  });
+      if (t.bebe) nombre += ` · Bebé ${tallaB}`;
+      if (t.nino) nombre += ` · Niño ${tallaN}`;
+      nombre += `)`;
+      if (typeof addToCart === 'function'){ addToCart(nombre, precio, desc); }
+    });
+  }
 
+  refrescarFilas();
   actualizarTotal();
-
-  // Añadir al carrito
-  document.getElementById('cj_add').addEventListener('click', ()=>{
-    const t = TIPOS[tipo];
-    const precio = precioTotal();
-    let nombre = `${t.nombre} (${color} · Adulto ${tallaA}`;
-    if (t.bebe) nombre += ` · Bebé ${tallaB}`;
-    if (t.nino) nombre += ` · Niño ${tallaN}`;
-    nombre += `)`;
-    if (typeof addToCart === 'function'){ addToCart(nombre, precio); }});
-})();
+})();;
 </script>
 
 
