@@ -519,6 +519,7 @@
     border-radius: 16px;
     padding: 16px;
   }
+  
     object-fit: contain;
     background: #fff;
     margin-bottom: 12px;
@@ -1607,9 +1608,7 @@ function confirmarInfo() {
 
 function openZaraModal(product, index) {
   window.currentZaraProduct = index;
-  
-  window.currentImageIndex = 0;
-document.getElementById("zaraModalImage").src = product.image;
+  document.getElementById("zaraModalImage").src = product.image;
   document.getElementById("zaraModalTitle").textContent = product.name;
   document.getElementById("zaraModalPrice").textContent = product.price;
   document.getElementById("zaraModal").style.display = "flex";
@@ -1638,16 +1637,18 @@ function addToCartFromModal() {
   }
 }
 
-// Función para mover en el carrusel del modal Zara
-function cambiarImagen(direccion) {
-  if (window.currentZaraProduct === undefined) return;
-  const producto = productos[window.currentZaraProduct];
-  if (!producto || !producto.imagenes || producto.imagenes.length === 0) return;
-
-  if (window.currentImageIndex === undefined) window.currentImageIndex = 0;
-  window.currentImageIndex = (window.currentImageIndex + direccion + producto.imagenes.length) % producto.imagenes.length;
-
-  document.getElementById("zaraModalImage").src = producto.imagenes[window.currentImageIndex];
+// Carrusel del modal: usa la lista actualmente renderizada
+function cambiarImagen(direccion){
+  try{
+    if (window.currentZaraProduct === undefined) return;
+    const lista = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : (window.productos || (typeof productos!=='undefined'?productos:[]));
+    const p = lista[window.currentZaraProduct];
+    if(!p || !p.imagenes || !p.imagenes.length) return;
+    if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
+    window.currentImageIndex = (window.currentImageIndex + direccion + p.imagenes.length) % p.imagenes.length;
+    var img = document.getElementById('zaraModalImage');
+    if(img){ img.src = p.imagenes[window.currentImageIndex] || p.imagenes[0]; }
+  }catch(e){}
 }
 
 </script>
@@ -1736,7 +1737,8 @@ const VARIANTES = {
   "Sudadera Balenciaga overside": {
     default: "Negro",
     items: {
-      "Rosa": { hex:"#ff69b4", img:"fotos/Sudadera Balenciaga overside.jpg" }}
+      "Rosa": { hex:"#ff69b4", img:"fotos/Sudadera Balenciaga overside.jpg" },
+    }
   },
   "Camiseta Dior": {
     default: "Blanco",
@@ -1957,6 +1959,7 @@ window.agregarEventosModalZara = function() {
       const producto = lista[index];
       if (!producto) return;
 
+      window.currentImageIndex=0;
       if (typeof window.openZaraModal === "function") {
         window.openZaraModal(
           { image: (producto.imagenes && producto.imagenes[0]) || producto.imagen || "", name: producto.nombre, price: ((producto.precio && producto.precio.toFixed) ? producto.precio.toFixed(2) : producto.precio) + " €" },
