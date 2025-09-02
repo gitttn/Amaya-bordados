@@ -1260,21 +1260,35 @@ body.modal-open{ overflow: hidden; }
 </head>
 <body>
 
-<header style="text-align:center; padding:20px 0;">
+<header style="position:fixed; top:0; left:0; width:100%; z-index:1000;
+               background:transparent; box-shadow:none; padding:10px 0;
+               display:flex; align-items:center; justify-content:center;">
+  
+  <!-- Logo centrado -->
   <img src="img/img.jpg" alt="The Suspect Logo" style="height:80px;">
+  
+  <!-- Carrito arriba derecha -->
+  <div style="position:absolute; right:20px; top:50%; transform:translateY(-50%);">
+    <button onclick="toggleCart()" title="Ver carrito" style="background:none; border:none; padding:0; line-height:0;">
+      <svg fill="none" height="28" stroke="#000" stroke-linecap="round" stroke-linejoin="round" 
+           stroke-width="2" viewBox="0 0 24 24" width="28" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      <span id="cart-count"></span>
+    </button>
+  </div>
 </header>
+
+<!-- Espacio para que el contenido no quede tapado -->
+<div style="height:120px;"></div>
+
+
+
 
 <noscript><div style='padding:12px;margin:8px;border-radius:10px;background:#fff3cd;color:#664d03;border:1px solid #ffecb5;font-family:system-ui,sans-serif;'>Este archivo necesita abrirse en un <b>navegador</b> (Chrome, Edge, Firefox). El visor actual no ejecuta JavaScript, por eso no aparecen los productos.</div></noscript>
-<header>
 
-<div class="cart-icon" onclick="toggleCart()" title="Ver carrito">
-<svg fill="none" height="26" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="26" xmlns="http://www.w3.org/2000/svg">
-<circle cx="9" cy="21" r="1"></circle>
-<circle cx="20" cy="21" r="1"></circle>
-<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-</svg><span id="cart-count"></span>
-</div>
-</header>
 <div class="overlay" id="overlay" onclick="toggleCart()"></div>
 <div class="checkout-overlay" id="checkoutOverlay" onclick="cerrarCheckout()"></div>
 <div class="cart-window" id="cartWindow">
