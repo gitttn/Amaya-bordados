@@ -1282,7 +1282,7 @@ body.modal-open{ overflow: hidden; }
 </header>
 
 <!-- Espacio para que el contenido no quede tapado -->
-<div style="height:60px;"></div>
+<div id="header-spacer" style="height:0;"></div>
 
 
 
@@ -3020,6 +3020,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }catch(e){}
     }, 800);
   });
+})();
+</script>
+
+
+<script>
+(function(){
+  function setHeaderSpacer(){
+    var header = document.querySelector('header');
+    var spacer = document.getElementById('header-spacer');
+    if(!header) return;
+    if(!spacer){
+      spacer = document.createElement('div');
+      spacer.id = 'header-spacer';
+      header.insertAdjacentElement('afterend', spacer);
+    }
+    var h = header.getBoundingClientRect().height;
+    spacer.style.height = (h + 30) + 'px'; // margen extra de 30px
+  }
+  window.addEventListener('load', setHeaderSpacer);
+  window.addEventListener('resize', setHeaderSpacer);
 })();
 </script>
 
