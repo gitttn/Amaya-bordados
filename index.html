@@ -1332,7 +1332,7 @@ body.modal-open{ overflow: hidden; }
           <span class="label" id="cj_precio_adulto">(14.99 €)</span>
         </div>
 
-        <div class="row" id="row_bebe" style="display:flex;">
+        <div class="row" id="row_bebe" style="display:none;">
           <span class="label">Bebé:</span>
           <div class="pills" id="cj_bebe_grp">
             <button class="pill" data-val="0-3m" aria-pressed="true">0-3m</button>
@@ -2287,7 +2287,7 @@ function renderConjuntosEnPagina(){
       <span class="label" id="cj_precio_adulto">(${(__CONJ_TIPOS[0].precioAdulto||0).toFixed(2)} €)</span>
     </div>
 
-    <div class="row" id="row_bebe" style="display:flex;">
+    <div class="row" id="row_bebe" style="display:none;">
       <span class="label">Bebé:</span>
       <div class="pills" id="cj_bebe_grp">
         ${__CONJ_TALLAS_BEBE.map(t=>`<button class="pill" data-val="${t}" aria-pressed="false">${t}</button>`).join("")}
@@ -2401,7 +2401,7 @@ btnAdd.addEventListener('click', ()=>{
       <select id="cj_talla_adulto">${__CONJ_TALLAS_ADULTO.map(t=>`<option value="${t}">${t}</option>`).join("")}</select>
       <span class="label" id="cj_precio_adulto">(${(__CONJ_TIPOS[0].precioAdulto||0).toFixed(2)} €)</span>
     </div>
-    <div class="row" id="row_bebe" style="display:flex;">
+    <div class="row" id="row_bebe" style="display:none;">
       <span class="label">Bebé:</span>
       <select id="cj_talla_bebe">${__CONJ_TALLAS_BEBE.map(t=>`<option value="${t}">${t}</option>`).join("")}</select>
       <span class="label" id="cj_precio_bebe">(${(__CONJ_TIPOS[0].precioBebe||0).toFixed(2)} €)</span>
@@ -2931,6 +2931,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 0);
   };
 })();
+</script>
+
+
+<script>
+document.querySelectorAll("#cj_tipo_grp .seg-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#cj_tipo_grp .seg-btn").forEach(b=>b.setAttribute("aria-pressed","false"));
+    btn.setAttribute("aria-pressed","true");
+    const tipo = btn.dataset.id;
+
+    // Mostrar/ocultar según tipo
+    document.getElementById("row_bebe").style.display = 
+      (tipo==="camiseta_body" || tipo==="sudadera_body") ? "flex" : "none";
+
+    document.getElementById("row_nino").style.display = 
+      (tipo==="camiseta_nino" || tipo==="sudadera_nino") ? "flex" : "none";
+  });
+});
+
+// Al cargar la página, forzar estado correcto (doble camiseta solo adulto)
+window.addEventListener("DOMContentLoaded", ()=>{
+  document.querySelector("#cj_tipo_grp .seg-btn[data-id='doble_camiseta']").click();
+});
 </script>
 
 </body>
