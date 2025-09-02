@@ -1257,19 +1257,43 @@ body.modal-open{ overflow: hidden; }
 .zara-prev:hover, .zara-next:hover{ background: rgba(255,255,255,.85); }
 </style>
 
+
+<style>
+/* === Overrides: bajar logo y carrito 20px sin tocar nada más === */
+
+/* Logo */
+header img[alt="The Suspect Logo"]{
+  margin-top: 0 !important;
+  position: relative !important;
+  top: 20px !important;
+}
+
+/* Carrito: probar varios selectores habituales en tu header */
+header #cartBtn,
+header .cart-btn,
+header .cart-icon,
+header button[title="Ver carrito"]{
+  position: absolute !important;
+  right: 20px !important;
+  top: 20px !important;
+  transform: none !important;
+}
+</style>
+
 </head>
 <body>
 
 
-<header style="position:fixed; top:0; left:0; width:100%; z-index:1000;
-               background:transparent; box-shadow:none; padding:10px 0;
-               display:flex; align-items:center; justify-content:center;">
-
+<header style="
+  position:fixed; top:0; left:0; width:100%; z-index:1000;
+  background:transparent; box-shadow:none; padding:10px 20px;
+  display:flex; align-items:center; justify-content:center;
+">
   <!-- Logo centrado -->
-  <img src="img/img.jpg" alt="The Suspect Logo" style="height:60px; position:relative; top:20px;">
+  <img src="img/img.jpg" alt="The Suspect Logo" style="height:60px; margin-top:30px;">
 
   <!-- Carrito alineado a la derecha -->
-  <div style="position:absolute; right:20px; top:20px;">
+  <div style="margin-left:auto;">
     <button onclick="toggleCart()" title="Ver carrito" style="background:none; border:none; padding:0; line-height:0;">
       <svg fill="none" height="28" stroke="#000" stroke-linecap="round" stroke-linejoin="round" 
            stroke-width="2" viewBox="0 0 24 24" width="28" xmlns="http://www.w3.org/2000/svg">
