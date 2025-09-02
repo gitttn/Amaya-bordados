@@ -1259,6 +1259,7 @@ body.modal-open{ overflow: hidden; }
 
 </head>
 <body>
+<noscript><div style='padding:12px;margin:8px;border-radius:10px;background:#fff3cd;color:#664d03;border:1px solid #ffecb5;font-family:system-ui,sans-serif;'>Este archivo necesita abrirse en un <b>navegador</b> (Chrome, Edge, Firefox). El visor actual no ejecuta JavaScript, por eso no aparecen los productos.</div></noscript>
 <header>
 <img alt="Amaya Design" onclick="location.reload()" src="logo-amaya.png"/>
 <div class="cart-icon" onclick="toggleCart()" title="Ver carrito">
@@ -1605,13 +1606,29 @@ function confirmarInfo() {
   document.getElementById("checkoutOverlay").style.display = "block";
 }
 
+
 function openZaraModal(product, index) {
-  window.currentZaraProduct = index;
-  document.getElementById("zaraModalImage").src = product.image;
-  document.getElementById("zaraModalTitle").textContent = product.name;
-  document.getElementById("zaraModalPrice").textContent = product.price;
-  document.getElementById("zaraModal").style.display = "flex";
+  try {
+    window.currentZaraProduct = index;
+    window.currentImageIndex = 0;
+    window.currentImageReady = false;
+
+    var imgEl = document.getElementById("zaraModalImage");
+    if (imgEl) {
+      imgEl.onload = function(){ window.currentImageReady = true; };
+      imgEl.onerror = function(){ window.currentImageReady = true; };
+      imgEl.src = product && product.image ? product.image : "";
+    }
+
+    var t = document.getElementById("zaraModalTitle");
+    if (t) t.textContent = product && product.name ? product.name : "";
+    var pr = document.getElementById("zaraModalPrice");
+    if (pr) pr.textContent = product && product.price ? product.price : "";
+    var modal = document.getElementById("zaraModal");
+    if (modal) modal.style.display = "flex";
+  } catch(e){ /* no romper la página */ }
 }
+
 function openModal(i){ try{ const p=productos?.[i]; if(!p) return; openZaraModal({ image: p.imagenes?.[0]||'', name: p.nombre, price: ((Number(p.precio)||0).toFixed(2))+' €' }, i); }catch(e){} }
 
 function closeZaraModal() {
@@ -1637,19 +1654,20 @@ function addToCartFromModal() {
 }
 
 // Carrusel del modal: usa la lista actualmente renderizada
-function cambiarImagen(direccion){
-  try{
-    if (window.currentZaraProduct === undefined) return;
-    const lista = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : (window.productos || (typeof productos!=='undefined'?productos:[]));
-    const p = lista[window.currentZaraProduct];
-    if(!p || !p.imagenes || !p.imagenes.length) return;
-    if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
-    window.currentImageIndex = (window.currentImageIndex + direccion + p.imagenes.length) % p.imagenes.length;
-    var img = document.getElementById('zaraModalImage');
-    if(img){ img.src = p.imagenes[window.currentImageIndex] || p.imagenes[0]; }
-  }catch(e){}
-}
 
+
+function cambiarImagen(direccion){
+  if (window.currentZaraProduct === undefined) return;
+  const lista = (window.__listaActual && window.__listaActual.length) ? window.__listaActual : productos;
+  const p = lista[window.currentZaraProduct];
+  if(!p || !p.imagenes || !p.imagenes.length) return;
+
+  if (typeof window.currentImageIndex !== 'number') window.currentImageIndex = 0;
+  window.currentImageIndex = (window.currentImageIndex + direccion + p.imagenes.length) % p.imagenes.length;
+
+  const img = document.getElementById('zaraModalImage');
+  if (img) { img.src = p.imagenes[window.currentImageIndex]; }
+}
 </script>
 <!-- Modal -->
 <div class="modal-overlay" id="imageModal">
@@ -1931,7 +1949,7 @@ window.renderizarProductos = function(lista) {
       <div class="product-card" data-index="${index}">
         <div class="product-image">
           ${coloresLabel ? `<span class="product-colors-badge">${coloresLabel}</span>` : ``}
-          <img src="${(p.imagenes && p.imagenes[0]) || p.imagen || ""}" alt="${p.nombre || ""}" loading="lazy"/>
+          <img onerror="this.onerror=null;this.src='https://picsum.photos/600/600?blur=2';" src="${(p.imagenes && p.imagenes[0]) || p.imagen || ""}" alt="${p.nombre || ""}" loading="lazy"/>
         </div>
         <div class="product-title">${p.nombre || ""}</div>
         <div class="product-price">${precio} €</div>
@@ -2934,26 +2952,56 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
+
+
+
 <script>
-document.querySelectorAll("#cj_tipo_grp .seg-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll("#cj_tipo_grp .seg-btn").forEach(b=>b.setAttribute("aria-pressed","false"));
-    btn.setAttribute("aria-pressed","true");
-    const tipo = btn.dataset.id;
+(function(){
+  var tipoGrp = document.getElementById('cj_tipo_grp');
+  var bebeRow = document.getElementById('row_bebe');
+  var ninoRow = document.getElementById('row_nino');
+  if(!tipoGrp || !bebeRow || !ninoRow){ return; }
 
-    // Mostrar/ocultar según tipo
-    document.getElementById("row_bebe").style.display = 
-      (tipo==="camiseta_body" || tipo==="sudadera_body") ? "flex" : "none";
+  function apply(tipo){
+    try{
+      bebeRow.style.display = (tipo==='camiseta_body' || tipo==='sudadera_body') ? 'flex' : 'none';
+      ninoRow.style.display = (tipo==='camiseta_nino' || tipo==='sudadera_nino') ? 'flex' : 'none';
+    }catch(_){}
+  }
 
-    document.getElementById("row_nino").style.display = 
-      (tipo==="camiseta_nino" || tipo==="sudadera_nino") ? "flex" : "none";
+  // listeners
+  Array.prototype.forEach.call(tipoGrp.querySelectorAll('.seg-btn'), function(btn){
+    btn.addEventListener('click', function(){
+      Array.prototype.forEach.call(tipoGrp.querySelectorAll('.seg-btn'), function(b){ b.setAttribute('aria-pressed','false'); });
+      btn.setAttribute('aria-pressed','true');
+      apply(btn.getAttribute('data-id'));
+    });
   });
-});
 
-// Al cargar la página, forzar estado correcto (doble camiseta solo adulto)
-window.addEventListener("DOMContentLoaded", ()=>{
-  document.querySelector("#cj_tipo_grp .seg-btn[data-id='doble_camiseta']").click();
-});
+  // estado inicial según botón activo (o doble_camiseta)
+  var active = tipoGrp.querySelector('.seg-btn[aria-pressed="true"]');
+  apply(active ? active.getAttribute('data-id') : 'doble_camiseta');
+})();
+</script>
+
+
+<script>
+(function(){
+  function ready(fn){ if(document.readyState!='loading'){ fn(); } else { document.addEventListener('DOMContentLoaded', fn); } }
+  ready(function(){
+    setTimeout(function(){
+      try{
+        var list = document.getElementById('lista-productos');
+        if(list && list.children.length === 0){
+          var warn = document.createElement('div');
+          warn.style.cssText = 'padding:12px;margin:8px;border-radius:10px;background:#fff3cd;color:#664d03;border:1px solid #ffecb5;font-family:system-ui,sans-serif;';
+          warn.innerHTML = 'Si ves esta nota, el archivo se ha abierto en un visor que <b>no ejecuta JavaScript</b>. Abre el HTML con <b>Chrome/Edge/Firefox</b> (Menú → “Abrir con” → Chrome) o súbelo a GitHub Pages.';
+          list && list.parentNode.insertBefore(warn, list);
+        }
+      }catch(e){}
+    }, 800);
+  });
+})();
 </script>
 
 </body>
