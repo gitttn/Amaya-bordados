@@ -1312,9 +1312,7 @@ body.modal-open{ overflow: hidden; }
 <button class="active" onclick="filtrarCategoria('todos', this)">Todos</button>
 <button onclick="filtrarCategoria('mujer', this)">Mujer</button>
 <button onclick="filtrarCategoria('hombre', this)">Hombre</button>
-<button onclick="filtrarCategoria('infantil', this)">Infantil</button>
 <button id="btnConjuntos" onclick="try{openConjuntos()}catch(e){var s=document.getElementById('seccion-conjuntos');var l=document.getElementById('lista-productos'); if(s){s.style.display='block';} if(l){l.style.display='none';} }" type="button">Conjuntos Personalizados</button>
-<button onclick="filtrarCategoria('regalos', this)">Regalos</button>
 </div>
 <!-- Sección Conjuntos Personalizados (oculta por defecto) -->
 <div id="seccion-conjuntos" style="display:none; padding:10px 10px 60px;">
@@ -1443,13 +1441,7 @@ const productos = [
   precio: 18,
   categoria: "mujer",
   imagenes: ["fotos/Camiseta Dior.jpg"]
-},
-{
-  nombre: "Sudadera Infantil Marvel",
-  precio: 20,
-  categoria: "infantil",
-  imagenes: ["fotos/Sudadera Marvel Niño.jpg"]
-},
+}
 ];
 
 
@@ -1778,10 +1770,6 @@ const VARIANTES = {
       "Negro": { hex:"#111111", img:"fotos/Camiseta Dior.jpg" }
     }
   },
-  "Sudadera Infantil Marvel": {
-    default: "Azul",
-    items: {
-      "Azul": { hex:"#0044aa", img:"fotos/Sudadera Marvel Niño.jpg" },
       "Rojo": { hex:"#cc0000", img:"fotos/Sudadera Marvel Niño.jpg" }
     }
   },
