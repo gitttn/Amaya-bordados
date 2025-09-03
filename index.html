@@ -1264,6 +1264,53 @@ body.modal-open{ overflow: hidden; }
 .zara-prev{ left:16px; } .zara-next{ right:16px; }
 .zara-prev:hover, .zara-next:hover{ background: rgba(255,255,255,.85); }
 </style>
+
+<style>
+/* ==== FIX OVERLAY/MODAL TAMAÑO CONSISTENTE ==== */
+.zara-modal-overlay{
+  position: fixed !important;
+  inset: 0 !important;
+  display: none; /* Se muestra con JS */
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0,0,0,.45) !important;
+  backdrop-filter: blur(2px);
+  z-index: 10000 !important;
+}
+
+.zara-modal-overlay.is-visible{ display:flex !important; }
+
+.zara-modal{
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #fff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18) !important;
+  width: clamp(320px, 90vw, 540px) !important;
+  max-height: 90vh !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+}
+
+.zara-carousel img#zaraModalImage{
+  width: 100% !important;
+  height: auto !important;
+  max-height: 300px !important;
+  object-fit: contain !important;
+  background:#fff !important;
+}
+
+.zara-modal .zara-modal-info{
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  padding: 12px !important;
+}
+
+/* Evitar scroll de la página cuando el modal está abierto */
+body.modal-open{ overflow: hidden !important; }
+</style>
+
 </head>
 <body>
 <div style="position: relative; padding: 20px 0; text-align: center;">
@@ -1614,7 +1661,8 @@ function confirmarInfo() {
 }
 
 
-function openZaraModal(product, index) {
+function openZaraModal(product, index){
+
   try {
     window.currentZaraProduct = index;
     window.currentImageIndex = 0;
@@ -1622,7 +1670,9 @@ function openZaraModal(product, index) {
 
     var imgEl = document.getElementById("zaraModalImage");
     if (imgEl) {
-      imgEl.onload = function(){ window.currentImageReady = true; };
+      imgEl.onload = function(){ window.currentImageReady = true; 
+  try{ document.body.classList.add('modal-open'); var ov=document.getElementById('zaraModal'); if(ov){ ov.classList.add('is-visible'); ov.style.display='flex'; } }catch(e){}
+};
       imgEl.onerror = function(){ window.currentImageReady = true; };
       imgEl.src = product && product.image ? product.image : "";
     }
@@ -1638,9 +1688,7 @@ function openZaraModal(product, index) {
 
 function openModal(i){ try{ const p=productos?.[i]; if(!p) return; openZaraModal({ image: p.imagenes?.[0]||'', name: p.nombre, price: ((Number(p.precio)||0).toFixed(2))+' €' }, i); }catch(e){} }
 
-function closeZaraModal() {
-  document.getElementById("zaraModal").style.display = "none";
-}
+function closeZaraModal(){ try{ document.body.classList.remove('modal-open'); var ov=document.getElementById('zaraModal'); if(ov){ ov.classList.remove('is-visible'); ov.style.display='none'; } }catch(e){} }
 function agregarEventosModalZara() {
   document.querySelectorAll(".product-image").forEach((img, index) => {
     img.addEventListener("click", () => {
