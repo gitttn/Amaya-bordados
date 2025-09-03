@@ -1319,6 +1319,76 @@ body.modal-open{ overflow: hidden; }
 }
 </style>
 
+
+<style>
+/* —— Modal sin barra de desplazamiento, centrado y ajustado —— */
+:root{ --vh: 1vh; }
+
+.zara-modal-overlay{ 
+  align-items: center !important; 
+  justify-content: center !important; 
+}
+
+.zara-modal{
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(420px, 90vw) !important;
+  max-height: calc(var(--vh) * 84) !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;   /* << sin scroll interno */
+  margin: 0 !important;
+}
+
+/* Imagen más contenida para que quepa todo sin scroll */
+.zara-carousel img#zaraModalImage{
+  width: 100% !important;
+  height: auto !important;
+  max-height: calc(var(--vh) * 40) !important;
+  object-fit: contain !important;
+}
+
+/* Compactar tipografías y espacios */
+.zara-modal-info{ 
+  gap: 6px !important; 
+  padding: 0 8px !important; 
+}
+#zaraModalTitle{ 
+  font-size: 18px !important; 
+  line-height: 1.2 !important;
+  margin: 4px 0 0 !important; 
+  text-align: center !important;
+}
+#zaraModalPrice{ 
+  font-size: 16px !important; 
+  margin: 2px 0 6px !important; 
+  text-align: center !important;
+}
+.color-picker, .size-picker{ gap: 6px !important; justify-content: center !important; }
+.size-btn{ padding: 6px 10px !important; font-size: 13px !important; }
+
+.zara-add-button{ 
+  padding: 12px 16px !important; 
+  border-radius: 999px !important; 
+}
+
+/* Asegurar que nada fuerce scroll dentro del modal */
+.zara-modal .zara-modal-body,
+.zara-modal .zara-modal-footer{
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Evitar scroll del body al abrir modal (ya estaba, reforzamos) */
+body.modal-open{ overflow: hidden !important; }
+
+/* Flechas y cerrar siempre por encima y centrados */
+.zara-prev, .zara-next{ z-index: 10010 !important; }
+.zara-modal-close{ z-index: 10020 !important; }
+</style>
+
 </head>
 <body>
 <div style="position: relative; padding: 20px 0; text-align: center;">
