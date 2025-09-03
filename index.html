@@ -1301,6 +1301,24 @@ body.modal-open{ overflow: hidden; }
 .zara-modal-close{ z-index: 10020 !important; }
 </style>
 
+
+<style>
+/* —— Overlay más pequeño —— */
+.zara-modal{
+  width: min(440px, 88vw) !important;       /* más estrecho */
+  max-height: calc(var(--vh) * 80) !important; /* más bajo */
+  padding: 12px !important;
+}
+
+.zara-carousel img#zaraModalImage{
+  max-height: calc(var(--vh) * 40) !important; /* imagen contenida más baja */
+}
+
+.zara-modal-info{
+  font-size: 90% !important;
+}
+</style>
+
 </head>
 <body>
 <div style="position: relative; padding: 20px 0; text-align: center;">
