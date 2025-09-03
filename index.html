@@ -898,6 +898,28 @@ button, .btn, .pill, .seg-btn, .color-swatch {
   .zara-prev, .zara-next { font-size: 28px; }
 }
 
+
+/* --- Caja de información profesional --- */
+#info-box-conjuntos{
+  margin:16px 0;
+  padding:10px 14px;
+  font-size:13px;
+  line-height:1.5;
+  color:#444;
+  border:1px solid #ddd;
+  border-radius:8px;
+  background:#fafafa;
+}
+#info-box-conjuntos p{ margin:0; }
+#info-box-conjuntos a{
+  color:#000;
+  font-weight:600;
+  text-decoration:underline;
+}
+#info-box-conjuntos, #info-box-conjuntos *{
+  box-shadow:none !important;
+}
+
 </style>
 <style>
 
@@ -1321,6 +1343,16 @@ body.modal-open{ overflow: hidden; }
 </div>
 <span class="label" id="cj_precio_adulto">(14.99 €)</span>
 </div>
+<div class="row" id="row_adulto2" style="display:none;">
+  <span class="label">2ª Camiseta:</span>
+  <div class="pills" id="cj_adulto2_grp">
+    <button class="pill" data-val="XS" aria-pressed="true">XS</button>
+    <button class="pill" data-val="S" aria-pressed="false">S</button>
+    <button class="pill" data-val="M" aria-pressed="false">M</button>
+    <button class="pill" data-val="L" aria-pressed="false">L</button>
+    <button class="pill" data-val="XL" aria-pressed="false">XL</button>
+  </div>
+<span class="label" id="cj_precio_adulto2">(0.00 €)</span></div>
 <div class="row" id="row_bebe" style="display:none;">
 <span class="label">Bebé:</span>
 <div class="pills" id="cj_bebe_grp">
@@ -1566,7 +1598,8 @@ const index = carrito.findIndex(p => p.nombre === nombre);
 
 function abrirInfo() {
   if (carrito.length === 0) {
-    toggleCart(); // Cierra la ventana si está abierta
+    // toggleCart() desactivado: no abrir carrito automáticamente
+// Cierra la ventana si está abierta
     alert("El carrito está vacío.");
     return;
   }
@@ -2619,11 +2652,11 @@ function volverATienda(){
 (function(){
   // ====== Conjuntos Personalizados (sin colores) ======
   const TIPOS = {
-    doble_camiseta: { nombre:"Doble Camiseta", precioAdulto:14.99*2, bebe:false, nino:false },
-    doble_sudadera: { nombre:"Doble Sudadera", precioAdulto:21.99*2, bebe:false, nino:false },
-    camiseta_body: { nombre:"Camiseta + Body Bebé", precioAdulto:14.99, precioBebe:11.99, bebe:true,  nino:false },
+    doble_camiseta: { nombre:"Doble Camiseta", precioAdulto:16.00, adultUnits:2, bebe:false, nino:false },
+    doble_sudadera: { nombre:"Doble Sudadera", precioAdulto:21.99, adultUnits:2, bebe:false, nino:false },
+    camiseta_body: { nombre:"Camiseta + Body Bebé", precioAdulto:16.00, precioBebe:11.99, bebe:true,  nino:false },
     sudadera_body: { nombre:"Sudadera + Body Bebé", precioAdulto:21.99, precioBebe:11.99, bebe:true,  nino:false },
-    camiseta_nino: { nombre:"Camiseta + Camiseta Niño", precioAdulto:14.99, precioNino:9.99, bebe:false, nino:true },
+    camiseta_nino: { nombre:"Camiseta + Camiseta Niño", precioAdulto:16.00, precioNino:9.99, bebe:false, nino:true },
     sudadera_nino: { nombre:"Sudadera + Sudadera Niño", precioAdulto:21.99, precioNino:14.99, bebe:false, nino:true }
   };
 
@@ -2634,7 +2667,7 @@ function volverATienda(){
 
   function precioTotal(){
     const t = TIPOS[tipo];
-    return (t.precioAdulto||0) + (t.precioBebe||0) + (t.precioNino||0);
+    return ((t.precioAdulto||0) * (t.adultUnits||1)) + ((t.precioBebe||0)) + ((t.precioNino||0));
   }
   function actualizarTotal(){
     const el = document.getElementById('cj_total');
@@ -2648,9 +2681,14 @@ function volverATienda(){
     const pAdulto = document.getElementById('cj_precio_adulto');
     const pBebe   = document.getElementById('cj_precio_bebe');
     const pNino   = document.getElementById('cj_precio_nino');
+    const pAdulto2 = document.getElementById('cj_precio_adulto2');
+    const lblAdulto = (document.querySelector('#cj_adulto_grp')?.previousElementSibling);
+
     if (rowBebe) rowBebe.style.display = t.bebe ? 'flex' : 'none';
     if (rowNino) rowNino.style.display = t.nino ? 'flex' : 'none';
     if (pAdulto) pAdulto.textContent = `(${(t.precioAdulto||0).toFixed(2)} €)`;
+    if (pAdulto2) pAdulto2.textContent = `(${(t.precioAdulto||0).toFixed(2)} €)`;
+    if (lblAdulto) lblAdulto.textContent = (t.adultUnits||1) > 1 ? '1ª Camiseta:' : 'Adulto:';
     if (pBebe)   pBebe.textContent   = `(${(t.precioBebe||0).toFixed(2)} €)`;
     if (pNino)   pNino.textContent   = `(${(t.precioNino||0).toFixed(2)} €)`;
   }
@@ -2948,5 +2986,416 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 })();
 </script>
+
+<script>
+// Mostrar 2ª tabla de tallas SOLO en Doble Camiseta / Doble Sudadera
+(function(){
+  function toggleSegundaTabla(tipo){
+    var row2 = document.getElementById('row_adulto2');
+    if(!row2) return;
+    var show = (tipo === 'doble_camiseta' || tipo === 'doble_sudadera');
+    row2.style.display = show ? 'flex' : 'none';
+  }
+
+  // Detecta selección inicial
+  var grp = document.getElementById('cj_tipo_grp');
+  if(grp){
+    var active = grp.querySelector('.seg-btn[aria-pressed="true"]');
+    var tipoIni = active ? active.getAttribute('data-id') : null;
+    if(tipoIni) toggleSegundaTabla(tipoIni);
+
+    // Escucha cambios de tipo
+    grp.querySelectorAll('.seg-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        // Actualiza aria-pressed del grupo (por si tu lógica no lo hace)
+        grp.querySelectorAll('.seg-btn').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+        btn.setAttribute('aria-pressed','true');
+        var tipo = btn.getAttribute('data-id');
+        toggleSegundaTabla(tipo);
+      });
+    });
+  }
+
+  // Comportamiento de selección en 2ª tabla
+  var grp2 = document.getElementById('cj_adulto2_grp');
+  if(grp2){
+    grp2.querySelectorAll('.pill').forEach(function(p){
+      p.addEventListener('click', function(){
+        grp2.querySelectorAll('.pill').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+        p.setAttribute('aria-pressed','true');
+      });
+    });
+  }
+})();
+</script>
+
+
+<script>
+// Handler único y precio robusto para "Añadir conjunto"
+(function(){
+  function getSelectedText(selector){
+    var el = document.querySelector(selector + ' .pill[aria-pressed="true"]');
+    return el ? (el.getAttribute('data-val') || el.textContent.trim()) : '';
+  }
+  function getTipoActual(){
+    var btn = document.querySelector('#cj_tipo_grp .seg-btn[aria-pressed="true"]');
+    return btn ? btn.getAttribute('data-id') : null;
+  }
+  function computeTotal(tipo, cfg){
+    // 1) Try from config (TIPOS)
+    try{
+      var units = Number((cfg && cfg.adultUnits) || 1);
+      var pa = Number((cfg && cfg.precioAdulto) || 0);
+      var pb = Number((cfg && cfg.precioBebe) || 0);
+      var pn = Number((cfg && cfg.precioNino) || 0);
+      var totalCfg = +(pa*units + pb + pn).toFixed(2);
+      if(totalCfg > 0) return totalCfg;
+    }catch(_){}
+
+    // 2) Fallback: read unit prices from DOM labels next to each row
+    function parseEuros(txt){
+      if(!txt) return 0;
+      var m = String(txt).replace(',', '.').match(/([0-9]+(?:\.[0-9]+)?)/);
+      return m ? Number(m[1]) : 0;
+    }
+    function visible(el){ return el && el.style && el.style.display !== 'none'; }
+
+    var p1 = document.getElementById('cj_precio_adulto');
+    var p2 = document.getElementById('cj_precio_adulto2');
+    var pb = document.getElementById('cj_precio_bebe');
+    var pn = document.getElementById('cj_precio_nino');
+
+    var row2 = document.getElementById('row_adulto2');
+    var rowB = document.getElementById('row_bebe');
+    var rowN = document.getElementById('row_nino');
+
+    var v = 0;
+    var v1 = parseEuros(p1 && p1.textContent);
+    var v2 = parseEuros(p2 && p2.textContent);
+    var vb = parseEuros(pb && pb.textContent);
+    var vn = parseEuros(pn && pn.textContent);
+
+    v += v1;                              // 1ª siempre si existe
+    if(visible(row2)) v += (v2 || v1);    // 2ª: usa su precio o el de la 1ª
+    if(visible(rowB)) v += vb;
+    if(visible(rowN)) v += vn;
+
+    if(v > 0) return +v.toFixed(2);
+
+    // 3) Last resort: leer el total mostrado en pantalla si existe
+    var shown = document.getElementById('cj_total');
+    if(shown){
+      var vs = parseEuros(shown.textContent);
+      if(vs > 0) return +vs.toFixed(2);
+    }
+    return 0;
+  }catch(_){ return 0; }
+  }
+  // Reemplaza el botón para eliminar listeners previos
+  var oldBtn = document.getElementById('cj_add');
+  if(!oldBtn) return;
+  var btn = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(btn, oldBtn);
+
+  btn.addEventListener('click', function(e){
+    if(e){ e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation(); }
+    try{
+      var tipo = (typeof window.__getTipoCJ==="function" ? window.__getTipoCJ() : getTipoActual());
+      // Fallback: si hay 2ª tabla visible, asumimos 'doble_camiseta'
+      try{
+        var row2 = document.getElementById('row_adulto2');
+        if((!tipo || (tipo!=='doble_camiseta' && tipo!=='doble_sudadera')) && row2 && row2.style.display !== 'none'){
+          tipo = 'doble_camiseta';
+        }
+      }catch(_){ }
+
+      var cfg = (typeof TIPOS !== 'undefined' && tipo) ? TIPOS[tipo] : null;
+      var talla1 = getSelectedText('#cj_adulto_grp');
+      var talla2 = getSelectedText('#cj_adulto2_grp');
+      var nombreBase = (cfg && cfg.nombre) ? cfg.nombre : (document.getElementById('row_adulto2') && document.getElementById('row_adulto2').style.display !== 'none' ? 'Doble Camiseta' : 'Conjunto personalizado');
+      var nombre = nombreBase;
+
+      if(tipo === 'doble_camiseta' || tipo === 'doble_sudadera'){
+        nombre += ' — 1ª: ' + (talla1||'-') + ' · 2ª: ' + (talla2||'-');
+      }else if(talla1){
+        nombre += ' — ' + talla1;
+      }
+
+      var precio = computeTotal(tipo, cfg);
+      var desc = (document.getElementById('cj_desc')?.value || '').trim();
+
+      if(typeof addToCart === 'function'){
+        addToCart(nombre, precio, desc);
+        // (Opcional) Abre el carrito automáticamente:
+        try{ if(typeof toggleCart==='function'){ // toggleCart() desactivado: no abrir carrito automáticamente
+} }catch(_){}
+      }else{
+        alert('No se pudo añadir al carrito (addToCart no disponible).');
+      }
+    }catch(err){
+      console.error(err);
+      alert('Ha ocurrido un error al añadir el conjunto.');
+    }
+    return false;
+  });
+})();
+</script>
+
+
+<script>
+// Estado robusto del tipo seleccionado en Conjuntos
+(function(){
+  // Estado global seguro
+  window.__cj_tipo = window.__cj_tipo || null;
+
+  function detectInitialTipo(){
+    var btn = document.querySelector('#cj_tipo_grp .seg-btn[aria-pressed="true"]');
+    return btn ? btn.getAttribute('data-id') : window.__cj_tipo || null;
+  }
+
+  function setTipo(tipo){
+    window.__cj_tipo = tipo;
+    // Marcar visualmente aria-pressed correcto
+    var grp = document.getElementById('cj_tipo_grp');
+    if(grp){
+      grp.querySelectorAll('.seg-btn').forEach(function(b){
+        b.setAttribute('aria-pressed', b.getAttribute('data-id') === tipo ? 'true' : 'false');
+      });
+    }
+    // Toggle 2ª tabla solo para dobles
+    var row2 = document.getElementById('row_adulto2');
+    if(row2){
+      var show = (tipo === 'doble_camiseta' || tipo === 'doble_sudadera');
+      row2.style.display = show ? 'flex' : 'none';
+    }
+    // Actualizar etiquetas de precios desde TIPOS
+    try{
+      if (typeof TIPOS !== 'undefined' && tipo && TIPOS[tipo]){
+        var t = TIPOS[tipo];
+        var pAdulto  = document.getElementById('cj_precio_adulto');
+        var pAdulto2 = document.getElementById('cj_precio_adulto2');
+        var pBebe    = document.getElementById('cj_precio_bebe');
+        var pNino    = document.getElementById('cj_precio_nino');
+        if(pAdulto)  pAdulto.textContent  = `(${Number(t.precioAdulto||0).toFixed(2)} €)`;
+        if(pAdulto2) pAdulto2.textContent = `(${Number(t.precioAdulto||0).toFixed(2)} €)`;
+        if(pBebe)    pBebe.textContent    = `(${Number(t.precioBebe||0).toFixed(2)} €)`;
+        if(pNino)    pNino.textContent    = `(${Number(t.precioNino||0).toFixed(2)} €)`;
+        // Cambiar etiqueta "Adulto" -> "1ª Camiseta" cuando sea doble
+        var lblAdulto = (document.querySelector('#cj_adulto_grp')?.previousElementSibling);
+        if(lblAdulto) lblAdulto.textContent = (t.adultUnits||1)>1 ? '1ª Camiseta:' : 'Adulto:';
+      }
+    }catch(_){}
+  }
+
+  // Init once DOM is ready
+  function initCJ(){
+    var tipoIni = detectInitialTipo();
+    if(!tipoIni){
+      // fallback: si está visible 2ª tabla, asumir doble_camiseta
+      var row2 = document.getElementById('row_adulto2');
+      if(row2 && row2.style.display !== 'none') tipoIni = 'doble_camiseta';
+    }
+    if(tipoIni) setTipo(tipoIni);
+
+    var grp = document.getElementById('cj_tipo_grp');
+    if(grp){
+      grp.querySelectorAll('.seg-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          setTipo(btn.getAttribute('data-id'));
+        });
+      });
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initCJ);
+  }else{
+    initCJ();
+  }
+
+  // Exponer helpers para otros scripts
+  window.__getTipoCJ = function(){ return window.__cj_tipo || detectInitialTipo(); }
+})();
+</script>
+
+
+<script>
+// --- FIX: Handler único y robusto para "Añadir conjunto" (no rompe nada existente) ---
+(function(){
+  function getTipo(){
+    try{
+      var active = document.querySelector('#cj_tipo_grp .seg-btn[aria-pressed="true"]');
+      var tipo = active ? active.getAttribute('data-id') : null;
+      // Fallbacks por UI visible
+      var row2 = document.getElementById('row_adulto2');
+      if((!tipo || (tipo!=='doble_camiseta' && tipo!=='doble_sudadera')) && row2 && row2.style.display !== 'none'){
+        // Si hay 2ª tabla visible, al menos es un "doble"
+        tipo = 'doble_camiseta';
+      }
+      return tipo;
+    }catch(_){ return null; }
+  }
+  function parseEuros(txt){
+    if(!txt) return 0;
+    var t = String(txt).replace(',', '.'); 
+    var m = t.match(/([0-9]+(?:\.[0-9]+)?)/);
+    return m ? Number(m[1]) : 0;
+  }
+  function totalDesdeDOM(){
+    // 1) Preferir total mostrado
+    var shown = document.getElementById('cj_total');
+    var vs = parseEuros(shown && shown.textContent);
+    if(vs > 0) return +vs.toFixed(2);
+
+    // 2) Sumar unitarios visibles
+    var p1 = parseEuros(document.getElementById('cj_precio_adulto')?.textContent);
+    var p2 = parseEuros(document.getElementById('cj_precio_adulto2')?.textContent);
+    var pb = parseEuros(document.getElementById('cj_precio_bebe')?.textContent);
+    var pn = parseEuros(document.getElementById('cj_precio_nino')?.textContent);
+    var row2 = document.getElementById('row_adulto2');
+    var rowB = document.getElementById('row_bebe');
+    var rowN = document.getElementById('row_nino');
+
+    var v = 0;
+    v += p1;
+    if(row2 && row2.style.display !== 'none') v += (p2 || p1);
+    if(rowB && rowB.style.display !== 'none') v += pb;
+    if(rowN && rowN.style.display !== 'none') v += pn;
+    return +v.toFixed(2);
+  }
+  function selectedVal(selector){
+    var el = document.querySelector(selector + ' .pill[aria-pressed="true"]');
+    return el ? (el.getAttribute('data-val') || el.textContent.trim()) : '';
+  }
+
+  var oldBtn = document.getElementById('cj_add');
+  if(!oldBtn) return;
+  // Reemplazar para eliminar posibles listeners múltiples
+  var btn = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(btn, oldBtn);
+
+  btn.addEventListener('click', function(ev){
+    try{
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation) ev.stopImmediatePropagation(); }
+      var tipo = getTipo();
+      var talla1 = selectedVal('#cj_adulto_grp');
+      var talla2 = selectedVal('#cj_adulto2_grp');
+      var nombreBase = (function(){
+  try{
+    if(typeof TIPOS !== 'undefined' && tipo && TIPOS[tipo] && TIPOS[tipo].nombre) return TIPOS[tipo].nombre;
+  }catch(_){}
+  // Fallback: usa el texto del botón activo de tipo
+  var btnAct = document.querySelector('#cj_tipo_grp .seg-btn[aria-pressed="true"]');
+  if(btnAct){
+    var t = (btnAct.textContent || '').trim();
+    if(t) return t;
+  }
+  // Fallback adicional por UI doble
+  var row2 = document.getElementById('row_adulto2');
+  if(row2 && row2.style.display !== 'none') return (tipo==='doble_sudadera' ? 'Doble Sudadera' : 'Doble Camiseta');
+  return 'Conjunto personalizado';
+})();;
+
+      var nombre = nombreBase;
+      if(tipo === 'doble_camiseta' || tipo === 'doble_sudadera'){
+        // Etiquetas de 1ª/2ª
+        var etiqueta = (tipo === 'doble_sudadera') ? ['1ª Sudadera', '2ª Sudadera'] : ['1ª Camiseta', '2ª Camiseta'];
+        nombre += ' — ' + etiqueta[0] + ': ' + (talla1||'-') + ' · ' + etiqueta[1] + ': ' + (talla2||'-');
+      }else{
+        if(talla1) nombre += ' (' + 'Adulto ' + talla1 + ')';
+        var tallaExtra = selectedVal('#cj_bebe_grp') || selectedVal('#cj_nino_grp');
+        if(tallaExtra) nombre += ' · ' + (document.getElementById('row_bebe')?.style.display!=='none' ? 'Bebé ' : 'Niño ') + tallaExtra;
+      }
+
+      var precio = totalDesdeDOM();
+      var desc = (document.getElementById('cj_desc')?.value || '').trim();
+
+      if(typeof addToCart === 'function'){
+        addToCart(nombre, precio, desc);
+        try{ if(typeof toggleCart==='function'){ // toggleCart() desactivado: no abrir carrito automáticamente
+} }catch(_){}
+      }else{
+        alert('No se pudo añadir al carrito (addToCart no disponible).');
+      }
+    }catch(err){
+      console.error(err);
+      alert('Ha ocurrido un error al añadir el conjunto.');
+    }
+    return false;
+  });
+})();
+</script>
+
+
+<script>
+// Evita el parpadeo de "Adulto:" -> "1ª Camiseta:" al cargar
+(function(){
+  function currentTipo(){
+    var a = document.querySelector('#cj_tipo_grp .seg-btn[aria-pressed="true"]');
+    return a ? a.getAttribute('data-id') : null;
+  }
+  function setLabels(tipo){
+    try{
+      var lblAdulto = document.querySelector('#cj_adulto_grp')?.previousElementSibling;
+      var row2 = document.getElementById('row_adulto2');
+      if(!lblAdulto) return;
+      if(tipo === 'doble_camiseta'){
+        lblAdulto.textContent = '1ª Camiseta:';
+        if(row2){ var s = row2.querySelector('.label'); if(s) s.textContent = '2ª Camiseta:'; }
+      }else if(tipo === 'doble_sudadera'){
+        lblAdulto.textContent = '1ª Sudadera:';
+        if(row2){ var s = row2.querySelector('.label'); if(s) s.textContent = '2ª Sudadera:'; }
+      }else{
+        lblAdulto.textContent = 'Adulto:';
+        if(row2){ var s = row2.querySelector('.label'); if(s) s.textContent = '2ª Camiseta:'; }
+      }
+      // Sincroniza precios unitarios rápido para evitar ver 14.99 si corresponde a 16.00
+      if(typeof TIPOS!=='undefined'){
+        var t = TIPOS[tipo] || {};
+        var pAdulto = document.getElementById('cj_precio_adulto');
+        var pAdulto2 = document.getElementById('cj_precio_adulto2');
+        if(pAdulto)  pAdulto.textContent  = `(${Number(t.precioAdulto||0).toFixed(2)} €)`;
+        if(pAdulto2) pAdulto2.textContent = `(${Number(t.precioAdulto||0).toFixed(2)} €)`;
+      }
+    }catch(_){}
+  }
+
+  // Corre lo antes posible: bucle hasta que existan los elementos
+  (function tick(i){
+    var tipo = currentTipo();
+    var ok = document.getElementById('cj_adulto_grp');
+    if(ok && tipo){ setLabels(tipo); return; }
+    if(i>40) return; // ~40 frames máx (~0.6s)
+    if('requestAnimationFrame' in window){
+      requestAnimationFrame(function(){ tick((i||0)+1); });
+    }else{
+      setTimeout(function(){ tick((i||0)+1); }, 15);
+    }
+  })();
+
+  // Reacciona también ante cambios manuales de tipo
+  var grp = document.getElementById('cj_tipo_grp');
+  if(grp){
+    grp.addEventListener('click', function(ev){
+      var btn = ev.target.closest('.seg-btn');
+      if(!btn) return;
+      var tipo = btn.getAttribute('data-id');
+      setLabels(tipo);
+    });
+  }
+})();
+</script>
+
+
+<!-- Información minimalista con recuadro elegante -->
+<div id="info-box-conjuntos" class="info-box">
+  <p>
+    <strong>ℹ️ Información:</strong> En los conjuntos personalizados, el pago se realiza de forma anticipada, con el diseño previamente creado y preparado para el bordado.
+    Para consultas sobre pedidos distintos, dispones de un
+    <a href="https://wa.me/34603603321" target="_blank" rel="noopener">enlace directo a nuestro chat de WhatsApp</a>.
+    También ofrecemos servicio al por mayor y pedidos por encargo.
+  </p>
+</div>
+
 </body>
 </html>
