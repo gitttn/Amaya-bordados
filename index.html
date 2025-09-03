@@ -1408,6 +1408,20 @@ body.modal-open{ overflow: hidden !important; }
 }
 </style>
 
+
+<style>
+/* —— Eliminar barra de desplazamiento del modal —— */
+.zara-modal{
+  overflow: hidden !important;   /* sin scroll interno */
+}
+.zara-modal *{
+  scrollbar-width: none !important;    /* Firefox */
+}
+.zara-modal *::-webkit-scrollbar{
+  display: none !important;            /* Chrome, Safari */
+}
+</style>
+
 </head>
 <body>
 <div style="position: relative; padding: 20px 0; text-align: center;">
