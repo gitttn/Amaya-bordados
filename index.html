@@ -1389,6 +1389,17 @@ body.modal-open{ overflow: hidden !important; }
 .zara-modal-close{ z-index: 10020 !important; }
 </style>
 
+
+<style>
+/* —— Desplazar modal un poco más arriba en móvil —— */
+@media (max-width: 768px){
+  .zara-modal{
+    top: 44% !important;            /* antes 50% */
+    transform: translate(-50%, -50%) !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div style="position: relative; padding: 20px 0; text-align: center;">
