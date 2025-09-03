@@ -1422,6 +1422,37 @@ body.modal-open{ overflow: hidden !important; }
 }
 </style>
 
+
+<style>
+/* —— Bloqueo total de desplazamiento (fondo y modal) —— */
+html, body{
+  overscroll-behavior: none !important;  /* evita rebote */
+}
+
+body.modal-open{
+  overflow: hidden !important; 
+  position: fixed !important;           /* fija la página de fondo */
+  width: 100% !important;
+}
+
+.zara-modal-overlay{
+  overscroll-behavior: contain !important;
+  touch-action: none !important;        /* evita gestos de scroll en overlay */
+}
+
+.zara-modal{
+  overflow: hidden !important;          /* sin scroll interno */
+}
+
+/* Por si alguno de los contenedores internos intentaba forzar scroll */
+.zara-modal .zara-modal-body,
+.zara-modal .zara-modal-footer,
+.zara-modal .zara-modal-info{
+  max-height: none !important;
+  overflow: hidden !important;
+}
+</style>
+
 </head>
 <body>
 <div style="position: relative; padding: 20px 0; text-align: center;">
@@ -3566,6 +3597,46 @@ document.addEventListener("DOMContentLoaded", () => {
   window.closeZaraModal = function(){
     try{ document.body.classList.remove('modal-open'); }catch(e){}
     if (typeof _close === 'function') { return _close(); }
+  };
+})();
+</script>
+
+
+<script>
+(function(){
+  var overlay = document.getElementById('zaraModal');
+  // Interceptar gestos táctiles dentro del modal/overlay
+  function preventTouch(e){ e.preventDefault(); }
+  var _open = window.openZaraModal;
+  window.openZaraModal = function(p,i){
+    document.body.classList.add('modal-open');
+    try{
+      // bloquear desplazamiento táctil
+      var ov = document.getElementById('zaraModal');
+      if (ov && ov.addEventListener){
+        ov.addEventListener('touchmove', preventTouch, { passive: false });
+      }
+      var ov2 = document.querySelector('.zara-modal-overlay');
+      if (ov2 && ov2.addEventListener){
+        ov2.addEventListener('touchmove', preventTouch, { passive: false });
+      }
+    }catch(e){}
+    if (typeof _open === 'function') return _open(p,i);
+  };
+  var _close = window.closeZaraModal;
+  window.closeZaraModal = function(){
+    document.body.classList.remove('modal-open');
+    try{
+      var ov = document.getElementById('zaraModal');
+      if (ov && ov.removeEventListener){
+        ov.removeEventListener('touchmove', preventTouch, { passive: false });
+      }
+      var ov2 = document.querySelector('.zara-modal-overlay');
+      if (ov2 && ov2.removeEventListener){
+        ov2.removeEventListener('touchmove', preventTouch, { passive: false });
+      }
+    }catch(e){}
+    if (typeof _close === 'function') return _close();
   };
 })();
 </script>
