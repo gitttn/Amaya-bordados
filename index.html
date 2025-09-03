@@ -1264,6 +1264,43 @@ body.modal-open{ overflow: hidden; }
 .zara-prev{ left:16px; } .zara-next{ right:16px; }
 .zara-prev:hover, .zara-next:hover{ background: rgba(255,255,255,.85); }
 </style>
+
+<style>
+/* —— FIX Consistencia de tamaño del modal Zara —— */
+/* Usamos una variable --vh actualizable por JS para evitar el bug de 100vh en móviles */
+:root{ --vh: 1vh; }
+
+.zara-modal-overlay{ 
+  align-items: center !important; 
+  justify-content: center !important; 
+  background: rgba(0,0,0,.45) !important;
+  backdrop-filter: blur(2px);
+}
+
+.zara-modal{
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(560px, 94vw) !important;
+  max-height: calc(var(--vh) * 92) !important;  /* estable y consistente */
+  overflow: auto !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  border-radius: 16px !important;
+}
+
+.zara-carousel img#zaraModalImage{
+  width: 100% !important;
+  height: auto !important;
+  max-height: calc(var(--vh) * 50) !important;
+  object-fit: contain !important;
+}
+
+/* Asegura que el botón de cerrar siempre sea clicable */
+.zara-modal-close{ z-index: 10020 !important; }
+</style>
+
 </head>
 <body>
 <div style="position: relative; padding: 20px 0; text-align: center;">
@@ -3383,6 +3420,34 @@ document.addEventListener("DOMContentLoaded", () => {
     También ofrecemos servicio al por mayor y pedidos por encargo.
   </p>
 </div>
+
+
+<script>
+// —— FIX Consistencia altura viewport en móviles ——
+(function(){
+  function setVh(){
+    // 1% del alto real de la ventana visible en este momento
+    var vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', vh + 'px');
+  }
+  // Actualiza al cargar, al cambiar tamaño y orientación
+  window.addEventListener('load', setVh);
+  window.addEventListener('resize', setVh);
+  window.addEventListener('orientationchange', setVh);
+
+  // Enlazamos con tu modal para que al abrir tome el alto correcto
+  var _open = window.openZaraModal;
+  window.openZaraModal = function(product, index){
+    try{ setVh(); document.body.classList.add('modal-open'); }catch(e){}
+    if (typeof _open === 'function') { return _open(product, index); }
+  };
+  var _close = window.closeZaraModal;
+  window.closeZaraModal = function(){
+    try{ document.body.classList.remove('modal-open'); }catch(e){}
+    if (typeof _close === 'function') { return _close(); }
+  };
+})();
+</script>
 
 </body>
 </html>
