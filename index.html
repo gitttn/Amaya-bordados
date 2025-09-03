@@ -1669,7 +1669,7 @@ function cambiarImagen(direccion){
 <div class="zara-modal-overlay" id="zaraModal" style="display:none;">
 <div class="zara-modal">
 <button class="zara-modal-close" onclick="closeZaraModal()">✖</button>
-<div class="zara-carousel"><button aria-label="Anterior" class="zara-prev" onclick="cambiarImagen(-1)" type="button">‹</button><img alt="Imagen del producto" id="zaraModalImage" src=""/><button aria-label="Siguiente" class="zara-next" onclick="cambiarImagen(1)" type="button">›</button></div>
+<div class="zara-carousel"><button aria-label="Anterior" class="zara-prev" onclick="cambiarImagen(-1)" type="button">‹</button><img alt="Imagen del producto" id="zaraModalImage" src=""><button aria-label="Siguiente" class="zara-next" onclick="cambiarImagen(1)" type="button">›</button></img></div>
 <div class="zara-modal-info">
 <h2 id="zaraModalTitle"></h2>
 <p id="zaraModalPrice"></p>
@@ -2208,6 +2208,7 @@ setVH(); window.addEventListener('resize', setVH);
   };
 })();
 </script>
+
 <script>
 // === Datos base de tipos, colores y tallas ===
 const __CONJ_TIPOS = [
