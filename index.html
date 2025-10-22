@@ -1431,6 +1431,14 @@ body.modal-open{ overflow: hidden !important; }
 <div id="envioGratisBarra" style="font-size:13px; color:#555; margin-bottom:10px;"></div>
 <div id="cart"></div>
 <button class="finalizar" onclick="abrirInfo()">Finalizar pedido</button>
+  <!-- Stripe: botón de pago dinámico (Checkout) -->
+  <a id="stripePayCartBtn"
+     href="#"
+     onclick="pagarConStripe(event)"
+     style="display:block;margin-top:10px;text-align:center;padding:12px 0;background:#000;color:#fff;border-radius:8px;font-size:16px;text-decoration:none;">
+     PAGAR AHORA 💳
+  </a>
+
 </div>
 <div class="checkout-window" id="checkoutWindow">
 <button class="close-checkout" onclick="cerrarCheckout()">✖</button>
@@ -3545,6 +3553,84 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof _close === 'function') { return _close(); }
   };
 })();
+</script>
+
+
+<!-- Stripe Checkout (dinámico con backend) -->
+<script src="https://js.stripe.com/v3"></script>
+<script>
+// === CONFIGURA TU CLAVE PÚBLICA DE STRIPE ===
+const STRIPE_PUBLIC_KEY = "pk_live_51RfLmxI0KRqOylszQfHmKx7Eq9R5D6Z7W4D4xoiOWP16Pj7aU0KjmxpIvIDQc75vc8iIbbgjDD4CeTXgBG1wxJv400Ju8YJg2G"; // <-- reemplaza
+
+async function crearSesionCheckoutNetlify(payload){
+  const res = await fetch('/.netlify/functions/crear-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('Netlify endpoint respondió ' + res.status);
+  return await res.json();
+}
+
+async function crearSesionCheckoutVercel(payload){
+  const res = await fetch('/api/crear-checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('Vercel endpoint respondió ' + res.status);
+  return await res.json();
+}
+
+// Convierte el carrito actual en line_items de Stripe
+function buildLineItems(){
+  if(!Array.isArray(carrito) || carrito.length === 0){
+    alert('El carrito está vacío.');
+    return null;
+  }
+  return carrito.map(it => ({
+    price_data: {
+      currency: 'eur',
+      product_data: { name: it.nombre },
+      unit_amount: Math.round(Number(it.precio) * 100) // céntimos
+    },
+    quantity: Number(it.cantidad) || 1
+  }));
+}
+
+async function pagarConStripe(e){
+  if(e) e.preventDefault();
+  try{
+    const line_items = buildLineItems();
+    if(!line_items) return;
+    const stripe = Stripe(STRIPE_PUBLIC_KEY);
+
+    const payload = {
+      line_items,
+      // URLs de redirección: ajusta al dominio donde publiques tu web
+      success_url: window.location.origin + '/success.html',
+      cancel_url: window.location.origin + '/cancel.html',
+      shipping_address_collection: { allowed_countries: ['ES', 'PT', 'FR'] },
+      metadata: { origen: 'amaya-design-web' }
+    };
+
+    let data;
+    // Intento 1: Netlify
+    try{
+      data = await crearSesionCheckoutNetlify(payload);
+    }catch(err){
+      // Intento 2: Vercel (fallback)
+      data = await crearSesionCheckoutVercel(payload);
+    }
+    if(!data || !data.id) throw new Error('No se recibió sessionId');
+
+    const { error } = await stripe.redirectToCheckout({ sessionId: data.id });
+    if(error) alert(error.message || 'Error al redirigir a Stripe');
+  }catch(err){
+    console.error(err);
+    alert('No se pudo iniciar el pago. Revisa la consola para más detalles.');
+  }
+}
 </script>
 
 </body>
